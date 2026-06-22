@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model HeroContent {
+  id                 String @id @default(uuid())
+  label              String
+  heading            String
+  buttonText         String
+  backgroundImageUrl String
+  slideOrder         Int
+}
+
+model AboutSection {
+  id         String @id @default("about")
+  label      String
+  heading    String
+  paragraph  String
+  image1Url  String
+  image2Url  String
+  buttonText String
+}
+
+model Service {
+  id          String @id @default(uuid())
+  iconName    String
+  title       String
+  description String
+  sortOrder   Int
+}
+
+model Project {
+  id            String @id @default(uuid())
+  title         String
+  categoryLabel String
+  imageUrl      String
+  sortOrder     Int
+}
+
+model BlogPost {
+  id            String   @id @default(uuid())
+  title         String
+  excerpt       String
+  imageUrl      String
+  categoryTag   String
+  publishedDate DateTime @default(now())
+  sortOrder     Int
+}
+
+model CtaSection {
+  id                 String @id @default("cta")
+  heading            String
+  subtext            String
+  buttonText         String
+  backgroundImageUrl String
+}
+
+model AdminUser {
+  id             String @id @default(uuid())
+  email          String @unique
+  hashedPassword String
+}
