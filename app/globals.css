@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bone: #FAF7F2;
+  --color-bone-dark: #F0EAE1;
+  --color-charcoal: #121212;
+  --color-charcoal-muted: #3D3D3D;
+  --color-charcoal-light: #6B6B6B;
+  --color-brass: var(--color-charcoal-muted);
+  --color-brass-dark: var(--color-charcoal);
+  --color-brass-light: var(--color-charcoal-light);
+  
+  --color-terracotta: var(--color-charcoal-muted);
+  --color-terracotta-dark: var(--color-charcoal);
+  --color-terracotta-light: var(--color-charcoal-light);
+  --font-serif: "Gotham", "Gotham SSm", "Gotham Pro", var(--font-gotham), "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Gotham", "Gotham SSm", "Gotham Pro", var(--font-gotham), "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --animate-fade-in: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-up: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-up: scale-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scale-up {
+    from {
+      opacity: 0;
+      transform: scale(0.97) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+/* Custom CSS Resets and Utilities */
+:root {
+  color-scheme: light;
+}
+
+::selection {
+  background-color: #121212;
+  color: #FAF7F2;
+}
+
+body {
+  background-color: #FAF7F2;
+  color: #121212;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Elegant gray floating scrollbar design */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A3A3A3;
+  border-radius: 9px;
+  border: 2px solid #FAF7F2; /* floating spacing matching body background */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #737373;
+}
+
+/* Custom transitions and scroll snapping styling for animations */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth motion for dynamic elements */
+.smooth-transition {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px rgba(18, 18, 18, 0.3);
+  color: transparent;
+}
+
