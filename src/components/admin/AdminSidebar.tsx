@@ -33,8 +33,12 @@ export default function AdminSidebar() {
       {/* Sidebar Header */}
       <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold tracking-widest text-white">KALA.</h2>
-          <span className="text-[9px] tracking-wider text-white/40 uppercase">MANAGEMENT</span>
+          <h2 className="text-sm font-bold tracking-widest text-white">
+            KALA DESIGN STUDIO
+          </h2>
+          <span className="text-[9px] tracking-wider text-white/40 uppercase">
+            MANAGEMENT
+          </span>
         </div>
       </div>
 

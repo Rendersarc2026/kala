@@ -1,269 +1,254 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { uploadFile } from "@/lib/upload";
-import { revalidatePath } from "next/cache";
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "An unknown error occurred";
+async function getUploadedUrl(
+  formData: FormData,
+  fieldName: string,
+  existingUrl: string,
+): Promise<string> {
+  const file = formData.get(fieldName);
+  if (file && file instanceof File && file.size > 0) {
+    return await uploadFile(file);
+  }
+  return existingUrl;
 }
 
-// ----------------------------------------------------
-// HERO SLIDES ACTIONS
-// ----------------------------------------------------
+// ─── About ───────────────────────────────────────────────────────────────────
+
+export async function saveAboutSection(formData: FormData) {
+  try {
+    const image1Url = await getUploadedUrl(
+      formData,
+      "image1",
+      formData.get("existingImage1") as string,
+    );
+    const image2Url = await getUploadedUrl(
+      formData,
+      "image2",
+      formData.get("existingImage2") as string,
+    );
+
+    await prisma.aboutSection.upsert({
+      where: { id: "about" },
+      update: {
+        label: formData.get("label") as string,
+        heading: formData.get("heading") as string,
+        paragraph: formData.get("paragraph") as string,
+        image1Url,
+        image2Url,
+        buttonText: formData.get("buttonText") as string,
+      },
+      create: {
+        id: "about",
+        label: formData.get("label") as string,
+        heading: formData.get("heading") as string,
+        paragraph: formData.get("paragraph") as string,
+        image1Url,
+        image2Url,
+        buttonText: formData.get("buttonText") as string,
+      },
+    });
+
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+// ─── Hero Slides ─────────────────────────────────────────────────────────────
 
 export async function saveHeroSlide(formData: FormData) {
   try {
-    const id = formData.get("id") as string | null;
-    const label = formData.get("label") as string;
-    const heading = formData.get("heading") as string;
-    const buttonText = formData.get("buttonText") as string;
-    const slideOrder = parseInt(formData.get("slideOrder") as string) || 1;
-    const file = formData.get("image") as File | null;
+    const backgroundImageUrl = await getUploadedUrl(
+      formData,
+      "image",
+      formData.get("existingImage") as string,
+    );
 
-    let backgroundImageUrl = formData.get("existingImage") as string;
+    const data = {
+      label: formData.get("label") as string,
+      heading: formData.get("heading") as string,
+      buttonText: formData.get("buttonText") as string,
+      backgroundImageUrl,
+      slideOrder: Number(formData.get("slideOrder")),
+    };
 
-    // Check if a new file is uploaded
-    if (file && file.size > 0) {
-      backgroundImageUrl = await uploadFile(file);
-    }
-
+    const id = formData.get("id");
     if (id) {
-      // Update
-      await prisma.heroContent.update({
-        where: { id },
-        data: { label, heading, buttonText, slideOrder, backgroundImageUrl },
-      });
+      await prisma.heroContent.update({ where: { id: id as string }, data });
     } else {
-      // Create
-      await prisma.heroContent.create({
-        data: { label, heading, buttonText, slideOrder, backgroundImageUrl },
-      });
+      await prisma.heroContent.create({ data });
     }
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
 export async function deleteHeroSlide(id: string) {
   try {
     await prisma.heroContent.delete({ where: { id } });
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: "Failed to delete Hero slide" };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
-// ----------------------------------------------------
-// ABOUT SECTION ACTIONS
-// ----------------------------------------------------
-
-export async function saveAboutSection(formData: FormData) {
-  try {
-    const label = formData.get("label") as string;
-    const heading = formData.get("heading") as string;
-    const paragraph = formData.get("paragraph") as string;
-    const buttonText = formData.get("buttonText") as string;
-
-    const file1 = formData.get("image1") as File | null;
-    const file2 = formData.get("image2") as File | null;
-
-    let image1Url = formData.get("existingImage1") as string;
-    let image2Url = formData.get("existingImage2") as string;
-
-    if (file1 && file1.size > 0) {
-      image1Url = await uploadFile(file1);
-    }
-    if (file2 && file2.size > 0) {
-      image2Url = await uploadFile(file2);
-    }
-
-    await prisma.aboutSection.upsert({
-      where: { id: "about" },
-      update: { label, heading, paragraph, buttonText, image1Url, image2Url },
-      create: { id: "about", label, heading, paragraph, buttonText, image1Url, image2Url },
-    });
-
-    revalidatePath("/");
-    return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
-  }
-}
-
-// ----------------------------------------------------
-// SERVICES ACTIONS
-// ----------------------------------------------------
+// ─── Services ────────────────────────────────────────────────────────────────
 
 export async function saveService(formData: FormData) {
   try {
-    const id = formData.get("id") as string | null;
-    const iconName = formData.get("iconName") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const sortOrder = parseInt(formData.get("sortOrder") as string) || 1;
+    const data = {
+      iconName: formData.get("iconName") as string,
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      sortOrder: Number(formData.get("sortOrder")),
+    };
 
+    const id = formData.get("id");
     if (id) {
-      await prisma.service.update({
-        where: { id },
-        data: { iconName, title, description, sortOrder },
-      });
+      await prisma.service.update({ where: { id: id as string }, data });
     } else {
-      await prisma.service.create({
-        data: { iconName, title, description, sortOrder },
-      });
+      await prisma.service.create({ data });
     }
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
 export async function deleteService(id: string) {
   try {
     await prisma.service.delete({ where: { id } });
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: "Failed to delete Service card" };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
-// ----------------------------------------------------
-// PROJECTS SHOWCASE ACTIONS
-// ----------------------------------------------------
+// ─── Projects ────────────────────────────────────────────────────────────────
 
 export async function saveProject(formData: FormData) {
   try {
-    const id = formData.get("id") as string | null;
-    const title = formData.get("title") as string;
-    const categoryLabel = formData.get("categoryLabel") as string;
-    const sortOrder = parseInt(formData.get("sortOrder") as string) || 1;
-    const file = formData.get("image") as File | null;
+    const imageUrl = await getUploadedUrl(
+      formData,
+      "image",
+      formData.get("existingImage") as string,
+    );
 
-    let imageUrl = formData.get("existingImage") as string;
+    const data = {
+      title: formData.get("title") as string,
+      categoryLabel: formData.get("categoryLabel") as string,
+      imageUrl,
+      sortOrder: Number(formData.get("sortOrder")),
+    };
 
-    if (file && file.size > 0) {
-      imageUrl = await uploadFile(file);
-    }
-
+    const id = formData.get("id");
     if (id) {
-      await prisma.project.update({
-        where: { id },
-        data: { title, categoryLabel, sortOrder, imageUrl },
-      });
+      await prisma.project.update({ where: { id: id as string }, data });
     } else {
-      await prisma.project.create({
-        data: { title, categoryLabel, sortOrder, imageUrl },
-      });
+      await prisma.project.create({ data });
     }
 
-    revalidatePath("/");
+    revalidatePath("/projects", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
 export async function deleteProject(id: string) {
   try {
     await prisma.project.delete({ where: { id } });
-    revalidatePath("/");
+    revalidatePath("/projects", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: "Failed to delete Project" };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
-// ----------------------------------------------------
-// BLOG ACTIONS
-// ----------------------------------------------------
+// ─── Blog Posts ──────────────────────────────────────────────────────────────
 
 export async function saveBlogPost(formData: FormData) {
   try {
-    const id = formData.get("id") as string | null;
-    const title = formData.get("title") as string;
-    const excerpt = formData.get("excerpt") as string;
-    const categoryTag = formData.get("categoryTag") as string;
-    const sortOrder = parseInt(formData.get("sortOrder") as string) || 1;
-    const file = formData.get("image") as File | null;
+    const imageUrl = await getUploadedUrl(
+      formData,
+      "image",
+      formData.get("existingImage") as string,
+    );
 
-    let imageUrl = formData.get("existingImage") as string;
+    const data = {
+      title: formData.get("title") as string,
+      excerpt: formData.get("excerpt") as string,
+      imageUrl,
+      categoryTag: formData.get("categoryTag") as string,
+      sortOrder: Number(formData.get("sortOrder")),
+    };
 
-    if (file && file.size > 0) {
-      imageUrl = await uploadFile(file);
-    }
-
+    const id = formData.get("id");
     if (id) {
-      await prisma.blogPost.update({
-        where: { id },
-        data: { title, excerpt, categoryTag, sortOrder, imageUrl },
-      });
+      await prisma.blogPost.update({ where: { id: id as string }, data });
     } else {
-      await prisma.blogPost.create({
-        data: { title, excerpt, categoryTag, sortOrder, imageUrl },
-      });
+      await prisma.blogPost.create({ data });
     }
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
 export async function deleteBlogPost(id: string) {
   try {
     await prisma.blogPost.delete({ where: { id } });
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: "Failed to delete blog post" };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
-// ----------------------------------------------------
-// CTA SECTION ACTIONS
-// ----------------------------------------------------
+// ─── CTA Section ─────────────────────────────────────────────────────────────
 
 export async function saveCtaSection(formData: FormData) {
   try {
-    const heading = formData.get("heading") as string;
-    const subtext = formData.get("subtext") as string;
-    const buttonText = formData.get("buttonText") as string;
-    const file = formData.get("image") as File | null;
-
-    let backgroundImageUrl = formData.get("existingImage") as string;
-
-    if (file && file.size > 0) {
-      backgroundImageUrl = await uploadFile(file);
-    }
+    const backgroundImageUrl = await getUploadedUrl(
+      formData,
+      "image",
+      formData.get("existingImage") as string,
+    );
 
     await prisma.ctaSection.upsert({
       where: { id: "cta" },
-      update: { heading, subtext, buttonText, backgroundImageUrl },
-      create: { id: "cta", heading, subtext, buttonText, backgroundImageUrl },
+      update: {
+        heading: formData.get("heading") as string,
+        subtext: formData.get("subtext") as string,
+        buttonText: formData.get("buttonText") as string,
+        backgroundImageUrl,
+      },
+      create: {
+        id: "cta",
+        heading: formData.get("heading") as string,
+        subtext: formData.get("subtext") as string,
+        buttonText: formData.get("buttonText") as string,
+        backgroundImageUrl,
+      },
     });
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
-  } catch (error: unknown) {
-    console.error(error);
-    return { success: false, error: getErrorMessage(error) };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 }

@@ -9,12 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-gotham)", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "monospace"],
+        serif: ["var(--font-gotham)", "system-ui", "sans-serif"],
+        sans: ["var(--font-gotham)", "system-ui", "sans-serif"],
+        mono: ["var(--font-gotham)", "system-ui", "sans-serif"],
       },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        ivory: {
+          DEFAULT: "#F8F6F2",
+          dark: "#EFECE6",
+        },
+        charcoal: {
+          DEFAULT: "#000000",
+          light: "#6B6B68",
+        },
+        terracotta: "#B8845A",
+        "studio-border": "rgba(0,0,0,0.10)",
+      },
+      letterSpacing: {
+        editorial: "0.18em",
       },
     },
   },

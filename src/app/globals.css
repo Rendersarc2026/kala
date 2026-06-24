@@ -3,59 +3,98 @@
 @tailwind utilities;
 
 :root {
-  --background: #0d0d0d;
-  --foreground: #f5f5f5;
-  --charcoal: #141414;
-  --white: #ffffff;
-  --black: #080808;
+  --ivory:        #F8F6F2;
+  --ivory-dark:   #EFECE6;
+  --charcoal:     #000000;
+  --charcoal-mid: #1a1a1a;
+  --muted:        #6B6B68;
+  --terracotta:   #B8845A;
+  --border:       rgba(0, 0, 0, 0.10);
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--background);
+  background-color: var(--ivory);
 }
 
 body {
-  color: var(--foreground);
-  background-color: var(--background);
-  font-family: var(--font-gotham), sans-serif;
+  color: var(--charcoal);
+  background-color: var(--ivory);
+  font-family: var(--font-gotham), system-ui, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
+/* Scrollbar — warm minimal */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track  { background: var(--ivory-dark); }
+::-webkit-scrollbar-thumb  { background: rgba(28,28,26,0.20); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(28,28,26,0.35); }
 
-::-webkit-scrollbar-track {
-  background: #0d0d0d;
-}
+/* ─── Utility classes ─── */
 
-::-webkit-scrollbar-thumb {
-  background: #262626;
-  border-radius: 3px;
+/* Underline-from-left link animation */
+.nav-link {
+  position: relative;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #404040;
-}
-
-/* Custom Utility Classes */
-.editorial-line {
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
   height: 1px;
   background: currentColor;
-  opacity: 0.15;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
 }
 
-.text-editorial-label {
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
+/* Underline for CTA text links */
+.cta-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.cta-link span.underline-bar {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cta-link:hover span.underline-bar {
+  width: 100%;
+}
+
+/* Section label */
+.label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--muted);
+  font-family: var(--font-gotham), sans-serif;
   font-weight: 500;
-  opacity: 0.6;
 }
 
-.text-editorial-title {
-  font-family: var(--font-gotham), sans-serif;
-  letter-spacing: -0.02em;
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+/* ─── Scroll-reveal animation ─── */
+.project-card {
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.project-card.animate-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
 }

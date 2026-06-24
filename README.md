@@ -1,4 +1,4 @@
-# Kala. | Architecture & Curated Interiors Studio
+# Kala | Architecture & Curated Interiors Studio
 
 Kala is a minimalist, editorial-style website for an architecture and interior design studio. It includes a public-facing website presenting landing sliders, team history (Who We Are), design services, project archives, journal entries, and a protected Admin Dashboard (`/admin`) for full content management.
 

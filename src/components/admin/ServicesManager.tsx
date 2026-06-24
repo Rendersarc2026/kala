@@ -13,15 +13,38 @@ interface Service {
   sortOrder: number;
 }
 
-export default function ServicesManager({ initialServices }: { initialServices: Service[] }) {
+export default function ServicesManager({
+  initialServices,
+}: {
+  initialServices: Service[];
+}) {
   const [services, setServices] = useState<Service[]>(initialServices);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentService, setCurrentService] = useState<Partial<Service> | null>(null);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [currentService, setCurrentService] = useState<Partial<Service> | null>(
+    null,
+  );
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Pick a set of beautiful Lucide icons to offer in a dropdown
-  const availableIcons = ["Compass", "Layers", "Layout", "Sparkles", "PenTool", "Eye", "Wind", "Box"];
+  const availableIcons = [
+    "Home",
+    "Building2",
+    "Coffee",
+    "Briefcase",
+    "ChefHat",
+    "Compass",
+    "Layers",
+    "Layout",
+    "Sparkles",
+    "PenTool",
+    "Eye",
+    "Wind",
+    "Box",
+  ];
 
   const handleEdit = (service: Service) => {
     setCurrentService(service);
@@ -47,9 +70,15 @@ export default function ServicesManager({ initialServices }: { initialServices: 
       const res = await deleteService(id);
       if (res.success) {
         setServices(services.filter((s) => s.id !== id));
-        setMessage({ type: "success", text: "Service card deleted successfully" });
+        setMessage({
+          type: "success",
+          text: "Service card deleted successfully",
+        });
       } else {
-        setMessage({ type: "error", text: res.error || "Failed to delete service" });
+        setMessage({
+          type: "error",
+          text: res.error || "Failed to delete service",
+        });
       }
     } catch {
       setMessage({ type: "error", text: "An error occurred while deleting" });
@@ -76,7 +105,10 @@ export default function ServicesManager({ initialServices }: { initialServices: 
         setMessage({ type: "success", text: "Service saved successfully" });
         window.location.reload();
       } else {
-        setMessage({ type: "error", text: res.error || "Failed to save service" });
+        setMessage({
+          type: "error",
+          text: res.error || "Failed to save service",
+        });
       }
     } catch {
       setMessage({ type: "error", text: "Error saving service card" });
@@ -89,8 +121,12 @@ export default function ServicesManager({ initialServices }: { initialServices: 
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-light uppercase tracking-wide">Studio Services</h1>
-          <p className="text-white/40 text-xs mt-1 uppercase tracking-wider">Manage what we do specialty list</p>
+          <h1 className="text-2xl font-light uppercase tracking-wide">
+            Studio Services
+          </h1>
+          <p className="text-white/40 text-xs mt-1 uppercase tracking-wider">
+            Manage what we do specialty list
+          </p>
         </div>
         <button
           onClick={handleCreateNew}
@@ -212,7 +248,13 @@ export default function ServicesManager({ initialServices }: { initialServices: 
       {/* Grid listing */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => {
-          const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[service.iconName] || LucideIcons.HelpCircle;
+          const Icon =
+            (
+              LucideIcons as unknown as Record<
+                string,
+                React.ComponentType<{ size?: number }>
+              >
+            )[service.iconName] || LucideIcons.HelpCircle;
           return (
             <div
               key={service.id}
