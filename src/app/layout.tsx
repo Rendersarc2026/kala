@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Navbar from "@/components/site/Navbar";
+import Footer from "@/components/site/Footer";
 import "./globals.css";
 
 const gotham = localFont({
@@ -25,8 +27,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${gotham.variable} antialiased bg-ivory text-charcoal`}>
-        {children}
+      <body className={`${gotham.variable} antialiased`}>
+        <Navbar />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
       </body>
     </html>
   );

@@ -93,11 +93,9 @@ const steps = [
 function TimelineCard({
   step,
   align = "left",
-  isActive = false,
 }: {
   step: (typeof steps)[number];
   align?: "left" | "right";
-  isActive?: boolean;
 }) {
   return (
     <motion.div
@@ -179,7 +177,7 @@ export default function ProcessTimeline() {
             {/* Left column (desktop) */}
             <div className="hidden md:flex md:justify-start">
               {isEven && (
-                <TimelineCard step={step} align="left" isActive={isActive} />
+                <TimelineCard step={step} align="left" />
               )}
             </div>
 
@@ -206,12 +204,12 @@ export default function ProcessTimeline() {
             <div className="min-w-0">
               {/* Mobile: always show */}
               <div className="md:hidden">
-                <TimelineCard step={step} align="left" isActive={isActive} />
+                <TimelineCard step={step} align="left" />
               </div>
               {/* Desktop: only odd steps on right */}
               {!isEven && (
                 <div className="hidden md:flex md:justify-end">
-                  <TimelineCard step={step} align="right" isActive={isActive} />
+                  <TimelineCard step={step} align="right" />
                 </div>
               )}
             </div>

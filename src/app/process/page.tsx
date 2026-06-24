@@ -1,8 +1,5 @@
-import Navbar from "@/components/site/Navbar";
-import Footer from "@/components/site/Footer";
 import ProcessTimeline from "@/components/site/ProcessTimeline";
 import Image from "next/image";
-import Link from "next/link";
 
 export const metadata = {
   title: "Our Process | KALA DESIGN STUDIO",
@@ -12,9 +9,7 @@ export const metadata = {
 
 export default function ProcessPage() {
   return (
-    <main className="min-h-screen bg-ivory text-charcoal">
-      <Navbar />
-
+    <>
       <section className="pt-40 pb-16 md:pt-52 md:pb-20 px-8 md:px-14 max-w-7xl mx-auto">
         <p className="label mb-5">How We Work</p>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
@@ -49,8 +44,6 @@ export default function ProcessPage() {
       <section className="py-16 md:py-28 px-8 md:px-14 max-w-7xl mx-auto">
         <ProcessTimeline />
       </section>
-
-      <Footer />
-    </main>
+    </>
   );
 }

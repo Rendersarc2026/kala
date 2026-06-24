@@ -1,10 +1,8 @@
 import { prisma } from "@/lib/db";
-import Navbar from "@/components/site/Navbar";
 import Hero from "@/components/site/Hero";
 import Services from "@/components/site/Services";
 import CoreValues from "@/components/site/CoreValues";
 import Testimonials from "@/components/site/Testimonials";
-import Footer from "@/components/site/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -18,13 +16,11 @@ export default async function HomePage() {
   });
 
   return (
-    <main className="min-h-screen bg-black">
-      <Navbar />
+    <div className="min-h-screen bg-black">
       <Hero slides={slides} />
       <Services services={services} />
       <CoreValues />
       <Testimonials />
-      <Footer />
-    </main>
+    </div>
   );
 }

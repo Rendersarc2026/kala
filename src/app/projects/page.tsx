@@ -1,6 +1,4 @@
 import { prisma } from "@/lib/db";
-import Navbar from "@/components/site/Navbar";
-import Footer from "@/components/site/Footer";
 import ProjectsGrid from "@/components/site/ProjectsGrid";
 
 export const metadata = {
@@ -17,9 +15,7 @@ export default async function ProjectsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-ivory text-charcoal">
-      <Navbar />
-
+    <>
       {/* Page header */}
       <section className="pt-40 pb-12 md:pt-52 md:pb-16 px-8 md:px-14 max-w-7xl mx-auto">
         {/* <h1 className="font-sans text-5xl md:text-7xl font-light text-charcoal leading-tight">
@@ -31,8 +27,6 @@ export default async function ProjectsPage() {
       <section className="pb-24 px-8 md:px-14 max-w-screen-xl mx-auto">
         <ProjectsGrid projects={projects} />
       </section>
-
-      <Footer />
-    </main>
+    </>
   );
 }
