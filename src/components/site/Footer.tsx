@@ -32,7 +32,7 @@ export default function Footer() {
             <nav className="flex flex-col gap-3">
               {[
                 { label: "Featured Projects", href: "/projects" },
-                { label: "Why Choose Us", href: "/why-choose-us" },
+                { label: "Why Choose Us", href: "/about#why-choose-us" },
                 { label: "About & Team", href: "/about" },
                 { label: "Our Process", href: "/process" },
                 { label: "Contact", href: "/contact" },

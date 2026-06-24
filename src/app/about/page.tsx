@@ -3,6 +3,14 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  CheckCircle,
+  Zap,
+  Shield,
+  Clock,
+  HeartHandshake,
+  TrendingUp,
+} from "lucide-react";
 
 export const metadata = {
   title: "About Us & Team | KALA DESIGN STUDIO",
@@ -57,6 +65,57 @@ const team = [
   },
 ];
 
+const reasons = [
+  {
+    icon: CheckCircle,
+    title: "Uncompromising Quality",
+    description:
+      "We hold ourselves to the highest standards at every stage. From concept to completion, each decision is made with intention. Our work speaks through the longevity and coherence of every space.",
+    stat: "100%",
+    statLabel: "Client satisfaction",
+  },
+  {
+    icon: Zap,
+    title: "Decisive Process",
+    description:
+      "We move with clarity. Our structured approach eliminates unnecessary iterations while preserving room for discovery. Clients experience a clear journey from brief to delivery.",
+    stat: "40+",
+    statLabel: "Projects delivered",
+  },
+  {
+    icon: Shield,
+    title: "Trusted Partnership",
+    description:
+      "We treat every client relationship as a long-term partnership. Transparency, honest communication, and respect for your investment are non-negotiables in how we operate.",
+    stat: "12+",
+    statLabel: "Years in practice",
+  },
+  {
+    icon: Clock,
+    title: "Respect for Time & Budget",
+    description:
+      "Architectural projects need not be chaotic. Our project management keeps timelines realistic and budgets disciplined. We plan rigorously so that execution runs smoothly.",
+    stat: "95%",
+    statLabel: "On-time delivery",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Deeply Collaborative",
+    description:
+      "Great design doesn't happen in isolation. Your insights and vision are essential ingredients. Our process draws them out through meaningful dialogue at every stage.",
+    stat: "3",
+    statLabel: "Continents of work",
+  },
+  {
+    icon: TrendingUp,
+    title: "Measurable Impact",
+    description:
+      "Our spaces are designed to function and appreciate over time. Thoughtful design elevates property value, enhances wellbeing, and creates lasting impressions for years to come.",
+    stat: "30%",
+    statLabel: "Avg. property value increase",
+  },
+];
+
 export default async function AboutPage() {
   const about = await prisma.aboutSection.findUnique({
     where: { id: "about" },
@@ -78,9 +137,9 @@ export default async function AboutPage() {
 
       <div className="w-full h-[1px] bg-studio-border" />
 
-      {/* Studio story — asymmetric grid */}
+      {/* About — Studio story */}
       {about && (
-        <section className="py-20 md:py-32 px-8 md:px-14 max-w-7xl mx-auto">
+        <section className="py-20 md:py-32 px-8 md:px-14 max-w-7xl mx-auto" id="about">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16 items-start">
             {/* Images */}
             <div className="lg:col-span-5 relative flex flex-col sm:flex-row gap-5 items-start">
@@ -134,7 +193,7 @@ export default async function AboutPage() {
       )}
 
       {/* Team */}
-      <section className="py-20 md:py-32 bg-ivory-dark border-t border-studio-border">
+      <section className="py-20 md:py-32 bg-ivory-dark border-t border-studio-border" id="team">
         <div className="px-8 md:px-14 max-w-7xl mx-auto">
           <p className="label mb-5">The People</p>
           <h2 className="font-sans text-4xl md:text-5xl font-light text-charcoal mb-16 md:mb-20">
@@ -166,8 +225,63 @@ export default async function AboutPage() {
         </div>
       </section>
 
+      {/* Why Choose Us */}
+      <section className="py-20 md:py-32 bg-ivory border-t border-studio-border" id="why-choose-us">
+        <div className="px-8 md:px-14 max-w-7xl mx-auto">
+          <p className="label mb-5">Our Difference</p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16 md:mb-20">
+            <h2 className="font-sans text-4xl md:text-5xl font-light text-charcoal leading-tight">
+              Why Choose
+              <br />
+              KALA DESIGN STUDIO
+            </h2>
+            <p className="text-sm text-charcoal-light font-sans font-light max-w-xs leading-relaxed">
+              Design should be rigorous, beautiful, and deeply human. Here is what
+              working with us actually means.
+            </p>
+          </div>
+
+          <div className="border-t border-studio-border">
+            {reasons.map((reason, i) => {
+              const Icon = reason.icon;
+              return (
+                <div
+                  key={reason.title}
+                  className="group grid grid-cols-12 gap-4 md:gap-10 py-10 md:py-12 border-b border-studio-border hover:bg-ivory-dark transition-colors duration-500 -mx-3 px-3"
+                >
+                  <div className="col-span-12 md:col-span-2 flex md:flex-col items-center md:items-start gap-3 md:gap-0.5">
+                    <span className="font-sans text-3xl font-light text-charcoal/80">
+                      {reason.stat}
+                    </span>
+                    <span className="label">{reason.statLabel}</span>
+                  </div>
+                  <div className="col-span-12 md:col-span-3 flex items-start gap-4">
+                    <Icon
+                      size={18}
+                      strokeWidth={1.5}
+                      className="text-terracotta mt-1 flex-shrink-0"
+                    />
+                    <h3 className="font-sans text-xl md:text-2xl font-light text-charcoal group-hover:text-terracotta transition-colors duration-300">
+                      {reason.title}
+                    </h3>
+                  </div>
+                  <p className="col-span-12 md:col-span-6 text-sm text-charcoal-light font-sans font-light leading-relaxed">
+                    {reason.description}
+                  </p>
+                  <div className="hidden md:flex md:col-span-1 justify-end items-start pt-1">
+                    <span className="text-[11px] tracking-editorial text-charcoal/20 font-sans">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="py-20 px-8 md:px-14 bg-ivory">
+      <section className="py-20 md:py-28 bg-ivory-dark border-t border-studio-border">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
           <h2 className="font-sans text-3xl md:text-5xl font-light text-charcoal leading-tight">
             Start a conversation

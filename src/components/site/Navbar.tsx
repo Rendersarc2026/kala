@@ -13,7 +13,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { name: "Projects", href: "/projects" },
-  { name: "Why Choose Us", href: "/why-choose-us" },
+  { name: "Why Choose Us", href: "/about#why-choose-us" },
   { name: "About & Team", href: "/about" },
   { name: "Our Process", href: "/process" },
   { name: "Contact", href: "/contact" },
