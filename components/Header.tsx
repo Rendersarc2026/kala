@@ -165,28 +165,38 @@ export default function Header() {
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Transparent Backdrop Click-to-Close Overlay (No dim, no blur) */}
+            {/* Blurred Glassmorphism Backdrop Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-transparent z-40 cursor-pointer pointer-events-auto"
+              className="fixed inset-0 bg-charcoal/30 z-40 cursor-pointer pointer-events-auto"
+              style={{
+                WebkitBackdropFilter: "blur(8px)",
+                backdropFilter: "blur(8px)",
+                willChange: "backdrop-filter",
+              }}
             />
 
             {/* Menu Container */}
             <motion.div
-              initial={{ y: 50, opacity: 0 }}
+              initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ y: 30, opacity: 0 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
             >
               {/* Central Menu Card */}
               <div 
-                className="bg-[#121212]/85 border border-white/10 shadow-2xl backdrop-blur-xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
-                style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
+                className="bg-[#121212]/90 border border-white/10 shadow-2xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
+                style={{ 
+                  WebkitBackdropFilter: "blur(20px)",
+                  backdropFilter: "blur(20px)",
+                  willChange: "transform, backdrop-filter",
+                  transform: "translateZ(0)"
+                }}
               >
                 
                 {/* Small Menu Title */}

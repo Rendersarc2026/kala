@@ -1,47 +1,60 @@
-'use client';
+"use client";
 
-import React, { useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, useScroll, useTransform, useMotionValueEvent, useSpring } from 'framer-motion';
-import { ArrowUpRight, Compass, ShieldCheck, Scale, Leaf, Clock, UserCheck } from 'lucide-react';
+import React, { useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  ArrowUpRight,
+  Compass,
+  ShieldCheck,
+  Scale,
+  Leaf,
+  Clock,
+  UserCheck,
+} from "lucide-react";
 
-import { projects } from '@/data/projects';
-import { testimonials } from '@/data/testimonials';
-import ProjectCard from '@/components/ProjectCard';
-import TestimonialSlider from '@/components/TestimonialSlider';
-
+import { projects } from "@/data/projects";
+import { testimonials } from "@/data/testimonials";
+import ProjectCard from "@/components/ProjectCard";
+import TestimonialSlider from "@/components/TestimonialSlider";
 
 const WHY_CHOOSE_US = [
   {
     icon: Compass,
-    title: 'Customized Designs',
-    description: 'We reject cookie-cutter templates. Every layout, millwork detail, and fabric selection is custom-tailored to your habits.',
+    title: "Customized Designs",
+    description:
+      "We reject cookie-cutter templates. Every layout, millwork detail, and fabric selection is custom-tailored to your habits.",
   },
   {
     icon: ShieldCheck,
-    title: 'Turnkey Solutions',
-    description: 'From structural alterations to placing the final coffee-table book, we manage all design and coordination logistics.',
+    title: "Turnkey Solutions",
+    description:
+      "From structural alterations to placing the final coffee-table book, we manage all design and coordination logistics.",
   },
   {
     icon: Scale,
-    title: 'Transparent Pricing',
-    description: 'Detailed bills of quantities (BOQ) with itemized costs. No hidden fees, surprise markups, or structural cost overruns.',
+    title: "Transparent Pricing",
+    description:
+      "Detailed bills of quantities (BOQ) with itemized costs. No hidden fees, surprise markups, or structural cost overruns.",
   },
   {
     icon: Leaf,
-    title: 'Quality Materials',
-    description: 'We source premium natural stone, sustainable timber, and luxury textiles that age beautifully and last generations.',
+    title: "Quality Materials",
+    description:
+      "We source premium natural stone, sustainable timber, and luxury textiles that age beautifully and last generations.",
   },
   {
     icon: Clock,
-    title: 'On-Time Delivery',
-    description: 'Rigorous project scheduling, buffer management, and vendor coordination ensure we hand over keys on the promised day.',
+    title: "On-Time Delivery",
+    description:
+      "Rigorous project scheduling, buffer management, and vendor coordination ensure we hand over keys on the promised day.",
   },
   {
     icon: UserCheck,
-    title: 'Dedicated Management',
-    description: 'A single point of contact coordinates architects, engineers, and sub-contractors to maintain execution consistency.',
+    title: "Dedicated Management",
+    description:
+      "A single point of contact coordinates architects, engineers, and sub-contractors to maintain execution consistency.",
   },
 ];
 
@@ -94,7 +107,8 @@ export default function Home() {
               transition={{ duration: 1.2, delay: 0.2, ease: easeLarge }}
               className="font-serif text-4xl sm:text-6xl md:text-7xl text-white font-light leading-[1.1] tracking-wide"
             >
-              Architectural purity.<br className="hidden sm:inline" />
+              Architectural purity.
+              <br className="hidden sm:inline" />
               Sensory warmth.
             </motion.h1>
 
@@ -104,7 +118,8 @@ export default function Home() {
               transition={{ duration: 1.2, delay: 0.4, ease: easeLarge }}
               className="font-sans text-sm sm:text-base text-white/70 max-w-md mt-8 font-light tracking-wide leading-relaxed"
             >
-              We sculpt premium residential, commercial, and hospitality interiors that age gracefully.
+              We sculpt premium residential, commercial, and hospitality
+              interiors that age gracefully.
             </motion.p>
           </motion.div>
 
@@ -118,7 +133,7 @@ export default function Home() {
             </span>
             <motion.div
               animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="h-10 w-[1px] bg-white/30"
             />
           </motion.div>
@@ -143,7 +158,9 @@ export default function Home() {
             transition={{ duration: 0.8, ease: easeLarge }}
             className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-charcoal leading-[1.2] font-light max-w-5xl tracking-tight"
           >
-            We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care.
+            We sculpt tactile, honest spaces focused on tectonic integrity and
+            sensory warmth. Trusted by clients who demand precision, beauty, and
+            care.
           </motion.h2>
 
           {/* Centered CTA Button */}
@@ -191,16 +208,22 @@ export default function Home() {
             {featuredProjects.map((project, idx) => {
               // Apply shifting layout classes on desktop for the editorial look
               const isEven = idx % 2 === 0;
-              const desktopOffset = isEven ? 'md:translate-y-0' : 'md:translate-y-16';
+              const desktopOffset = isEven
+                ? "md:translate-y-0"
+                : "md:translate-y-16";
               return (
-                  <motion.div
-                    key={project.slug}
-                    initial={{ opacity: 0, y: 40, scale: 0.92 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: idx * 0.15, ease: easeLarge }}
-                    className={`${desktopOffset}`}
-                  >
+                <motion.div
+                  key={project.slug}
+                  initial={{ opacity: 0, y: 40, scale: 0.92 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: false, amount: 0.15 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: (idx % 2) * 0.1,
+                    ease: easeLarge,
+                  }}
+                  className={`${desktopOffset}`}
+                >
                   <ProjectCard project={project} />
                 </motion.div>
               );
@@ -210,32 +233,49 @@ export default function Home() {
       </section>
 
       {/* 4. STUDIO COMPETENCIES — Scroll-driven horizontal carousel */}
-      <CarouselSection items={WHY_CHOOSE_US} easeLarge={easeLarge} />
+      <CarouselSection items={WHY_CHOOSE_US} />
 
       {/* 5. PROCESS SECTION */}
-      <section className="relative h-screen bg-white border-t border-b border-black/5 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12">
+      <section 
+        className="relative bg-white border-t border-b border-charcoal/5 overflow-hidden w-full"
+        style={{ height: "100vh", minHeight: "100vh" }}
+      >
+        {/* Background Image */}
+        <div className="absolute inset-0 p-6 md:p-12 z-0">
+          <div className="relative w-full h-full overflow-hidden rounded-3xl bg-bone">
+            <motion.div
+              initial={{ scale: 1.08, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 0.95 }}
+              viewport={{ once: false, amount: 0.1 }}
+              transition={{ duration: 1.6, ease: easeLarge }}
+              className="relative w-full h-full"
+            >
+              <Image
+                src="/interior/wallpaperflare.com_wallpaper.jpg"
+                alt="The Path to Sanctuary"
+                fill
+                className="object-cover object-center"
+              />
+            </motion.div>
+          </div>
+        </div>
+        <div className="absolute inset-0 z-10 flex items-center justify-center px-6 md:px-12 pointer-events-none">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeLarge }}
+            viewport={{ once: false, amount: 0.1 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: easeLarge }}
+            className="pointer-events-auto"
           >
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal/50 font-semibold block mb-3">
-              Working Method
-            </span>
-            <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light tracking-wide mb-10">
-              The Path to Sanctuary
-            </h2>
             <Link
               href="/process"
-              className="group relative inline-flex items-center justify-center bg-charcoal text-white hover:bg-terracotta hover:text-white px-10 py-5 transition-all duration-500 font-sans text-xs uppercase tracking-[0.3em] font-bold overflow-hidden"
+              className="group relative inline-flex items-center justify-center bg-charcoal text-white hover:bg-terracotta hover:scale-105 px-14 py-6 rounded-full transition-all duration-500 font-sans text-sm uppercase tracking-[0.25em] font-semibold overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
             >
-              <span className="relative z-10 flex items-center gap-3">
+              <span className="relative z-10 flex items-center gap-4">
                 Explore Our Process
-                <ArrowUpRight className="h-4 w-4 transform transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <ArrowUpRight className="h-5 w-5 transform transition-transform duration-500 group-hover:translate-x-1.5 group-hover:-translate-y-1.5" />
               </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-[0.16,1,0.3,1]" />
             </Link>
           </motion.div>
         </div>
@@ -272,7 +312,8 @@ export default function Home() {
             Let&apos;s design your space.
           </h2>
           <p className="font-sans text-xs sm:text-sm text-white/70 font-light mb-10 max-w-md leading-relaxed tracking-wider">
-            Whether a residential estate, bespoke office, or commercial gallery, let&apos;s shape a tactile, human environment together.
+            Whether a residential estate, bespoke office, or commercial gallery,
+            let&apos;s shape a tactile, human environment together.
           </p>
           <Link
             href="/contact"
@@ -287,175 +328,55 @@ export default function Home() {
   );
 }
 
-function CarouselSection({ items, easeLarge }: { items: typeof WHY_CHOOSE_US; easeLarge: [number, number, number, number] }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [scrollRange, setScrollRange] = React.useState(0);
-  const [currentStep, setCurrentStep] = React.useState(1);
-
-
-
-  const totalSteps = items.length - 2; // For 6 items, this is 4
-
-  React.useEffect(() => {
-    const calculateScrollRange = () => {
-      if (trackRef.current) {
-        const track = trackRef.current;
-        const parent = track.parentElement;
-        if (parent) {
-          const range = track.scrollWidth - parent.clientWidth;
-          setScrollRange(Math.max(range, 0));
-        }
-      }
-    };
-
-    calculateScrollRange();
-    
-    const resizeObserver = new ResizeObserver(() => {
-      calculateScrollRange();
-    });
-    
-    if (trackRef.current) {
-      resizeObserver.observe(trackRef.current);
-    }
-    
-    if (trackRef.current && trackRef.current.parentElement) {
-      resizeObserver.observe(trackRef.current.parentElement);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [items]);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-  });
-
-  const smoothScrollYProgress = useSpring(scrollYProgress, {
-    stiffness: 180,
-    damping: 28,
-    mass: 0.8,
-    restDelta: 0.001
-  });
-
-  const x = useTransform(smoothScrollYProgress, (latest) => latest * -scrollRange);
-
-  useMotionValueEvent(smoothScrollYProgress, "change", (latest) => {
-    // Map scrollYProgress (0 to 1) to step index (1 to totalSteps)
-    const stepVal = Math.min(
-      totalSteps,
-      Math.max(1, Math.round(latest * (totalSteps - 1)) + 1)
-    );
-    setCurrentStep(stepVal);
-  });
-
+function CarouselSection({
+  items,
+}: {
+  items: typeof WHY_CHOOSE_US;
+  easeLarge?: [number, number, number, number];
+}) {
   return (
-    <div ref={containerRef} className="relative h-[300vh] w-full">
-      <section
-        className="sticky top-0 h-screen w-full bg-charcoal overflow-hidden flex flex-col justify-between py-16 md:py-24 transition-colors duration-700"
-      >
-        {/* Decorative background dots pattern */}
-        <div
-          className="absolute inset-0 pointer-events-none z-0 opacity-[0.08]"
-          style={{
-            backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
-
+    <section className="bg-white py-20 md:py-32 border-t border-charcoal/5">
+      <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
         {/* Title */}
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 z-10">
-          <div className="max-w-3xl">
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: easeLarge }}
-              className="font-sans text-[10px] tracking-[0.3em] uppercase text-bone/60 font-semibold block mb-3"
-            >
-              ◆ Studio Competencies
-            </motion.span>
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15, ease: easeLarge }}
-              className="font-serif text-3xl md:text-5xl text-bone font-light leading-tight tracking-wide"
-            >
-              Meticulous in detail, <span className="italic text-bone-dark/80">transparent</span> in execution.
-            </motion.h2>
-          </div>
+        <div className="max-w-3xl mb-12 md:mb-20">
+          <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light leading-tight tracking-wide">
+            Why choose us
+          </h2>
         </div>
 
-        {/* Cards container in the center */}
-        <div className="w-full my-auto flex items-center z-10">
-          <div className="w-full max-w-7xl mx-auto px-6 md:px-12 relative">
-            <div className="overflow-hidden py-4">
-              <motion.div
-                ref={trackRef}
-                style={{ x }}
-                className="flex gap-8 will-change-transform cursor-grab active:cursor-grabbing"
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {items.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={idx}
+                className="relative flex flex-col justify-between p-8 sm:p-10 bg-white border border-charcoal/5 hover:border-charcoal/15 transition-all duration-500 rounded-3xl cursor-pointer shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] group overflow-hidden min-h-[280px]"
               >
-                {items.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 40 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.7, delay: idx * 0.06, ease: easeLarge }}
-                      whileHover={{ y: -10 }}
-                      className="group flex-shrink-0 w-[420px] h-[380px] flex flex-col justify-between p-10 bg-charcoal/90 backdrop-blur-md border border-white/5 hover:border-white/15 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl cursor-pointer"
-                    >
-                      <div className="space-y-6">
-                        <div className="p-3.5 w-fit border border-white/10 bg-white/[0.02] group-hover:bg-bone group-hover:border-bone transition-all duration-500 rounded-xl">
-                          <Icon className="h-6 w-6 text-white/50 group-hover:text-charcoal transition-colors duration-500 stroke-[1.2px]" />
-                        </div>
-                        <h3 className="font-serif text-2xl text-bone/90 font-light group-hover:text-white transition-colors duration-500">
-                          {item.title}
-                        </h3>
-                        <p className="font-sans text-sm text-bone/60 leading-relaxed font-light group-hover:text-bone/85 transition-colors duration-500">
-                          {item.description}
-                        </p>
-                      </div>
-                      
-                      <div className="flex justify-between items-center pt-4 border-t border-white/5 group-hover:border-white/15 transition-colors duration-500">
-                        <span className="font-sans text-[10px] tracking-widest text-white/30 uppercase font-semibold">
-                          0{idx + 1} / 0{items.length}
-                        </span>
-                        <span className="text-white/30 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-500 text-xs">
-                          →
-                        </span>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            </div>
-          </div>
-        </div>
+                {/* Giant background numbers */}
+                <div className="absolute right-6 bottom-4 font-serif text-[8rem] text-charcoal/[0.02] font-light leading-none select-none pointer-events-none group-hover:text-charcoal/[0.04] group-hover:-translate-y-1 transition-all duration-500">
+                  0{idx + 1}
+                </div>
 
-        {/* Step Indicator at the bottom with a modern progress bar */}
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center z-10">
-          <div className="flex items-center gap-4">
-            <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-bone/40 font-semibold">Scroll Progress</span>
-            <div className="h-[2px] w-32 bg-white/15 relative overflow-hidden rounded-full">
-              <motion.div
-                animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                transition={{ type: 'spring', stiffness: 150, damping: 20 }}
-                className="absolute left-0 top-0 bottom-0 bg-bone rounded-full"
-              />
-            </div>
-          </div>
-          <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-bone/45 font-semibold flex items-center gap-2">
-            <span className="text-bone font-bold">0{currentStep}</span>
-            <span className="opacity-45">—</span>
-            <span>0{totalSteps}</span>
-          </div>
+                <div className="flex flex-col gap-6 z-10">
+                  {/* Icon */}
+                  <div className="p-4 w-fit border border-charcoal/10 bg-charcoal/[0.02] group-hover:scale-110 group-hover:border-terracotta group-hover:bg-terracotta transition-all duration-500 rounded-2xl flex-shrink-0">
+                    <Icon className="h-6 w-6 text-charcoal/40 group-hover:text-white transition-colors duration-300 stroke-[1.2px]" />
+                  </div>
+                  {/* Title */}
+                  <h3 className="font-serif text-xl sm:text-2xl text-charcoal/90 font-light group-hover:text-charcoal transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  {/* Description */}
+                  <p className="font-sans text-xs sm:text-sm text-charcoal/50 leading-relaxed font-light group-hover:text-charcoal/80 transition-colors duration-300">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }

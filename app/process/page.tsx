@@ -77,17 +77,11 @@ export default function ProcessPage() {
           transition={{ duration: 1, ease: easeLarge }}
           className="text-center"
         >
-          <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold block mb-4">
-            ◆ Working Method
-          </span>
+         
           <h1 className="font-serif text-4xl md:text-6xl text-charcoal font-light leading-[1.15] tracking-wide mb-6">
-            The Path to Sanctuary
+            Our Process
           </h1>
-          <p className="font-sans text-sm md:text-base text-charcoal-light font-light max-w-2xl mx-auto leading-relaxed">
-            From the first conversation to the final walkthrough, our six-phase
-            design process ensures clarity, craftsmanship, and care at every
-            step.
-          </p>
+          
         </motion.div>
       </section>
 
