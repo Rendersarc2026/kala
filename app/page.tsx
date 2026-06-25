@@ -1,16 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValueEvent, useSpring } from 'framer-motion';
 import { ArrowUpRight, Compass, ShieldCheck, Scale, Leaf, Clock, UserCheck } from 'lucide-react';
 
 import { projects } from '@/data/projects';
 import { testimonials } from '@/data/testimonials';
 import ProjectCard from '@/components/ProjectCard';
 import TestimonialSlider from '@/components/TestimonialSlider';
-import ProcessStrip from '@/components/ProcessStrip';
+
 
 const WHY_CHOOSE_US = [
   {
@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* 1. HERO SECTION (Shrink on scroll animation) */}
-      <div className="relative h-screen w-full bg-bone overflow-hidden">
+      <div className="relative h-screen w-full bg-white overflow-hidden">
         <motion.section
           style={{ scale, borderRadius }}
           className="relative w-full h-full flex items-center justify-center overflow-hidden bg-charcoal origin-top"
@@ -126,7 +126,7 @@ export default function Home() {
       </div>
 
       {/* 2. ABOUT TEASER (Centered layout matching screenshot) */}
-      <section className="py-24 md:py-36 bg-bone overflow-hidden border-b border-charcoal/5">
+      <section className="py-24 md:py-36 bg-white overflow-hidden border-b border-charcoal/5">
         <div className="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
           {/* Subtitle with Diamond */}
           <div className="mb-6">
@@ -166,7 +166,7 @@ export default function Home() {
       </section>
 
       {/* 3. FEATURED PROJECTS (Asymmetric Grid) */}
-      <section className="py-24 md:py-32 bg-bone-dark/20 border-t border-b border-charcoal/5 overflow-hidden">
+      <section className="py-24 md:py-32 bg-white border-t border-b border-charcoal/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-baseline mb-16 md:mb-24 space-y-4 md:space-y-0">
             <div>
@@ -193,14 +193,14 @@ export default function Home() {
               const isEven = idx % 2 === 0;
               const desktopOffset = isEven ? 'md:translate-y-0' : 'md:translate-y-16';
               return (
-                <motion.div
-                  key={project.slug}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1, ease: easeLarge }}
-                  className={`${desktopOffset}`}
-                >
+                  <motion.div
+                    key={project.slug}
+                    initial={{ opacity: 0, y: 40, scale: 0.92 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: idx * 0.15, ease: easeLarge }}
+                    className={`${desktopOffset}`}
+                  >
                   <ProjectCard project={project} />
                 </motion.div>
               );
@@ -209,66 +209,48 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. WHY CHOOSE US */}
-      <section className="py-24 md:py-36 bg-bone overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="max-w-3xl mb-16 md:mb-24">
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold block mb-3">
-              Studio Competencies
-            </span>
-            <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light leading-tight tracking-wide">
-              Meticulous in detail, transparent in execution.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
-            {WHY_CHOOSE_US.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: idx * 0.05, ease: easeLarge }}
-                  className="space-y-4 flex flex-col"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 border border-charcoal/5 bg-bone-dark/30">
-                      <Icon className="h-5 w-5 text-terracotta stroke-[1px]" />
-                    </div>
-                    <h3 className="font-serif text-lg text-charcoal font-medium">
-                      {item.title}
-                    </h3>
-                  </div>
-                  <p className="font-sans text-xs text-charcoal-light leading-relaxed font-light pl-11">
-                    {item.description}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* 4. STUDIO COMPETENCIES — Scroll-driven horizontal carousel */}
+      <CarouselSection items={WHY_CHOOSE_US} easeLarge={easeLarge} />
 
       {/* 5. PROCESS SECTION */}
-      <section className="py-24 md:py-32 bg-bone-dark/10 border-t border-b border-charcoal/5 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-16">
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal-light font-semibold block mb-3">
+      <section className="relative h-screen bg-charcoal border-t border-b border-white/5 overflow-hidden">
+        <Image
+          src="/interior/wallpaperflare.com_wallpaper (4).jpg"
+          alt="Design process background"
+          fill
+          className="object-cover object-center opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/60 z-10" />
+
+        <div className="absolute inset-0 z-20 flex items-center justify-center px-6 md:px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeLarge }}
+          >
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/50 font-semibold block mb-3">
               Working Method
             </span>
-            <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light tracking-wide">
+            <h2 className="font-serif text-3xl md:text-5xl text-white font-light tracking-wide mb-10">
               The Path to Sanctuary
             </h2>
-          </div>
-
-          <ProcessStrip />
+            <Link
+              href="/process"
+              className="group relative inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-10 py-5 transition-all duration-500 font-sans text-xs uppercase tracking-[0.3em] font-bold overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center gap-3">
+                Explore Our Process
+                <ArrowUpRight className="h-4 w-4 transform transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
       {/* 6. TESTIMONIALS */}
-      <section className="py-24 md:py-36 bg-bone overflow-hidden">
+      <section className="py-24 md:py-36 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="mb-12">
             <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold block mb-3">
@@ -307,6 +289,179 @@ export default function Home() {
             <span>Begin Dialogue</span>
             <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
           </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CarouselSection({ items, easeLarge }: { items: typeof WHY_CHOOSE_US; easeLarge: [number, number, number, number] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollRange, setScrollRange] = React.useState(0);
+  const [currentStep, setCurrentStep] = React.useState(1);
+
+  const cardW = 420;
+  const gap = 32;
+  const step = cardW + gap;
+  const totalSteps = items.length - 2; // For 6 items, this is 4
+
+  React.useEffect(() => {
+    const calculateScrollRange = () => {
+      if (trackRef.current) {
+        const track = trackRef.current;
+        const parent = track.parentElement;
+        if (parent) {
+          const range = track.scrollWidth - parent.clientWidth;
+          setScrollRange(Math.max(range, 0));
+        }
+      }
+    };
+
+    calculateScrollRange();
+    
+    const resizeObserver = new ResizeObserver(() => {
+      calculateScrollRange();
+    });
+    
+    if (trackRef.current) {
+      resizeObserver.observe(trackRef.current);
+    }
+    
+    if (trackRef.current && trackRef.current.parentElement) {
+      resizeObserver.observe(trackRef.current.parentElement);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [items]);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+  });
+
+  const smoothScrollYProgress = useSpring(scrollYProgress, {
+    stiffness: 180,
+    damping: 28,
+    mass: 0.8,
+    restDelta: 0.001
+  });
+
+  const x = useTransform(smoothScrollYProgress, (latest) => latest * -scrollRange);
+
+  useMotionValueEvent(smoothScrollYProgress, "change", (latest) => {
+    // Map scrollYProgress (0 to 1) to step index (1 to totalSteps)
+    const stepVal = Math.min(
+      totalSteps,
+      Math.max(1, Math.round(latest * (totalSteps - 1)) + 1)
+    );
+    setCurrentStep(stepVal);
+  });
+
+  return (
+    <div ref={containerRef} className="relative h-[300vh] w-full">
+      <section
+        className="sticky top-0 h-screen w-full bg-terracotta overflow-hidden flex flex-col justify-between py-16 md:py-24 transition-colors duration-700"
+      >
+        {/* Decorative thin background architectural grid lines */}
+        <div className="absolute inset-0 pointer-events-none flex justify-between max-w-7xl mx-auto px-6 md:px-12 z-0 opacity-[0.06]">
+          <div className="w-[1px] h-full bg-bone" />
+          <div className="w-[1px] h-full bg-bone hidden md:block" />
+          <div className="w-[1px] h-full bg-bone hidden md:block" />
+          <div className="w-[1px] h-full bg-bone" />
+        </div>
+
+        {/* Title */}
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 z-10">
+          <div className="max-w-3xl">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: easeLarge }}
+              className="font-sans text-[10px] tracking-[0.3em] uppercase text-bone/60 font-semibold block mb-3"
+            >
+              ◆ Studio Competencies
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15, ease: easeLarge }}
+              className="font-serif text-3xl md:text-5xl text-bone font-light leading-tight tracking-wide"
+            >
+              Meticulous in detail, <span className="italic text-bone-dark/80">transparent</span> in execution.
+            </motion.h2>
+          </div>
+        </div>
+
+        {/* Cards container in the center */}
+        <div className="w-full my-auto flex items-center z-10">
+          <div className="w-full max-w-7xl mx-auto px-6 md:px-12 relative">
+            <div className="overflow-hidden py-4">
+              <motion.div
+                ref={trackRef}
+                style={{ x }}
+                className="flex gap-8 will-change-transform cursor-grab active:cursor-grabbing"
+              >
+                {items.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.7, delay: idx * 0.06, ease: easeLarge }}
+                      whileHover={{ y: -10 }}
+                      className="group flex-shrink-0 w-[420px] h-[380px] flex flex-col justify-between p-10 bg-charcoal/90 backdrop-blur-md border border-white/5 hover:border-white/15 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl cursor-pointer"
+                    >
+                      <div className="space-y-6">
+                        <div className="p-3.5 w-fit border border-white/10 bg-white/[0.02] group-hover:bg-bone group-hover:border-bone transition-all duration-500 rounded-xl">
+                          <Icon className="h-6 w-6 text-white/50 group-hover:text-charcoal transition-colors duration-500 stroke-[1.2px]" />
+                        </div>
+                        <h3 className="font-serif text-2xl text-bone/90 font-light group-hover:text-white transition-colors duration-500">
+                          {item.title}
+                        </h3>
+                        <p className="font-sans text-sm text-bone/60 leading-relaxed font-light group-hover:text-bone/85 transition-colors duration-500">
+                          {item.description}
+                        </p>
+                      </div>
+                      
+                      <div className="flex justify-between items-center pt-4 border-t border-white/5 group-hover:border-white/15 transition-colors duration-500">
+                        <span className="font-sans text-[10px] tracking-widest text-white/30 uppercase font-semibold">
+                          0{idx + 1} / 0{items.length}
+                        </span>
+                        <span className="text-white/30 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-500 text-xs">
+                          →
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        {/* Step Indicator at the bottom with a modern progress bar */}
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center z-10">
+          <div className="flex items-center gap-4">
+            <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-bone/40 font-semibold">Scroll Progress</span>
+            <div className="h-[2px] w-32 bg-white/15 relative overflow-hidden rounded-full">
+              <motion.div
+                animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                className="absolute left-0 top-0 bottom-0 bg-bone rounded-full"
+              />
+            </div>
+          </div>
+          <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-bone/45 font-semibold flex items-center gap-2">
+            <span className="text-bone font-bold">0{currentStep}</span>
+            <span className="opacity-45">—</span>
+            <span>0{totalSteps}</span>
+          </div>
         </div>
       </section>
     </div>

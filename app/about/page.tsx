@@ -179,10 +179,10 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: idx * 0.05, ease: easeLarge }}
-                className="group relative flex flex-col"
+                className="group relative flex flex-col bg-white border border-charcoal/5 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500"
               >
                 {/* Photo with Overlay */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-bone-dark border border-charcoal/5 mb-4">
+                <div className="relative aspect-[3/5] w-full overflow-hidden bg-bone-dark">
                   {!hasError ? (
                     <Image
                       src={member.image}
@@ -210,8 +210,8 @@ export default function About() {
                 </div>
 
                 {/* Details */}
-                <div className="px-1 space-y-1">
-                  <h3 className="font-serif text-lg text-charcoal group-hover:text-terracotta transition-colors duration-300">
+                <div className="px-4 pb-5 pt-4 space-y-1.5 text-center">
+                  <h3 className="font-serif text-xl text-charcoal group-hover:text-terracotta transition-colors duration-300">
                     {member.name}
                   </h3>
                   <p className="font-sans text-xs tracking-wider text-charcoal-light uppercase">

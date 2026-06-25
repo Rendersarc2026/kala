@@ -37,7 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${montserrat.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-bone text-charcoal selection:bg-terracotta selection:text-bone">
+      <body className="min-h-full flex flex-col bg-white text-charcoal selection:bg-terracotta selection:text-bone">
         <Header />
         <main className="flex-grow pt-0">{children}</main>
         <Footer />

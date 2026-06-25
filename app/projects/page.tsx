@@ -64,17 +64,13 @@ export default function ProjectsIndex() {
           })}
         </div>
 
-        {/* Projects Asymmetric Grid */}
+        {/* Projects Grid */}
         <motion.div 
           layout 
-          className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20 md:gap-y-28"
+          className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-32"
         >
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, idx) => {
-              // Create asymmetric offsetting grid on desktop
-              const isEven = idx % 2 === 0;
-              const desktopOffset = isEven ? 'md:translate-y-0' : 'md:translate-y-12';
-              
               return (
                 <motion.div
                   key={project.slug}
@@ -83,7 +79,6 @@ export default function ProjectsIndex() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className={`${desktopOffset}`}
                 >
                   <ProjectCard project={project} />
                 </motion.div>

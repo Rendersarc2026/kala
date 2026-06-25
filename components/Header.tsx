@@ -16,20 +16,36 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const pathname = usePathname();
 
   // Close menu when route changes
   useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
+    if (isMenuOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsMenuOpen(false);
+    }
+  }, [pathname, isMenuOpen]);
 
-  // Automatically open menu when user scrolls to the bottom
+  // Track scroll position for home screen nav reveal
   useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 60);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Automatically open menu when user scrolls to the bottom (home page only)
+  useEffect(() => {
+    if (pathname !== "/") return;
+
     let hasTriggered = false;
 
     const handleScroll = () => {
-      const threshold = 15; // px from bottom
-      const resetThreshold = 80; // px away from bottom to reset the trigger
+      const threshold = 15;
+      const resetThreshold = 80;
       
       const totalHeight = document.documentElement.scrollHeight;
       const visibleHeight = window.innerHeight;
@@ -49,7 +65,7 @@ export default function Header() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [pathname]);
 
   // Determine active page label
   const getActiveLabel = () => {
@@ -90,10 +106,17 @@ export default function Header() {
       {/* 2. BOTTOM FLOATING NAV BAR (Fixed at viewport bottom) */}
       <div className="fixed bottom-8 left-0 right-0 z-50 flex justify-center pointer-events-none px-6">
         <motion.div
+          onClick={() => setIsMenuOpen(true)}
           initial={{ y: 50, opacity: 0 }}
-          animate={isMenuOpen ? { y: 120, opacity: 0 } : { y: 0, opacity: 1 }}
+          animate={
+            isMenuOpen
+              ? { y: 120, opacity: 0 }
+              : isHome && !hasScrolled
+                ? { y: 50, opacity: 0 }
+                : { y: 0, opacity: 1 }
+          }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-[310px] h-14 bg-charcoal/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md flex items-center relative px-6 pointer-events-auto"
+          className="w-full max-w-[310px] h-14 bg-charcoal/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md flex items-center relative px-6 pointer-events-auto cursor-pointer"
         >
           {/* Active Page Name */}
           <span className="font-sans text-[10px] tracking-[0.35em] uppercase font-bold text-bone select-none absolute left-1/2 -translate-x-1/2">
@@ -102,7 +125,7 @@ export default function Header() {
 
           {/* Hamburger Menu Toggle Button */}
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }}
             className="w-6 h-6 flex flex-col justify-center items-center relative focus:outline-none ml-auto"
             aria-label="Toggle navigation menu"
           >
@@ -127,21 +150,21 @@ export default function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setIsMenuOpen(false)}
               className="fixed inset-0 bg-transparent z-40 cursor-pointer pointer-events-auto"
             />
 
             {/* Menu Container */}
             <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
             >
-              {/* Central Menu Card (Translucent Dark Background with Glassmorphism) */}
-              <div className="bg-[#121212]/75 border border-white/10 shadow-2xl backdrop-blur-xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto">
+              {/* Central Menu Card */}
+              <div className="bg-[#121212]/85 border border-white/10 shadow-2xl backdrop-blur-xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto">
                 
                 {/* Small Menu Title */}
                 <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-white/40 block mb-6 text-left">
@@ -205,7 +228,7 @@ export default function Header() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
+              transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
             >
               <button

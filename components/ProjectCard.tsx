@@ -12,7 +12,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ project, className = '' }: ProjectCardProps) {
   return (
     <Link href={`/projects/${project.slug}`} className={`group block ${className}`}>
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-bone-dark mb-4">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-bone-dark mb-4">
         {/* Project Image */}
         <Image
           src={project.heroImage}
@@ -37,18 +37,16 @@ export default function ProjectCard({ project, className = '' }: ProjectCardProp
       </div>
 
       {/* Project Details */}
-      <div className="space-y-1.5 px-1">
-        <div className="flex justify-between items-baseline">
-          <h3 className="font-serif text-lg text-charcoal group-hover:text-terracotta transition-colors duration-300">
-            {project.title}
-          </h3>
-          <span className="font-sans text-[10px] tracking-wider text-charcoal-light uppercase">
-            {project.area}
-          </span>
-        </div>
+      <div className="space-y-1.5 px-1 text-center">
+        <h3 className="font-serif text-lg text-charcoal group-hover:text-terracotta transition-colors duration-300">
+          {project.title}
+        </h3>
         <p className="font-sans text-xs text-charcoal-light font-light">
           {project.location} &bull; {project.year}
         </p>
+        <span className="font-sans text-[10px] tracking-wider text-charcoal-light uppercase block">
+          {project.area}
+        </span>
       </div>
     </Link>
   );
