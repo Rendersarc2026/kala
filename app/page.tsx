@@ -213,31 +213,23 @@ export default function Home() {
       <CarouselSection items={WHY_CHOOSE_US} easeLarge={easeLarge} />
 
       {/* 5. PROCESS SECTION */}
-      <section className="relative h-screen bg-charcoal border-t border-b border-white/5 overflow-hidden">
-        <Image
-          src="/interior/wallpaperflare.com_wallpaper (4).jpg"
-          alt="Design process background"
-          fill
-          className="object-cover object-center opacity-40"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/60 z-10" />
-
-        <div className="absolute inset-0 z-20 flex items-center justify-center px-6 md:px-12">
+      <section className="relative h-screen bg-white border-t border-b border-black/5 overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: easeLarge }}
           >
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/50 font-semibold block mb-3">
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal/50 font-semibold block mb-3">
               Working Method
             </span>
-            <h2 className="font-serif text-3xl md:text-5xl text-white font-light tracking-wide mb-10">
+            <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light tracking-wide mb-10">
               The Path to Sanctuary
             </h2>
             <Link
               href="/process"
-              className="group relative inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-10 py-5 transition-all duration-500 font-sans text-xs uppercase tracking-[0.3em] font-bold overflow-hidden"
+              className="group relative inline-flex items-center justify-center bg-charcoal text-white hover:bg-terracotta hover:text-white px-10 py-5 transition-all duration-500 font-sans text-xs uppercase tracking-[0.3em] font-bold overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-3">
                 Explore Our Process
@@ -301,9 +293,8 @@ function CarouselSection({ items, easeLarge }: { items: typeof WHY_CHOOSE_US; ea
   const [scrollRange, setScrollRange] = React.useState(0);
   const [currentStep, setCurrentStep] = React.useState(1);
 
-  const cardW = 420;
-  const gap = 32;
-  const step = cardW + gap;
+
+
   const totalSteps = items.length - 2; // For 6 items, this is 4
 
   React.useEffect(() => {
@@ -362,15 +353,16 @@ function CarouselSection({ items, easeLarge }: { items: typeof WHY_CHOOSE_US; ea
   return (
     <div ref={containerRef} className="relative h-[300vh] w-full">
       <section
-        className="sticky top-0 h-screen w-full bg-terracotta overflow-hidden flex flex-col justify-between py-16 md:py-24 transition-colors duration-700"
+        className="sticky top-0 h-screen w-full bg-charcoal overflow-hidden flex flex-col justify-between py-16 md:py-24 transition-colors duration-700"
       >
-        {/* Decorative thin background architectural grid lines */}
-        <div className="absolute inset-0 pointer-events-none flex justify-between max-w-7xl mx-auto px-6 md:px-12 z-0 opacity-[0.06]">
-          <div className="w-[1px] h-full bg-bone" />
-          <div className="w-[1px] h-full bg-bone hidden md:block" />
-          <div className="w-[1px] h-full bg-bone hidden md:block" />
-          <div className="w-[1px] h-full bg-bone" />
-        </div>
+        {/* Decorative background dots pattern */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0 opacity-[0.08]"
+          style={{
+            backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+          }}
+        />
 
         {/* Title */}
         <div className="w-full max-w-7xl mx-auto px-6 md:px-12 z-10">

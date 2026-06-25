@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Project } from '@/lib/types';
-import { motion } from 'framer-motion';
+
 
 interface ProjectCardProps {
   project: Project;

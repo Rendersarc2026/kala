@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { teamMembers } from '@/data/team';
-import { Sparkles, ArrowRight } from 'lucide-react';
+
 
 const VALUES = [
   {

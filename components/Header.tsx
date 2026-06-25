@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,14 +18,36 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const pathname = usePathname();
+  const lastOpenedRef = useRef<number>(0);
 
   // Close menu when route changes
   useEffect(() => {
-    if (isMenuOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    const timer = setTimeout(() => {
       setIsMenuOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
+  // Track the timestamp when the menu is opened
+  useEffect(() => {
+    if (isMenuOpen) {
+      lastOpenedRef.current = Date.now();
     }
-  }, [pathname, isMenuOpen]);
+  }, [isMenuOpen]);
+
+  // Close menu when user scrolls (up or down) after a small delay
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleScroll = () => {
+      if (Date.now() - lastOpenedRef.current > 300) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMenuOpen]);
 
   // Track scroll position for home screen nav reveal
   useEffect(() => {
@@ -44,13 +66,13 @@ export default function Header() {
     let hasTriggered = false;
 
     const handleScroll = () => {
-      const threshold = 15;
-      const resetThreshold = 80;
-      
+      const threshold = 50;
+      const resetThreshold = 100;
+
       const totalHeight = document.documentElement.scrollHeight;
       const visibleHeight = window.innerHeight;
       const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-      
+
       const distanceToBottom = totalHeight - visibleHeight - scrollPosition;
 
       if (distanceToBottom <= threshold) {
@@ -82,9 +104,6 @@ export default function Header() {
   const isHeroOverlayPage = isHome || isProjectDetail;
 
   const topTextColor = isHeroOverlayPage ? "text-white" : "text-charcoal";
-  const topMutedColor = isHeroOverlayPage
-    ? "text-white/50"
-    : "text-charcoal/50";
 
   return (
     <>
@@ -117,6 +136,7 @@ export default function Header() {
           }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[310px] h-14 bg-charcoal/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md flex items-center relative px-6 pointer-events-auto cursor-pointer"
+          style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
         >
           {/* Active Page Name */}
           <span className="font-sans text-[10px] tracking-[0.35em] uppercase font-bold text-bone select-none absolute left-1/2 -translate-x-1/2">
@@ -164,7 +184,10 @@ export default function Header() {
               className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
             >
               {/* Central Menu Card */}
-              <div className="bg-[#121212]/85 border border-white/10 shadow-2xl backdrop-blur-xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto">
+              <div 
+                className="bg-[#121212]/85 border border-white/10 shadow-2xl backdrop-blur-xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
+                style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
+              >
                 
                 {/* Small Menu Title */}
                 <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-white/40 block mb-6 text-left">
@@ -211,13 +234,13 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Action Button: Get a Consultation */}
+                {/* Action Button: Contact Us */}
                 <Link
                   href="/contact"
                   className="mt-6 w-full border border-white/10 bg-neutral-900/60 hover:bg-neutral-800 hover:border-white/20 text-white text-[9px] uppercase tracking-[0.25em] font-semibold py-3 px-4 flex items-center justify-center gap-2.5 transition-all duration-300"
                 >
                   <span>&rarr;</span>
-                  <span>Get a Consultation</span>
+                  <span>Contact Us</span>
                 </Link>
 
               </div>
@@ -233,7 +256,8 @@ export default function Header() {
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="w-10 h-10 rounded-full border border-white/15 bg-charcoal/80 backdrop-blur-md text-white hover:bg-white hover:text-charcoal flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xl"
+                className="w-10 h-10 rounded-full border border-white/15 bg-charcoal/80 backdrop-blur-md text-white hover:bg-white hover:text-charcoal flex items-center justify-center transition-colors duration-300 cursor-pointer shadow-2xl"
+                style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />

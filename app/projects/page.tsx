@@ -70,7 +70,7 @@ export default function ProjectsIndex() {
           className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-32"
         >
           <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project, idx) => {
+            {filteredProjects.map((project) => {
               return (
                 <motion.div
                   key={project.slug}

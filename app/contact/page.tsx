@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Phone, CheckCircle, ArrowRight, Send } from 'lucide-react';
+import { Mail, Phone, CheckCircle, Send } from 'lucide-react';
 
 interface FormData {
   name: string;
@@ -119,7 +119,7 @@ export default function Contact() {
               Let&apos;s Design Your Space
             </h1>
             <p className="font-sans text-sm sm:text-base text-charcoal-muted max-w-xl font-light leading-relaxed">
-              Begin the dialogue about your residence, workplace, or hospitality project. Get in touch with our design studio.
+              Contact Us about your residence, workplace, or hospitality project. Get in touch with our design studio.
             </p>
           </motion.section>
 
