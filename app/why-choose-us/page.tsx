@@ -108,20 +108,32 @@ export default function WhyChooseUsPage() {
     <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
       {/* Intro Header */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 mb-20 md:mb-32">
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: easeLarge }}
+          className="mb-8"
+        >
           <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold">
             Our Differentiator
           </span>
-        </div>
+        </motion.div>
 
-        <div className="max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.1, ease: easeLarge }}
+          className="max-w-4xl"
+        >
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl text-charcoal font-light leading-[1.15] tracking-wide">
             Why Choose KALA
           </h1>
           <p className="font-sans text-sm sm:text-base text-charcoal-muted max-w-2xl mt-6 font-light leading-relaxed">
             We bridge the gap between creative architectural design and rigorous engineering execution. Our structured design-build model gives you complete transparency, sensory materiality, and timely project delivery without the stress.
           </p>
-        </div>
+        </motion.div>
       </section>
 
       {/* Differentiators Grid */}
@@ -177,7 +189,13 @@ export default function WhyChooseUsPage() {
       <section className="bg-neutral-50 border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            <div className="lg:col-span-6 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: easeLarge }}
+              className="lg:col-span-6 space-y-6"
+            >
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal-light font-bold">
                 Quality Craftsmanship
               </span>
@@ -196,7 +214,7 @@ export default function WhyChooseUsPage() {
                   <ArrowUpRight className="h-4 w-4 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
             <div className="lg:col-span-6 relative w-full aspect-[4/3] overflow-hidden bg-bone-dark shadow-sm rounded-xl">
               <Image

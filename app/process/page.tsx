@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 
 const PROCESS_STEPS = [
   {
@@ -59,7 +59,7 @@ function TimelineNode({
   scrollYProgress 
 }: { 
   idx: number; 
-  scrollYProgress: any; 
+  scrollYProgress: MotionValue<number>; 
 }) {
   const totalSteps = 6;
   const p_idx = 0.08 + idx * (0.9 - 0.08) / (totalSteps - 1);
@@ -86,7 +86,7 @@ function TimelineContent({
   className,
 }: {
   idx: number;
-  scrollYProgress: any;
+  scrollYProgress: MotionValue<number>;
   children: React.ReactNode;
   className: string;
 }) {

@@ -6,26 +6,41 @@ import { services } from '@/data/services';
 import { ArrowUpRight } from 'lucide-react';
 import AnimatedListItem from '@/components/AnimatedListItem';
 
+import { motion } from 'framer-motion';
+
 export default function Services() {
+  const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
   return (
     <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
       {/* Intro Header */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 mb-20 md:mb-32">
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: easeLarge }}
+          className="mb-8"
+        >
           <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold">
             Capabilities
           </span>
-        </div>
+        </motion.div>
 
-        <div className="max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.1, ease: easeLarge }}
+          className="max-w-4xl"
+        >
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl text-charcoal font-light leading-[1.15] tracking-wide">
             Our Services
           </h1>
           <p className="font-sans text-sm sm:text-base text-charcoal-muted max-w-2xl mt-6 font-light leading-relaxed">
             We provide full-service interior architecture and procurement. From conceptual sketches to site handovers, we align layout coordination and tactile finishes to create balanced, quiet environments.
           </p>
-        </div>
+        </motion.div>
       </section>
 
       {/* Alternating Service Rows */}

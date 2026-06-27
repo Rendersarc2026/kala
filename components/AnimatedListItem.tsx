@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { motion, Variants, useScroll } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 interface AnimatedListItemProps {
   index: number;
@@ -24,39 +24,9 @@ export default function AnimatedListItem({
   description,
   hideBigNumeral = false,
   isDark = false,
+  once = true,
   children,
 }: AnimatedListItemProps) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  
-  // Track local scroll progress of this specific element in the viewport
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-
-  const [animateState, setAnimateState] = React.useState<'hidden' | 'visible'>('hidden');
-
-  React.useEffect(() => {
-    // Set initial animation state on mount based on initial position
-    const initialProgress = scrollYProgress.get();
-    if (initialProgress > 0.08) {
-      setAnimateState('visible');
-    } else {
-      setAnimateState('hidden');
-    }
-
-    // Monitor scroll changes dynamically
-    return scrollYProgress.onChange((latest) => {
-      if (latest <= 0.08) {
-        // Below the viewport bottom threshold -> hide/disappear to the side
-        setAnimateState('hidden');
-      } else {
-        // Inside or above the viewport -> make visible
-        setAnimateState('visible');
-      }
-    });
-  }, [scrollYProgress]);
-
   // Odd-indexed items (1-based "01", index 0) show image on the left, text on the right.
   // Even-indexed items (1-based "02", index 1) show text on the left, image on the right.
   const isEven = index % 2 === 1;
@@ -153,8 +123,10 @@ export default function AnimatedListItem({
   };
 
   return (
-    <div
-      ref={ref}
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, amount: 0.08 }}
       className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center w-full overflow-hidden"
     >
       {/* Image Column */}
@@ -167,8 +139,6 @@ export default function AnimatedListItem({
         {!hideBigNumeral && (
           <motion.div
             variants={numeralVariants}
-            initial="hidden"
-            animate={animateState}
             className={`absolute -top-10 -left-4 sm:-top-16 sm:-left-12 font-serif ${numeralColor} pointer-events-none select-none z-0 hidden sm:block leading-none`}
             style={{ fontSize: 'clamp(4rem, 10vw, 9rem)' }}
           >
@@ -179,16 +149,12 @@ export default function AnimatedListItem({
         {/* 1px offset border rectangle */}
         <motion.div
           variants={borderVariants}
-          initial="hidden"
-          animate={animateState}
           className={`absolute inset-0 border ${borderColor} -translate-x-4 -translate-y-4 md:-translate-x-5 md:-translate-y-5 z-0`}
         />
 
         {/* Actual Image container */}
         <motion.div
           variants={imageVariants}
-          initial="hidden"
-          animate={animateState}
           className="relative aspect-[4/3] w-full overflow-hidden bg-bone-dark z-10 shadow-sm"
         >
           <Image
@@ -204,8 +170,6 @@ export default function AnimatedListItem({
       {/* Text Column */}
       <motion.div
         variants={textVariants}
-        initial="hidden"
-        animate={animateState}
         className={`col-span-1 lg:col-span-6 space-y-4 sm:space-y-6 ${
           isEven ? 'lg:order-1 lg:pr-8' : 'lg:order-2 lg:pl-8'
         }`}
@@ -226,6 +190,6 @@ export default function AnimatedListItem({
         {/* Optional children (e.g. deliverables, links, etc.) */}
         {children}
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

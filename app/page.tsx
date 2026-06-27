@@ -119,24 +119,43 @@ export default function Home() {
       <section className="py-24 md:py-36 bg-white overflow-hidden border-b border-charcoal/5">
         <div className="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
           {/* Subtitle with Diamond */}
-          <div className="mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1, ease: easeLarge }}
+            className="mb-6"
+          >
             <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-charcoal-muted font-bold inline-flex items-center gap-2">
               <span className="text-[7px]">◆</span> About Kala Studio
             </span>
-          </div>
+          </motion.div>
 
           {/* Centered Large Headline */}
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeLarge }}
-            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-charcoal leading-[1.2] font-light max-w-5xl tracking-tight"
-          >
-            We sculpt tactile, honest spaces focused on tectonic integrity and
-            sensory warmth. Trusted by clients who demand precision, beauty, and
-            care.
-          </motion.h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-charcoal leading-[1.2] font-light max-w-5xl tracking-tight">
+            <motion.span
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="inline-flex flex-wrap justify-center"
+              style={{ gap: "0.25em 0" }}
+            >
+              {"We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care.".split(" ").map((word, i) => (
+                <motion.span
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.5, delay: i * 0.04, ease: easeLarge }}
+                  className="inline-block"
+                  style={{ marginRight: "0.25em" }}
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.span>
+          </h2>
 
           {/* Centered CTA Button */}
           <motion.div
@@ -160,32 +179,25 @@ export default function Home() {
       {/* 3. FEATURED PROJECTS (Asymmetric Grid) */}
       <section className="py-24 md:py-32 bg-white border-t border-b border-charcoal/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row justify-between items-baseline mb-16 md:mb-24 space-y-4 md:space-y-0">
-            <div>
+          <div className="mb-16 md:mb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: easeLarge }}
+            >
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal-light font-semibold block mb-3">
                 ◆ Selected Works
               </span>
               <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light tracking-wide">
                 Featured Projects
               </h2>
-            </div>
-            <Link
-              href="/projects"
-              className="group inline-flex items-center justify-center space-x-2 bg-charcoal text-white hover:bg-neutral-800 px-6 py-3.5 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
-            >
-              <span>Explore all works</span>
-              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-white" />
-            </Link>
+            </motion.div>
           </div>
 
-          {/* Asymmetric Desktop Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-36">
+          {/* Symmetric Desktop Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-24">
             {featuredProjects.map((project, idx) => {
-              // Apply shifting layout classes on desktop for the editorial look
-              const isEven = idx % 2 === 0;
-              const desktopOffset = isEven
-                ? "md:translate-y-0"
-                : "md:translate-y-16";
               return (
                 <motion.div
                   key={project.slug}
@@ -197,13 +209,30 @@ export default function Home() {
                     delay: (idx % 2) * 0.1,
                     ease: easeLarge,
                   }}
-                  className={`${desktopOffset}`}
+                  className=""
                 >
                   <ProjectCard project={project} />
                 </motion.div>
               );
             })}
           </div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeLarge }}
+            className="mt-20 md:mt-28 text-center"
+          >
+            <Link
+              href="/projects"
+              className="group inline-flex items-center justify-center space-x-2 bg-charcoal text-white hover:bg-neutral-800 px-8 py-4 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
+            >
+              <span>Explore all works</span>
+              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-white" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -219,12 +248,12 @@ export default function Home() {
           className="relative bg-white border-t border-b border-charcoal/5 overflow-hidden w-full cursor-none"
           style={{ height: "100vh", minHeight: "100vh" }}
         >
-          {/* Background Image (No scaling or zoom animations, no padding or rounded corners) */}
+          {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <div className="relative w-full h-full overflow-hidden bg-bone">
               <div className="relative w-full h-full">
                 <Image
-                  src="/interior/piqsels.com-id-frfbp.jpg"
+                  src="/interior/wallpaperflare.com_wallpaper (3).jpg"
                   alt="The Path to Sanctuary"
                   fill
                   className="object-cover object-center"
@@ -303,14 +332,20 @@ export default function Home() {
       {/* 6. TESTIMONIALS */}
       <section className="py-24 md:py-36 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeLarge }}
+            className="mb-12"
+          >
             <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-terracotta font-semibold block mb-3">
               Client Valuations
             </span>
             <h2 className="font-serif text-3xl md:text-5xl text-charcoal font-light tracking-wide">
               Project Testimonials
             </h2>
-          </div>
+          </motion.div>
 
           <TestimonialSlider testimonials={testimonials} />
         </div>
@@ -327,20 +362,39 @@ export default function Home() {
         <div className="absolute inset-0 bg-charcoal/45 z-10" />
 
         <div className="relative z-20 text-center px-6 max-w-2xl flex flex-col items-center">
-          <h2 className="font-serif text-3xl sm:text-5xl text-white font-light leading-tight tracking-wide mb-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeLarge }}
+            className="font-serif text-3xl sm:text-5xl text-white font-light leading-tight tracking-wide mb-6"
+          >
             Let&apos;s design your space.
-          </h2>
-          <p className="font-sans text-xs sm:text-sm text-white/70 font-light mb-10 max-w-md leading-relaxed tracking-wider">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1, ease: easeLarge }}
+            className="font-sans text-xs sm:text-sm text-white/70 font-light mb-10 max-w-md leading-relaxed tracking-wider"
+          >
             Whether a residential estate, bespoke office, or commercial gallery,
             let&apos;s shape a tactile, human environment together.
-          </p>
-          <Link
-            href="/contact"
-            className="group relative inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-8 py-4 transition-all duration-500 rounded-none shadow-md font-sans text-xs uppercase tracking-widest font-semibold"
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2, ease: easeLarge }}
           >
-            <span>Contact Us</span>
-            <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
-          </Link>
+            <Link
+              href="/contact"
+              className="group relative inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-8 py-4 transition-all duration-500 rounded-none shadow-md font-sans text-xs uppercase tracking-widest font-semibold"
+            >
+              <span>Contact Us</span>
+              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
+            </Link>
+          </motion.div>
         </div>
       </section>
     </div>

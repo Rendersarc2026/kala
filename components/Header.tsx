@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -16,10 +16,18 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
   const pathname = usePathname();
   const lastOpenedRef = useRef<number>(0);
+  const lastScrollY = useRef<number>(0);
+
+  const handleNav = (href: string) => {
+    setIsMenuOpen(false);
+    router.push(href);
+  };
 
   // Close menu when route changes
   useEffect(() => {
@@ -36,14 +44,31 @@ export default function Header() {
     }
   }, [isMenuOpen]);
 
-  // Close menu when user scrolls (up or down) after a small delay
+  // Unified scroll effect: handles bottom nav hiding and menu overlay closing
   useEffect(() => {
-    if (!isMenuOpen) return;
-
     const handleScroll = () => {
-      if (Date.now() - lastOpenedRef.current > 300) {
-        setIsMenuOpen(false);
+      const currentScrollY = window.scrollY;
+
+      // 1. Hide/show bottom nav based on scroll direction
+      if (currentScrollY > 60) {
+        if (currentScrollY < lastScrollY.current) {
+          setIsScrollingUp(true);
+        } else {
+          setIsScrollingUp(false);
+        }
+      } else {
+        setIsScrollingUp(false);
       }
+
+      // 2. Close menu overlay if open and user scrolls in either direction
+      if (isMenuOpen) {
+        const timeElapsed = Date.now() - lastOpenedRef.current;
+        if (Math.abs(currentScrollY - lastScrollY.current) > 5 && timeElapsed > 250) {
+          setIsMenuOpen(false);
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -131,9 +156,11 @@ export default function Header() {
           animate={
             isMenuOpen
               ? { y: 120, opacity: 0 }
-              : isHome && !hasScrolled
-                ? { y: 50, opacity: 0 }
-                : { y: 0, opacity: 1 }
+              : isScrollingUp
+                ? { y: 100, opacity: 0 }
+                : isHome && !hasScrolled
+                  ? { y: 50, opacity: 0 }
+                  : { y: 0, opacity: 1 }
           }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[310px] h-14 bg-charcoal border border-white/10 rounded-full shadow-2xl flex items-center relative px-6 pointer-events-auto cursor-pointer"
@@ -206,15 +233,15 @@ export default function Header() {
                   {NAV_LINKS.map((link) => {
                     const isActive = pathname === link.href;
                     return (
-                      <Link
+                      <button
                         key={link.href}
-                        href={link.href}
-                        className={`font-serif text-3xl sm:text-4xl tracking-wide transition-colors duration-300 font-light hover:text-white ${
+                        onClick={() => handleNav(link.href)}
+                        className={`font-serif text-3xl sm:text-4xl tracking-wide transition-colors duration-300 font-light hover:text-white text-left ${
                           isActive ? "text-white" : "text-white/50"
                         }`}
                       >
                         {link.label}
-                      </Link>
+                      </button>
                     );
                   })}
                 </div>
@@ -222,18 +249,18 @@ export default function Header() {
                 {/* Two Columns of Extra Information */}
                 <div className="grid grid-cols-2 gap-6 border-t border-white/5 pt-6 mt-6 text-left font-sans text-[10px] tracking-wider">
                   <div className="space-y-1">
-                    <Link
-                      href="/about"
-                      className="block text-white/50 hover:text-white transition-colors uppercase"
+                    <button
+                      onClick={() => handleNav("/about")}
+                      className="block text-white/50 hover:text-white transition-colors uppercase text-left w-full"
                     >
                       News
-                    </Link>
-                    <Link
-                      href="/contact"
-                      className="block text-white/50 hover:text-white transition-colors uppercase"
+                    </button>
+                    <button
+                      onClick={() => handleNav("/contact")}
+                      className="block text-white/50 hover:text-white transition-colors uppercase text-left w-full"
                     >
                       Showroom
-                    </Link>
+                    </button>
                   </div>
                   <div className="space-y-1 text-white/40 leading-normal">
                     <p className="text-white/60 font-medium">+1 (555) 0199</p>
@@ -242,13 +269,13 @@ export default function Header() {
                 </div>
 
                 {/* Action Button: Contact Us */}
-                <Link
-                  href="/contact"
-                  className="mt-6 w-full border border-white/10 bg-neutral-900/60 hover:bg-neutral-800 hover:border-white/20 text-white text-[9px] uppercase tracking-[0.25em] font-semibold py-3 px-4 flex items-center justify-center gap-2.5 transition-all duration-300"
+                <button
+                  onClick={() => handleNav("/contact")}
+                  className="mt-6 w-full border border-white/10 bg-neutral-900/60 hover:bg-neutral-800 hover:border-white/20 text-white text-[9px] uppercase tracking-[0.25em] font-semibold py-3 px-4 flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer"
                 >
                   <span>&rarr;</span>
                   <span>Contact Us</span>
-                </Link>
+                </button>
 
               </div>
             </motion.div>
