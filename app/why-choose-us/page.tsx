@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Compass,
   ShieldCheck,
@@ -103,6 +103,7 @@ const COMPARISON = [
 
 export default function WhyChooseUsPage() {
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
   return (
     <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
@@ -136,52 +137,150 @@ export default function WhyChooseUsPage() {
         </motion.div>
       </section>
 
-      {/* Differentiators Grid */}
+      {/* Interactive Differentiators Showcase (Split-screen & Accordion layout instead of cards) */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 mb-24 md:mb-36">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Mobile View (Accordion Style) */}
+        <div className="block lg:hidden space-y-4">
           {WHY_CHOOSE_US.map((item, idx) => {
-            const Icon = item.icon;
+            const isOpen = activeIndex === idx;
             const numeral = `0${idx + 1}`;
             return (
-              <motion.div
+              <div
                 key={item.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: idx * 0.05, ease: easeLarge }}
-                className="group relative bg-white border border-charcoal/5 p-8 flex flex-col justify-between hover:shadow-xl transition-all duration-500 overflow-hidden"
+                className="border-b border-charcoal/10 pb-4 animate-fade-in"
               >
-                {/* Visual Accent */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-bone-dark/20 rounded-full blur-2xl group-hover:bg-terracotta/5 transition-all duration-500" />
-                
-                <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <span className="font-serif text-sm tracking-widest text-terracotta font-medium">
+                <button
+                  onClick={() => setActiveIndex(idx)}
+                  className="w-full flex items-center justify-between py-4 text-left focus:outline-none"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="font-serif text-xs text-terracotta font-medium">
                       {numeral}
                     </span>
-                    <div className="w-12 h-12 rounded-full bg-bone flex items-center justify-center text-charcoal group-hover:bg-terracotta group-hover:text-white transition-all duration-500">
-                      <Icon className="w-5 h-5" />
-                    </div>
+                    <h3 className="font-serif text-lg text-charcoal font-light">
+                      {item.title}
+                    </h3>
                   </div>
+                  <div className={`w-8 h-8 rounded-full bg-bone flex items-center justify-center text-charcoal transition-transform duration-300 ${isOpen ? 'rotate-180 bg-terracotta text-white' : ''}`}>
+                    <span className="text-xs">{isOpen ? '−' : '+'}</span>
+                  </div>
+                </button>
 
-                  <h3 className="font-serif text-xl text-charcoal mb-4 group-hover:text-terracotta transition-colors duration-300">
-                    {item.title}
-                  </h3>
-                  
-                  <p className="font-sans text-xs text-charcoal-muted leading-relaxed font-light mb-6">
-                    {item.description}
-                  </p>
-                </div>
-
-                {/* Hover Reveal Image / Extended Description */}
-                <div className="border-t border-charcoal/5 pt-6 mt-4">
-                  <p className="font-sans text-[11px] text-charcoal-light leading-relaxed font-light">
-                    {item.extended}
-                  </p>
-                </div>
-              </motion.div>
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: isOpen ? "auto" : 0,
+                    opacity: isOpen ? 1 : 0
+                  }}
+                  transition={{ duration: 0.4, ease: easeLarge }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2 pb-4 space-y-4">
+                    <div className="relative w-full aspect-[16/10] overflow-hidden rounded-xl bg-bone">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="font-sans text-xs text-charcoal leading-relaxed font-light">
+                      {item.description}
+                    </p>
+                    <p className="font-sans text-xs text-charcoal-muted leading-relaxed font-light">
+                      {item.extended}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
             );
           })}
+        </div>
+
+        {/* Desktop View (Split-Screen Interactive Magazine-style Showcase) */}
+        <div className="hidden lg:grid grid-cols-12 gap-16 items-start">
+          {/* Left Column: Interactive List */}
+          <div className="col-span-5 space-y-1">
+            {WHY_CHOOSE_US.map((item, idx) => {
+              const isActive = activeIndex === idx;
+              const numeral = `0${idx + 1}`;
+              return (
+                <div
+                  key={item.title}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  onClick={() => setActiveIndex(idx)}
+                  className="group py-6 border-b border-charcoal/10 cursor-pointer transition-all duration-300"
+                >
+                  <div className="flex items-center gap-6">
+                    <span className={`font-serif text-sm tracking-widest transition-colors duration-300 ${isActive ? 'text-terracotta font-medium' : 'text-charcoal-light'}`}>
+                      {numeral}
+                    </span>
+                    <h3 className={`font-serif text-xl transition-all duration-300 ${isActive ? 'text-terracotta font-medium translate-x-2' : 'text-charcoal font-light group-hover:translate-x-1'}`}>
+                      {item.title}
+                    </h3>
+                  </div>
+                  
+                  {/* Subtle reveal of short description for hovered/active item */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: isActive ? "auto" : 0,
+                      opacity: isActive ? 1 : 0,
+                      marginTop: isActive ? 12 : 0
+                    }}
+                    transition={{ duration: 0.35, ease: easeLarge }}
+                    className="overflow-hidden pl-11"
+                  >
+                    <p className="font-sans text-xs text-charcoal-muted leading-relaxed font-light max-w-sm">
+                      {item.description}
+                    </p>
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Right Column: Dynamic Preview Screen */}
+          <div className="col-span-7 sticky top-32">
+            <div className="border border-charcoal/5 rounded-2xl p-8 bg-neutral-50/50 shadow-sm space-y-6">
+              {/* Animated Image Container */}
+              <div className="relative w-full aspect-[16/10] overflow-hidden rounded-xl bg-bone shadow-inner">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeIndex}
+                    initial={{ opacity: 0, scale: 1.05 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.45, ease: easeLarge }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={WHY_CHOOSE_US[activeIndex].image}
+                      alt={WHY_CHOOSE_US[activeIndex].title}
+                      fill
+                      className="object-cover"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Text details for active differentiator */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-white border border-charcoal/5 text-terracotta shadow-sm">
+                    {React.createElement(WHY_CHOOSE_US[activeIndex].icon, { className: "w-5 h-5" })}
+                  </div>
+                  <h4 className="font-serif text-lg text-charcoal font-medium">
+                    {WHY_CHOOSE_US[activeIndex].title}
+                  </h4>
+                </div>
+                
+                <p className="font-sans text-xs text-charcoal-light leading-relaxed font-light">
+                  {WHY_CHOOSE_US[activeIndex].extended}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

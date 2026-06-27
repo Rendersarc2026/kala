@@ -19,7 +19,6 @@ export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const [isScrollingUp, setIsScrollingUp] = useState(false);
   const pathname = usePathname();
   const lastOpenedRef = useRef<number>(0);
   const lastScrollY = useRef<number>(0);
@@ -44,23 +43,12 @@ export default function Header() {
     }
   }, [isMenuOpen]);
 
-  // Unified scroll effect: handles bottom nav hiding and menu overlay closing
+  // Unified scroll effect: handles menu overlay closing
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // 1. Hide/show bottom nav based on scroll direction
-      if (currentScrollY > 60) {
-        if (currentScrollY < lastScrollY.current) {
-          setIsScrollingUp(true);
-        } else {
-          setIsScrollingUp(false);
-        }
-      } else {
-        setIsScrollingUp(false);
-      }
-
-      // 2. Close menu overlay if open and user scrolls in either direction
+      // Close menu overlay if open and user scrolls in either direction
       if (isMenuOpen) {
         const timeElapsed = Date.now() - lastOpenedRef.current;
         if (Math.abs(currentScrollY - lastScrollY.current) > 5 && timeElapsed > 250) {
@@ -156,11 +144,9 @@ export default function Header() {
           animate={
             isMenuOpen
               ? { y: 120, opacity: 0 }
-              : isScrollingUp
-                ? { y: 100, opacity: 0 }
-                : isHome && !hasScrolled
-                  ? { y: 50, opacity: 0 }
-                  : { y: 0, opacity: 1 }
+              : isHome && !hasScrolled
+                ? { y: 50, opacity: 0 }
+                : { y: 0, opacity: 1 }
           }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-[310px] h-14 bg-charcoal border border-white/10 rounded-full shadow-2xl flex items-center relative px-6 pointer-events-auto cursor-pointer"
