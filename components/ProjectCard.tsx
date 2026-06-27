@@ -12,7 +12,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ project, className = '' }: ProjectCardProps) {
   return (
     <Link href={`/projects/${project.slug}`} className={`group block ${className}`}>
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-bone-dark mb-4">
+      <div className="relative aspect-[3/2] w-full overflow-hidden bg-bone-dark mb-4">
         {/* Project Image */}
         <Image
           src={project.heroImage}

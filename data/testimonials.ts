@@ -23,6 +23,7 @@ export const testimonials: Testimonial[] = [
     clientName: 'Clara Hayes',
     location: 'Verdant HQ, San Francisco',
     projectType: 'Commercial',
+    image: '/testimonials/clara.jpg',
   },
   {
     id: '4',

@@ -62,24 +62,24 @@ body {
   overflow-x: hidden;
 }
 
-/* Elegant gray floating scrollbar design */
+/* Minimalist, luxury floating scrollbar design matching editorial theme */
 ::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.02);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #A3A3A3;
-  border-radius: 9px;
-  border: 2px solid #FFFFFF; /* floating spacing matching body background */
+  background: rgba(18, 18, 18, 0.25); /* Muted semi-transparent charcoal */
+  border-radius: 10px;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #737373;
+  background: rgba(18, 18, 18, 0.55); /* Darker on hover for visibility */
 }
 
 /* Custom transitions and scroll snapping styling for animations */

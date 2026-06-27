@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
+  { href: "/why-choose-us", label: "Why Us" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -135,8 +136,8 @@ export default function Header() {
                 : { y: 0, opacity: 1 }
           }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-[310px] h-14 bg-charcoal/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md flex items-center relative px-6 pointer-events-auto cursor-pointer"
-          style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
+          className="w-full max-w-[310px] h-14 bg-charcoal border border-white/10 rounded-full shadow-2xl flex items-center relative px-6 pointer-events-auto cursor-pointer"
+          style={{ transform: "translateZ(0)" }}
         >
           {/* Active Page Name */}
           <span className="font-sans text-[10px] tracking-[0.35em] uppercase font-bold text-bone select-none absolute left-1/2 -translate-x-1/2">
@@ -165,18 +166,17 @@ export default function Header() {
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Blurred Glassmorphism Backdrop Overlay */}
+            {/* Backdrop Overlay (Solid BG with page background blur) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-charcoal/30 z-40 cursor-pointer pointer-events-auto"
+              className="fixed inset-0 bg-charcoal/75 backdrop-blur-sm z-40 cursor-pointer pointer-events-auto"
               style={{
-                WebkitBackdropFilter: "blur(8px)",
-                backdropFilter: "blur(8px)",
-                willChange: "backdrop-filter",
+                WebkitBackdropFilter: "blur(4px)",
+                backdropFilter: "blur(4px)",
               }}
             />
 
@@ -188,13 +188,10 @@ export default function Header() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
             >
-              {/* Central Menu Card */}
+              {/* Central Menu Card (Solid Background, No Glassmorphism) */}
               <div 
-                className="bg-[#121212]/90 border border-white/10 shadow-2xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
+                className="bg-[#121212] border border-white/10 shadow-2xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
                 style={{ 
-                  WebkitBackdropFilter: "blur(20px)",
-                  backdropFilter: "blur(20px)",
-                  willChange: "transform, backdrop-filter",
                   transform: "translateZ(0)"
                 }}
               >
@@ -256,7 +253,7 @@ export default function Header() {
               </div>
             </motion.div>
 
-            {/* Bottom Centered Close Button (with matching Glassmorphism) */}
+            {/* Bottom Centered Close Button (Solid, No Glassmorphism) */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -266,8 +263,7 @@ export default function Header() {
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="w-10 h-10 rounded-full border border-white/15 bg-charcoal/80 backdrop-blur-md text-white hover:bg-white hover:text-charcoal flex items-center justify-center transition-colors duration-300 cursor-pointer shadow-2xl"
-                style={{ willChange: "backdrop-filter", transform: "translateZ(0)" }}
+                className="w-10 h-10 rounded-full border border-white/15 bg-charcoal text-white hover:bg-white hover:text-charcoal flex items-center justify-center transition-colors duration-300 cursor-pointer shadow-2xl"
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />

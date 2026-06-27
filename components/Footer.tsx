@@ -34,6 +34,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/why-choose-us" className="font-sans text-sm text-bone/70 hover:text-terracotta transition-colors font-light">
+                  Why Choose Us
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="font-sans text-sm text-bone/70 hover:text-terracotta transition-colors font-light">
                   Our Story
                 </Link>

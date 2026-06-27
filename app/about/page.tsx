@@ -38,7 +38,7 @@ export default function About() {
   };
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-bone">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
       {/* Editorial Profile / Story */}
       <section className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="mb-8">
@@ -88,7 +88,7 @@ export default function About() {
               sizes="(max-width: 1024px) 100vw, 40vw"
               className="object-cover"
             />
-            <div className="absolute bottom-4 left-4 bg-bone/95 px-4 py-2">
+            <div className="absolute bottom-4 left-4 bg-white/95 px-4 py-2">
               <span className="font-sans text-[9px] tracking-wider text-charcoal uppercase">
                 Maison Serein Project, France
               </span>
@@ -98,7 +98,7 @@ export default function About() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="bg-bone-dark/20 border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
+      <section className="bg-neutral-50 border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
             <div className="space-y-4">

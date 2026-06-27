@@ -29,7 +29,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const nextProject = projects[(projectIndex + 1) % projects.length];
 
   return (
-    <div className="w-full bg-bone">
+    <div className="w-full bg-white">
       {/* 1. Full-Screen Hero */}
       <section className="relative h-[85vh] w-full flex items-end overflow-hidden bg-charcoal">
         <Image
@@ -114,7 +114,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
       </section>
 
       {/* 3. Asymmetric Image Gallery */}
-      <section className="pb-24 md:pb-36 bg-bone overflow-hidden">
+      <section className="pb-24 md:pb-36 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           
           <div className="mb-12">

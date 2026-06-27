@@ -54,21 +54,84 @@ const PROCESS_STEPS = [
   },
 ];
 
+function TimelineNode({ 
+  idx, 
+  scrollYProgress 
+}: { 
+  idx: number; 
+  scrollYProgress: any; 
+}) {
+  const totalSteps = 6;
+  const p_idx = 0.08 + idx * (0.9 - 0.08) / (totalSteps - 1);
+  
+  // Dynamic scale: scales up when scroll reaches it
+  const scale = useTransform(
+    scrollYProgress,
+    [p_idx - 0.06, p_idx],
+    [1, 3.5]
+  );
+
+  return (
+    <motion.div
+      style={{ scale }}
+      className="w-4 h-4 rounded-full bg-charcoal border-2 border-charcoal z-30 transition-shadow duration-300 shadow-sm"
+    />
+  );
+}
+
+function TimelineContent({
+  idx,
+  scrollYProgress,
+  children,
+  className,
+}: {
+  idx: number;
+  scrollYProgress: any;
+  children: React.ReactNode;
+  className: string;
+}) {
+  const totalSteps = 6;
+  const p_idx = 0.08 + idx * (0.9 - 0.08) / (totalSteps - 1);
+  const isEven = idx % 2 === 0;
+
+  // Move towards the edge of the screen slightly:
+  // - Even steps move to the left (-25px)
+  // - Odd steps move to the right (25px)
+  const targetX = isEven ? -25 : 25;
+
+  // Shifts outward and stays shifted on scroll down
+  const x = useTransform(
+    scrollYProgress,
+    [p_idx - 0.12, p_idx],
+    [0, targetX]
+  );
+
+  // Scales up and stays scaled up on scroll down
+  const scale = useTransform(
+    scrollYProgress,
+    [p_idx - 0.12, p_idx],
+    [1, 1.08]
+  );
+
+  return (
+    <motion.div style={{ x, scale }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
 export default function ProcessPage() {
   const timelineRef = useRef<HTMLDivElement>(null);
 
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const easeSmooth: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-  const { scrollYProgress } = useScroll({
-    target: timelineRef,
-    offset: ['start end', 'end start'],
-  });
+  const { scrollYProgress } = useScroll();
 
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const lineHeight = useTransform(scrollYProgress, [0.08, 0.9], ['0%', '100%']);
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-bone">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 mb-20 md:mb-32">
         <motion.div
@@ -91,64 +154,54 @@ export default function ProcessPage() {
         <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-1 bg-charcoal/10 rounded-full z-0" />
         <motion.div
           style={{ height: lineHeight }}
-          className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-1 bg-gradient-to-b from-terracotta to-charcoal rounded-full z-10 origin-top"
+          className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-1 bg-charcoal rounded-full z-10 origin-top"
         />
 
         <div className="relative z-20 space-y-24 md:space-y-36">
           {PROCESS_STEPS.map((step, idx) => {
             const isEven = idx % 2 === 0;
             return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: isEven ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.8, ease: easeSmooth }}
-                className={`relative flex flex-col md:flex-row items-start gap-8 md:gap-16 ${
-                  isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                }`}
-              >
-                {/* Timeline Node */}
-                <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 z-30">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 15,
-                      delay: 0.2,
-                    }}
-                    className="w-5 h-5 rounded-full border-2 border-terracotta bg-bone flex items-center justify-center"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-terracotta" />
-                  </motion.div>
+              <div key={idx} className="relative w-full">
+                {/* Timeline Node - placed outside the moving motion.div so it stays strictly on the center line */}
+                <div className="absolute left-6 md:left-1/2 -translate-y-1/2 md:-translate-x-1/2 top-1/2 z-30">
+                  <TimelineNode idx={idx} scrollYProgress={scrollYProgress} />
                 </div>
 
-                {/* Content */}
-                <div
-                  className={`pl-16 md:pl-0 md:w-[calc(50%-3rem)] ${
-                    isEven ? 'md:text-left md:mr-auto' : 'md:text-right md:ml-auto'
+                <motion.div
+                  initial={{ opacity: 0, x: isEven ? -30 : 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.8, ease: easeSmooth }}
+                  className={`relative flex flex-col md:flex-row items-start gap-8 md:gap-16 ${
+                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
                   }`}
                 >
-                  <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-terracotta font-semibold block mb-2">
-                    Step {step.number}
-                  </span>
-                  <h3 className="font-serif text-2xl md:text-3xl text-charcoal font-light tracking-wide mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="font-sans text-xs md:text-sm text-charcoal-light font-light leading-relaxed mb-4">
-                    {step.description}
-                  </p>
-                  <p className="font-sans text-[11px] text-charcoal/60 font-light leading-relaxed">
-                    {step.details}
-                  </p>
-                </div>
+                  {/* Content */}
+                  <TimelineContent
+                    idx={idx}
+                    scrollYProgress={scrollYProgress}
+                    className={`pl-16 md:pl-0 md:w-[calc(50%-3rem)] ${
+                      isEven ? 'md:text-left md:mr-auto' : 'md:text-right md:ml-auto'
+                    }`}
+                  >
+                    <span className="font-sans text-sm tracking-[0.25em] uppercase text-terracotta font-bold block mb-2">
+                      Step {step.number}
+                    </span>
+                    <h3 className="font-serif text-4xl md:text-5xl text-charcoal font-light tracking-wide mb-4">
+                      {step.title}
+                    </h3>
+                    <p className="font-sans text-base md:text-lg text-charcoal-light font-light leading-relaxed mb-4">
+                      {step.description}
+                    </p>
+                    <p className="font-sans text-sm md:text-base text-charcoal/60 font-light leading-relaxed">
+                      {step.details}
+                    </p>
+                  </TimelineContent>
 
-                {/* Spacer for the other side on desktop */}
-                <div className="hidden md:block md:w-[calc(50%-3rem)]" />
-              </motion.div>
+                  {/* Spacer for the other side on desktop */}
+                  <div className="hidden md:block md:w-[calc(50%-3rem)]" />
+                </motion.div>
+              </div>
             );
           })}
         </div>
