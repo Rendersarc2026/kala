@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
@@ -23,6 +23,13 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
     setDirection(-1);
     setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      handleNext();
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [activeIndex, testimonials.length]);
 
   const activeTestimonial = testimonials[activeIndex];
 

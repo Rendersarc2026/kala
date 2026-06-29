@@ -157,7 +157,7 @@ export default function WhyChooseUsPage() {
                     <span className="font-serif text-xs text-terracotta font-medium">
                       {numeral}
                     </span>
-                    <h3 className="font-serif text-lg text-charcoal font-light">
+                    <h3 className="font-serif text-xl text-charcoal font-light">
                       {item.title}
                     </h3>
                   </div>
@@ -184,7 +184,7 @@ export default function WhyChooseUsPage() {
                         className="object-cover"
                       />
                     </div>
-                    <p className="font-sans text-xs text-charcoal leading-relaxed font-light">
+                    <p className="font-sans text-base text-charcoal leading-relaxed font-light">
                       {item.description}
                     </p>
                     <p className="font-sans text-xs text-charcoal-muted leading-relaxed font-light">
@@ -215,7 +215,7 @@ export default function WhyChooseUsPage() {
                     <span className={`font-serif text-sm tracking-widest transition-colors duration-300 ${isActive ? 'text-terracotta font-medium' : 'text-charcoal-light'}`}>
                       {numeral}
                     </span>
-                    <h3 className={`font-serif text-xl transition-all duration-300 ${isActive ? 'text-terracotta font-medium translate-x-2' : 'text-charcoal font-light group-hover:translate-x-1'}`}>
+                    <h3 className={`font-serif text-2xl transition-all duration-300 ${isActive ? 'text-terracotta font-medium translate-x-2' : 'text-charcoal font-light group-hover:translate-x-1'}`}>
                       {item.title}
                     </h3>
                   </div>
@@ -231,7 +231,7 @@ export default function WhyChooseUsPage() {
                     transition={{ duration: 0.35, ease: easeLarge }}
                     className="overflow-hidden pl-11"
                   >
-                    <p className="font-sans text-xs text-charcoal-muted leading-relaxed font-light max-w-sm">
+                    <p className="font-sans text-lg text-charcoal-muted leading-relaxed font-light max-w-sm">
                       {item.description}
                     </p>
                   </motion.div>
