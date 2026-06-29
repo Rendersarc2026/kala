@@ -122,12 +122,10 @@ function TimelineContent({
 
 export default function ProcessPage() {
   const timelineRef = useRef<HTMLDivElement>(null);
-
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const easeSmooth: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
   const { scrollYProgress } = useScroll();
-
   const lineHeight = useTransform(scrollYProgress, [0.08, 0.9], ['0%', '100%']);
 
   return (
@@ -140,21 +138,19 @@ export default function ProcessPage() {
           transition={{ duration: 1, ease: easeLarge }}
           className="text-center"
         >
-         
           <h1 className="font-serif text-4xl md:text-6xl text-charcoal font-light leading-[1.15] tracking-wide mb-6">
             Our Process
           </h1>
-          
         </motion.div>
       </section>
 
       {/* Vertical Timeline */}
       <section ref={timelineRef} className="relative max-w-5xl mx-auto px-6">
-        {/* Vertical Progress Line */}
-        <div className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-1 bg-charcoal/10 rounded-full z-0" />
+        {/* Vertical Progress Line (only visible on desktop center) */}
+        <div className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 bottom-0 w-1 bg-charcoal/10 rounded-full z-0" />
         <motion.div
           style={{ height: lineHeight }}
-          className="absolute left-6 md:left-1/2 md:-translate-x-1/2 top-0 w-1 bg-charcoal rounded-full z-10 origin-top"
+          className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 w-1 bg-charcoal rounded-full z-10 origin-top"
         />
 
         <div className="relative z-20 space-y-24 md:space-y-36">
@@ -162,45 +158,74 @@ export default function ProcessPage() {
             const isEven = idx % 2 === 0;
             return (
               <div key={idx} className="relative w-full">
-                {/* Timeline Node - placed outside the moving motion.div so it stays strictly on the center line */}
-                <div className="absolute left-6 md:left-1/2 -translate-y-1/2 md:-translate-x-1/2 top-1/2 z-30">
-                  <TimelineNode idx={idx} scrollYProgress={scrollYProgress} />
-                </div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: isEven ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-80px' }}
-                  transition={{ duration: 0.8, ease: easeSmooth }}
-                  className={`relative flex flex-col md:flex-row items-start gap-8 md:gap-16 ${
-                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
-                >
-                  {/* Content */}
-                  <TimelineContent
-                    idx={idx}
-                    scrollYProgress={scrollYProgress}
-                    className={`pl-16 md:pl-0 md:w-[calc(50%-3rem)] ${
-                      isEven ? 'md:text-left md:mr-auto' : 'md:text-right md:ml-auto'
-                    }`}
+                
+                {/* 1. MOBILE & TABLET LAYOUT (block lg:hidden) */}
+                <div className="block lg:hidden">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 0.8, ease: easeSmooth }}
+                    className="relative flex flex-col items-start pl-0"
                   >
                     <span className="font-sans text-sm tracking-[0.25em] uppercase text-terracotta font-bold block mb-2">
                       Step {step.number}
                     </span>
-                    <h3 className="font-serif text-4xl md:text-5xl text-charcoal font-light tracking-wide mb-4">
+                    <h3 className="font-serif text-3xl sm:text-4xl text-charcoal font-light tracking-wide mb-4">
                       {step.title}
                     </h3>
-                    <p className="font-sans text-base md:text-lg text-charcoal-light font-light leading-relaxed mb-4">
+                    <p className="font-sans text-base text-charcoal-light font-light leading-relaxed mb-4">
                       {step.description}
                     </p>
-                    <p className="font-sans text-sm md:text-base text-charcoal/60 font-light leading-relaxed">
+                    <p className="font-sans text-sm text-charcoal/60 font-light leading-relaxed">
                       {step.details}
                     </p>
-                  </TimelineContent>
+                  </motion.div>
+                </div>
 
-                  {/* Spacer for the other side on desktop */}
-                  <div className="hidden md:block md:w-[calc(50%-3rem)]" />
-                </motion.div>
+                {/* 2. DESKTOP TIMELINE LAYOUT (hidden lg:block) */}
+                <div className="hidden lg:block">
+                  {/* Timeline Node - centered horizontally and vertically */}
+                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-30">
+                    <TimelineNode idx={idx} scrollYProgress={scrollYProgress} />
+                  </div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: isEven ? -30 : 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 0.8, ease: easeSmooth }}
+                    className={`relative flex flex-row items-start gap-16 ${
+                      isEven ? 'flex-row' : 'flex-row-reverse'
+                    }`}
+                  >
+                    {/* Content */}
+                    <TimelineContent
+                      idx={idx}
+                      scrollYProgress={scrollYProgress}
+                      className={`w-[calc(50%-3rem)] ${
+                        isEven ? 'text-left mr-auto' : 'text-right ml-auto'
+                      }`}
+                    >
+                      <span className="font-sans text-sm tracking-[0.25em] uppercase text-terracotta font-bold block mb-2">
+                        Step {step.number}
+                      </span>
+                      <h3 className="font-serif text-5xl text-charcoal font-light tracking-wide mb-4">
+                        {step.title}
+                      </h3>
+                      <p className="font-sans text-lg text-charcoal-light font-light leading-relaxed mb-4">
+                        {step.description}
+                      </p>
+                      <p className="font-sans text-base text-charcoal/60 font-light leading-relaxed">
+                        {step.details}
+                      </p>
+                    </TimelineContent>
+
+                    {/* Spacer for the other side */}
+                    <div className="w-[calc(50%-3rem)]" />
+                  </motion.div>
+                </div>
+
               </div>
             );
           })}

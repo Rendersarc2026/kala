@@ -12,7 +12,6 @@ const NAV_LINKS = [
   { href: "/services", label: "Services" },
   { href: "/why-choose-us", label: "Why Us" },
   { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
@@ -106,6 +105,7 @@ export default function Header() {
   // Determine active page label
   const getActiveLabel = () => {
     if (pathname === "/") return "Home";
+    if (pathname.startsWith("/contact")) return "Contact";
     const link = NAV_LINKS.find(
       (l) => l.href !== "/" && pathname.startsWith(l.href),
     );
