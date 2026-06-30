@@ -9,7 +9,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-space-grotesk",
   display: "swap",
 });
@@ -84,45 +84,42 @@ export default function Home() {
           {/* Hero Content */}
           <motion.div
             style={{ opacity }}
-            className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 pb-16 md:pb-24 flex flex-col md:flex-row md:items-end md:justify-between gap-12 text-left pointer-events-auto"
+            className="relative z-20 w-full px-4 sm:px-6 md:px-8 pb-40 md:pb-24 flex flex-col items-center md:items-start justify-end text-center md:text-left pointer-events-auto"
           >
             {/* Left Column: Eyebrow + Staggered Headline */}
-            <div className="flex flex-col max-w-2xl">
+            <div className="flex flex-col items-center md:items-start max-w-2xl w-full">
               <motion.span
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.0, ease: easeLarge }}
-                className="font-sans text-[10px] uppercase tracking-[0.35em] text-paper/70 font-semibold mb-6 flex items-center gap-2"
+                className="font-sans text-[10px] uppercase tracking-[0.35em] text-paper/70 font-semibold mb-6 flex items-center justify-center md:justify-start gap-2"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-brass-accent" />{" "}
-                EST. 2018 / ARCHITECTURAL STUDIO
+                <span className="w-1.5 h-1.5 rounded-full bg-brass-accent" /> From concept to completion.
               </motion.span>
 
-              <h1 className="font-space-grotesk text-5xl sm:text-7xl lg:text-8xl font-bold text-paper leading-[0.95] tracking-tight uppercase">
+              <h1 className="font-space-grotesk text-4xl sm:text-7xl lg:text-8xl font-light text-paper leading-[0.95] tracking-tight uppercase">
                 <span className="block overflow-hidden py-1">
-                  <motion.span
+                  <motion.span 
                     initial={{ y: "100%" }}
                     animate={{ y: 0 }}
                     transition={{ duration: 1.1, ease: easeLarge }}
-                    className="block"
+                    className="block whitespace-nowrap"
                   >
-                    ARCHITECTURAL
+                    WE TURN SPACE
                   </motion.span>
                 </span>
                 <span className="block overflow-hidden py-1">
-                  <motion.span
+                  <motion.span 
                     initial={{ y: "100%" }}
                     animate={{ y: 0 }}
                     transition={{ duration: 1.1, delay: 0.1, ease: easeLarge }}
-                    className="block text-brass-accent"
+                    className="block text-brass-accent whitespace-nowrap"
                   >
-                    PURITY.
+                    INTO PLACE
                   </motion.span>
                 </span>
               </h1>
             </div>
-
-            {/* Right Column: Paragraph + CTA */}
           </motion.div>
         </motion.section>
       </div>
