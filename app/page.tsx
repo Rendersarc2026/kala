@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div className={`${spaceGrotesk.variable} ${inter.variable} w-full`}>
       {/* 1. HERO SECTION */}
-      <div className="relative h-screen w-full bg-paper overflow-hidden">
+      <div className="relative h-screen w-full bg-white overflow-hidden">
         <motion.section
           style={{ scale, borderRadius }}
           className="relative w-full h-full flex items-end justify-center overflow-hidden bg-ink"
@@ -88,6 +88,16 @@ export default function Home() {
           >
             {/* Left Column: Eyebrow + Staggered Headline */}
             <div className="flex flex-col max-w-2xl">
+              <motion.span
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.0, ease: easeLarge }}
+                className="font-sans text-[10px] uppercase tracking-[0.35em] text-paper/70 font-semibold mb-6 flex items-center gap-2"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-brass-accent" />{" "}
+                EST. 2018 / ARCHITECTURAL STUDIO
+              </motion.span>
+
               <h1 className="font-space-grotesk text-5xl sm:text-7xl lg:text-8xl font-bold text-paper leading-[0.95] tracking-tight uppercase">
                 <span className="block overflow-hidden py-1">
                   <motion.span
@@ -113,30 +123,6 @@ export default function Home() {
             </div>
 
             {/* Right Column: Paragraph + CTA */}
-            {/* <div className="flex flex-col max-w-md items-start">
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.35, ease: easeLarge }}
-                className="font-sans text-sm sm:text-base text-paper/85 font-light tracking-wide leading-relaxed mb-8"
-              >
-                We sculpt premium residential, commercial, and hospitality interiors that age gracefully. Crafted with tactile honesty and tectonic integrity.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.45, ease: easeLarge }}
-              >
-                <Link
-                  href="/projects"
-                  className="group relative inline-flex items-center justify-between border border-paper/40 text-paper hover:bg-paper hover:text-ink px-8 py-4 transition-all duration-500 font-space-grotesk text-[10px] uppercase tracking-widest font-bold overflow-hidden"
-                >
-                  <span className="relative z-10">Explore Projects</span>
-                  <span className="relative z-10 ml-6 transform transition-transform duration-500 group-hover:translate-x-1.5">&rarr;</span>
-                </Link>
-              </motion.div>
-            </div> */}
           </motion.div>
         </motion.section>
       </div>
