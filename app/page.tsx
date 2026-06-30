@@ -3,15 +3,23 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Space_Grotesk, Inter } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 import { projects } from "@/data/projects";
 import { testimonials } from "@/data/testimonials";
@@ -45,83 +53,90 @@ export default function Home() {
   const borderRadius = useTransform(scrollY, [0, 600], [0, 32]); // from square to rounded-3xl
   const opacity = useTransform(scrollY, [0, 450], [1, 0]);
 
+  // Scroll parallax for hero background image
+  const yBg = useTransform(scrollY, [0, 800], ["0%", "15%"]);
+  const scaleBg = useTransform(scrollY, [0, 800], [1.05, 1.15]);
+
   return (
-    <div className="w-full">
+    <div className={`${spaceGrotesk.variable} ${inter.variable} w-full`}>
       {/* 1. HERO SECTION */}
-      <div className="relative h-screen w-full bg-white overflow-hidden">
+      <div className="relative h-screen w-full bg-paper overflow-hidden">
         <motion.section
-          className="relative w-full h-full flex items-end justify-center overflow-hidden bg-charcoal"
+          style={{ scale, borderRadius }}
+          className="relative w-full h-full flex items-end justify-center overflow-hidden bg-ink"
         >
-          <Image
-            src="/interior/wallpaperflare.com_wallpaper (1).jpg"
-            alt="Luxury living space design by KALA"
-            fill
-            priority
-            className="object-cover object-center"
-          />
+          {/* Parallax Background Image */}
+          <motion.div
+            style={{ y: yBg, scale: scaleBg }}
+            className="absolute inset-0 z-0 pointer-events-none"
+          >
+            <Image
+              src="/interior/wallpaperflare.com_wallpaper (1).jpg"
+              alt="Luxury living space design by KALA"
+              fill
+              priority
+              className="object-cover object-center"
+            />
+            {/* Smooth dark vertical gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[rgba(28,23,20,0.85)] via-[rgba(28,23,20,0.35)] to-transparent z-10" />
+          </motion.div>
 
           {/* Hero Content */}
           <motion.div
             style={{ opacity }}
-            className="relative z-20 w-full max-w-none px-6 md:px-12 pb-12 md:pb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8 text-left pointer-events-auto"
+            className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 pb-16 md:pb-24 flex flex-col md:flex-row md:items-end md:justify-between gap-12 text-left pointer-events-auto"
           >
-            {/* Left Column: Headline, Subheading, Avatars */}
-            <div className="flex flex-col max-w-xl">
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, ease: easeLarge }}
-                className="font-sans text-xs uppercase tracking-[0.4em] text-white/90 mb-4"
-                style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)" }}
-              >
-                Kala Interior Architecture
-              </motion.p>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.2, ease: easeLarge }}
-                className="font-serif text-4xl sm:text-6xl md:text-7xl text-white font-light leading-[1.1] tracking-wide"
-                style={{
-                  textShadow:
-                    "0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 20px rgba(0, 0, 0, 0.4)",
-                }}
-              >
-                Architectural purity. Sensory warmth.
-              </motion.h1>
+            {/* Left Column: Eyebrow + Staggered Headline */}
+            <div className="flex flex-col max-w-2xl">
+              <h1 className="font-space-grotesk text-5xl sm:text-7xl lg:text-8xl font-bold text-paper leading-[0.95] tracking-tight uppercase">
+                <span className="block overflow-hidden py-1">
+                  <motion.span
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 1.1, ease: easeLarge }}
+                    className="block"
+                  >
+                    ARCHITECTURAL
+                  </motion.span>
+                </span>
+                <span className="block overflow-hidden py-1">
+                  <motion.span
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 1.1, delay: 0.1, ease: easeLarge }}
+                    className="block text-brass-accent"
+                  >
+                    PURITY.
+                  </motion.span>
+                </span>
+              </h1>
             </div>
 
-            {/* Right Column: Paragraph, Buttons */}
-            <div className="flex flex-col max-w-md">
+            {/* Right Column: Paragraph + CTA */}
+            {/* <div className="flex flex-col max-w-md items-start">
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.4, ease: easeLarge }}
-                className="font-sans text-sm sm:text-base text-white/90 font-light tracking-wide leading-relaxed mb-6"
-                style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)" }}
+                transition={{ duration: 1.2, delay: 0.35, ease: easeLarge }}
+                className="font-sans text-sm sm:text-base text-paper/85 font-light tracking-wide leading-relaxed mb-8"
               >
-                We sculpt premium residential, commercial, and hospitality
-                interiors that age gracefully.
+                We sculpt premium residential, commercial, and hospitality interiors that age gracefully. Crafted with tactile honesty and tectonic integrity.
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.5, ease: easeLarge }}
-                className="flex flex-wrap gap-4 items-center"
+                transition={{ duration: 1.2, delay: 0.45, ease: easeLarge }}
               >
                 <Link
                   href="/projects"
-                  className="inline-flex items-center gap-2 bg-white text-black hover:bg-white/90 px-6 py-3 rounded-full font-sans text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.25)]"
+                  className="group relative inline-flex items-center justify-between border border-paper/40 text-paper hover:bg-paper hover:text-ink px-8 py-4 transition-all duration-500 font-space-grotesk text-[10px] uppercase tracking-widest font-bold overflow-hidden"
                 >
-                  <span>Explore Projects</span>
-                  <span className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold">
-                    &rarr;
-                  </span>
+                  <span className="relative z-10">Explore Projects</span>
+                  <span className="relative z-10 ml-6 transform transition-transform duration-500 group-hover:translate-x-1.5">&rarr;</span>
                 </Link>
-               
               </motion.div>
-            </div>
+            </div> */}
           </motion.div>
         </motion.section>
       </div>
@@ -235,7 +250,7 @@ export default function Home() {
 
           {/* Premium Mobile Horizontal Snap Slider */}
           <div className="md:hidden flex flex-col w-full">
-            <div 
+            <div
               onScroll={handleMobileScroll}
               className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-6 -mx-6 px-6 pb-2"
             >
