@@ -176,7 +176,7 @@ export default function Home() {
           >
             <Link
               href="/about"
-              className="bg-charcoal text-white hover:bg-neutral-800 transition-colors duration-300 px-7 py-3.5 font-sans text-[10px] uppercase tracking-[0.25em] font-bold flex items-center gap-2"
+              className="border border-charcoal text-charcoal hover:bg-charcoal hover:text-white transition-all duration-300 px-7 py-3.5 font-sans text-[10px] uppercase tracking-[0.25em] font-bold flex items-center gap-2"
             >
               <span>↳</span>
               <span>Who We Are</span>
@@ -236,10 +236,10 @@ export default function Home() {
           >
             <Link
               href="/projects"
-              className="group inline-flex items-center justify-center space-x-2 bg-charcoal text-white hover:bg-neutral-800 px-8 py-4 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
+              className="group inline-flex items-center justify-center space-x-2 border border-charcoal text-charcoal hover:bg-charcoal hover:text-white px-8 py-4 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
             >
               <span>Explore all works</span>
-              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-white" />
+              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-charcoal group-hover:text-white" />
             </Link>
           </motion.div>
         </div>
@@ -407,10 +407,10 @@ export default function Home() {
           >
             <Link
               href="/contact"
-              className="group relative inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-8 py-4 transition-all duration-500 rounded-none shadow-md font-sans text-xs uppercase tracking-widest font-semibold"
+              className="group relative inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-charcoal px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
             >
               <span>Contact Us</span>
-              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
+              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-charcoal" />
             </Link>
           </motion.div>
         </div>

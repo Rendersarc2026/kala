@@ -112,10 +112,11 @@ export default function Header() {
     return link ? link.label : "Home";
   };
 
-  // Determine if the current page has a hero overlay
+  // Determine if the current page has a hero overlay or is a dark page (like contact)
   const isHome = pathname === "/";
   const isProjectDetail = pathname.startsWith("/projects/");
-  const isHeroOverlayPage = isHome || isProjectDetail;
+  const isContact = pathname.startsWith("/contact");
+  const isHeroOverlayPage = isHome || isProjectDetail || isContact;
 
   const topTextColor = isHeroOverlayPage ? "text-white" : "text-charcoal";
 

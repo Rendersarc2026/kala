@@ -391,10 +391,10 @@ export default function WhyChooseUsPage() {
           <div className="relative z-10 shrink-0">
             <Link
               href="/contact"
-              className="group inline-flex items-center justify-center bg-white text-charcoal hover:bg-terracotta hover:text-white px-8 py-4 transition-all duration-500 rounded-none shadow-md font-sans text-xs uppercase tracking-widest font-semibold"
+              className="group inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-charcoal px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
             >
               <span>Contact Us</span>
-              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
+              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-charcoal" />
             </Link>
           </div>
         </div>
