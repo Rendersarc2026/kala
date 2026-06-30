@@ -130,7 +130,7 @@ export default function Header() {
           {/* Top Center: Logo */}
           <Link
             href="/"
-            className={`font-serif text-xl tracking-[0.25em] font-bold ${topTextColor} md:absolute md:left-1/2 md:-translate-x-1/2`}
+            className={`font-serif text-xl tracking-[0.25em] font-bold ${topTextColor} absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap`}
           >
             KALA DESIGNS
           </Link>

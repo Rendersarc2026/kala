@@ -82,6 +82,7 @@ interface InteractivePanelProps {
   setHoveredIndex: (index: number | null) => void;
   scrollYProgress: any;
   shouldReduceMotion: boolean;
+  isMobile: boolean;
 }
 
 function InteractivePanel({
@@ -91,6 +92,7 @@ function InteractivePanel({
   setHoveredIndex,
   scrollYProgress,
   shouldReduceMotion,
+  isMobile,
 }: InteractivePanelProps) {
   // Motion values for scroll-linked and hover transitions
   const overlayY = useMotionValue("0%");
@@ -102,8 +104,20 @@ function InteractivePanel({
 
   const hasTriggeredIntro = useRef(false);
 
+  // Set static visual state immediately on mobile (full-bleed images, white text, no hover/intro)
+  useEffect(() => {
+    if (isMobile) {
+      overlayY.set("-100%");
+      labelColor.set("#F6F1EA");
+      asteriskOpacity.set(0);
+      setIsIntroActive(false);
+    }
+  }, [isMobile, overlayY, labelColor, asteriskOpacity]);
+
   // Monitor scroll progress to trigger a one-time automatic preview animation
   useMotionValueEvent(scrollYProgress, "change", (latest: number) => {
+    if (isMobile) return; // Disable scroll-linked animation on mobile
+
     // Play the preview reveal once the section enters viewport (12% or more)
     if (latest >= 0.12 && !hasTriggeredIntro.current) {
       hasTriggeredIntro.current = true;
@@ -130,6 +144,7 @@ function InteractivePanel({
   // Handle overlay Y slide when hovered/unhovered (only after scroll intro is complete)
   const hasActivatedHoverRef = useRef(false);
   useEffect(() => {
+    if (isMobile) return; // Disable hover effects on mobile
     if (!isIntroActive) {
       if (!hasActivatedHoverRef.current) {
         overlayY.set("0%");
@@ -152,11 +167,12 @@ function InteractivePanel({
     } else {
       hasActivatedHoverRef.current = false;
     }
-  }, [isHovered, isIntroActive, overlayY, shouldReduceMotion]);
+  }, [isHovered, isIntroActive, overlayY, shouldReduceMotion, isMobile]);
 
   // Handle label color fades when hovered/unhovered
   const hasActivatedColorRef = useRef(false);
   useEffect(() => {
+    if (isMobile) return; // Disable color transitions on mobile
     if (!isIntroActive) {
       if (!hasActivatedColorRef.current) {
         labelColor.set("#1C1714");
@@ -177,10 +193,11 @@ function InteractivePanel({
     } else {
       hasActivatedColorRef.current = false;
     }
-  }, [isHovered, isIntroActive, labelColor, shouldReduceMotion]);
+  }, [isHovered, isIntroActive, labelColor, shouldReduceMotion, isMobile]);
 
   // Handle asterisk opacity fades
   useEffect(() => {
+    if (isMobile) return; // Disable asterisk on mobile
     if (!isIntroActive && isHovered) {
       animate(asteriskOpacity, 1, {
         duration: shouldReduceMotion ? 0 : 0.8,
@@ -191,14 +208,14 @@ function InteractivePanel({
         duration: shouldReduceMotion ? 0 : 0.4,
       });
     }
-  }, [isHovered, isIntroActive, asteriskOpacity, shouldReduceMotion]);
+  }, [isHovered, isIntroActive, asteriskOpacity, shouldReduceMotion, isMobile]);
 
   return (
     <Link
       href={panel.href}
       onMouseEnter={() => setHoveredIndex(index)}
       onMouseLeave={() => setHoveredIndex(null)}
-      className="relative flex-1 h-full overflow-hidden border-b md:border-b-0 md:border-r border-sand last:border-0 focus-visible:ring-2 focus-visible:ring-brass-accent focus-visible:outline-none select-none cursor-pointer group flex flex-col items-center justify-center text-center p-6 md:p-8"
+      className="relative flex-1 w-full md:h-full overflow-hidden border-b md:border-b-0 md:border-r border-sand last:border-b-0 md:last:border-r-0 focus-visible:ring-2 focus-visible:ring-brass-accent focus-visible:outline-none select-none cursor-pointer group flex flex-col items-center justify-center text-center p-6 md:p-8"
     >
       {/* IMAGE (revealed when white overlay slides away) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -213,16 +230,16 @@ function InteractivePanel({
         <div className="absolute inset-0 bg-ink/35 z-10" />
       </div>
 
-      {/* WHITE OVERLAY (slides to reveal/cover the image) */}
+      {/* WHITE OVERLAY (slides to reveal/cover the image on desktop only) */}
       <motion.div
         style={{ y: overlayY }}
-        className="absolute inset-0 bg-white z-10 pointer-events-none"
+        className="absolute inset-0 bg-white z-10 pointer-events-none hidden md:block"
       />
 
       {/* HOVER OVERLAY: Accent asterisk */}
       <motion.div 
         style={{ opacity: asteriskOpacity }}
-        className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 font-sans text-lg text-brass-accent pointer-events-none z-20"
+        className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 font-sans text-lg text-brass-accent pointer-events-none z-20 hidden md:block"
       >
         *
       </motion.div>
@@ -232,7 +249,10 @@ function InteractivePanel({
         variants={panelLabelVariants}
         className="relative z-20 font-space-grotesk text-xs md:text-sm font-bold tracking-[0.15em] uppercase leading-relaxed text-center"
       >
-        <motion.div style={{ color: labelColor }}>
+        <motion.div 
+          style={isMobile ? undefined : { color: labelColor }}
+          className="text-paper md:text-ink"
+        >
           {panel.label.split(" / ").map((line, idx) => (
             <span key={idx} className="block">{line}</span>
           ))}
@@ -248,12 +268,22 @@ export default function InteractiveStage() {
 
   const prefersReducedMotion = useReducedMotion();
   const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (prefersReducedMotion) {
       setShouldReduceMotion(true);
     }
   }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Scroll tracking container
   const { scrollYProgress } = useScroll({
@@ -291,6 +321,7 @@ export default function InteractiveStage() {
             setHoveredIndex={setHoveredIndex}
             scrollYProgress={scrollYProgress}
             shouldReduceMotion={shouldReduceMotion}
+            isMobile={isMobile}
           />
         ))}
       </motion.div>
