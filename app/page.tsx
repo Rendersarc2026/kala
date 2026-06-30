@@ -45,6 +45,15 @@ export default function Home() {
   const borderRadius = useTransform(scrollY, [0, 600], [0, 32]); // from square to rounded-3xl
   const opacity = useTransform(scrollY, [0, 450], [1, 0]);
 
+  // Scroll animations for process section framing effect
+  const { scrollYProgress: processScroll } = useScroll({
+    target: processSectionRef,
+    offset: ["start end", "start start"],
+  });
+
+  const processInset = useTransform(processScroll, [0, 1], ["4vw", "0vw"]);
+  const processBorderRadius = useTransform(processScroll, [0, 1], ["32px", "0px"]);
+
   return (
     <div className="w-full">
       {/* 1. HERO SECTION (Shrink on scroll animation) */}
@@ -177,7 +186,7 @@ export default function Home() {
       </section>
 
       {/* 3. FEATURED PROJECTS (Asymmetric Grid) */}
-      <section className="py-24 md:py-32 bg-white border-t border-b border-charcoal/5 overflow-hidden">
+      <section className="py-24 md:py-32 bg-white border-t border-charcoal/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="mb-16 md:mb-24">
             <motion.div
@@ -245,12 +254,21 @@ export default function Home() {
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative bg-white border-t border-b border-charcoal/5 overflow-hidden w-full cursor-none"
+          className="relative bg-white overflow-hidden w-full cursor-none"
           style={{ height: "100vh", minHeight: "100vh" }}
         >
           {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            <div className="relative w-full h-full overflow-hidden bg-bone">
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <motion.div
+              style={{
+                top: processInset,
+                bottom: processInset,
+                left: processInset,
+                right: processInset,
+                borderRadius: processBorderRadius,
+              }}
+              className="absolute overflow-hidden bg-bone"
+            >
               <div className="relative w-full h-full">
                 <Image
                   src="/interior/wallpaperflare.com_wallpaper (3).jpg"
@@ -261,7 +279,7 @@ export default function Home() {
                 {/* Dark overlay for contrast */}
                 <div className="absolute inset-0 bg-charcoal/30 z-10 transition-colors duration-500 group-hover:bg-charcoal/45" />
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Centered Heading */}
