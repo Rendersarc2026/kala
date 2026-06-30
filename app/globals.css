@@ -13,6 +13,14 @@
   --color-terracotta: #0A3C30;
   --color-terracotta-dark: #06261E;
   --color-terracotta-light: #0F5E4B;
+  --color-paper: #F6F1EA;
+  --color-ink: #1C1714;
+  --color-taupe: #8C8174;
+  --color-sand: #E4DED2;
+  --color-brass-accent: #A6824F;
+  --font-space-grotesk: var(--font-space-grotesk);
+  --font-ibm-plex-mono: var(--font-ibm-plex-mono);
+  --font-inter: var(--font-inter);
   --font-serif: "Gotham", "Gotham SSm", "Gotham Pro", var(--font-gotham), "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Gotham", "Gotham SSm", "Gotham Pro", var(--font-gotham), "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --animate-fade-in: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;

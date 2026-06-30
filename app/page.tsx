@@ -3,34 +3,35 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 import { projects } from "@/data/projects";
 import { testimonials } from "@/data/testimonials";
 import ProjectCard from "@/components/ProjectCard";
 import TestimonialSlider from "@/components/TestimonialSlider";
+import InteractiveStage from "@/components/InteractiveStage";
 
 export default function Home() {
   const featuredProjects = projects.filter((p) => p.featured).slice(0, 4);
 
-  const processSectionRef = React.useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [activeSlide, setActiveSlide] = React.useState(0);
 
-  // Mouse coordinates for Process section hover arrow
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth springs for cursor follow lag (premium editorial feel)
-  const springConfig = { damping: 30, stiffness: 250, mass: 0.6 };
-  const arrowX = useSpring(mouseX, springConfig);
-  const arrowY = useSpring(mouseY, springConfig);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (processSectionRef.current) {
-      const rect = processSectionRef.current.getBoundingClientRect();
-      mouseX.set(e.clientX - rect.left);
-      mouseY.set(e.clientY - rect.top);
+  const handleMobileScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const clientWidth = container.clientWidth;
+    // Calculation accounts for card width (approx 82vw) + gap (6 / 24px)
+    const index = Math.round(scrollLeft / (clientWidth * 0.8));
+    if (index >= 0 && index < featuredProjects.length) {
+      setActiveSlide(index);
     }
   };
 
@@ -41,85 +42,86 @@ export default function Home() {
   const { scrollY } = useScroll();
   const scale = useTransform(scrollY, [0, 600], [1, 0.94]);
 
-
   const borderRadius = useTransform(scrollY, [0, 600], [0, 32]); // from square to rounded-3xl
   const opacity = useTransform(scrollY, [0, 450], [1, 0]);
 
-  // Scroll animations for process section framing effect
-  const { scrollYProgress: processScroll } = useScroll({
-    target: processSectionRef,
-    offset: ["start end", "start start"],
-  });
-
-  const processInset = useTransform(processScroll, [0, 1], ["4vw", "0vw"]);
-  const processBorderRadius = useTransform(processScroll, [0, 1], ["32px", "0px"]);
-
   return (
     <div className="w-full">
-      {/* 1. HERO SECTION (Shrink on scroll animation) */}
+      {/* 1. HERO SECTION */}
       <div className="relative h-screen w-full bg-white overflow-hidden">
         <motion.section
-          style={{ scale, borderRadius }}
-          className="relative w-full h-full flex items-center justify-center overflow-hidden bg-charcoal origin-top"
+          className="relative w-full h-full flex items-end justify-center overflow-hidden bg-charcoal"
         >
           <Image
             src="/interior/wallpaperflare.com_wallpaper (1).jpg"
             alt="Luxury living space design by KALA"
             fill
             priority
-            className="object-cover opacity-75 object-center"
+            className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/40 to-charcoal/30 z-10" />
 
           {/* Hero Content */}
           <motion.div
             style={{ opacity }}
-            className="relative z-20 text-center max-w-4xl px-6 flex flex-col items-center"
+            className="relative z-20 w-full max-w-none px-6 md:px-12 pb-12 md:pb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8 text-left pointer-events-auto"
           >
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: easeLarge }}
-              className="font-sans text-xs uppercase tracking-[0.4em] text-white/60 mb-6"
-            >
-              Kala Interior Architecture
-            </motion.p>
+            {/* Left Column: Headline, Subheading, Avatars */}
+            <div className="flex flex-col max-w-xl">
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, ease: easeLarge }}
+                className="font-sans text-xs uppercase tracking-[0.4em] text-white/90 mb-4"
+                style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)" }}
+              >
+                Kala Interior Architecture
+              </motion.p>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.2, ease: easeLarge }}
-              className="font-serif text-4xl sm:text-6xl md:text-7xl text-white font-light leading-[1.1] tracking-wide"
-            >
-              Architectural purity.
-              <br className="hidden sm:inline" />
-              Sensory warmth.
-            </motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.2, ease: easeLarge }}
+                className="font-serif text-4xl sm:text-6xl md:text-7xl text-white font-light leading-[1.1] tracking-wide"
+                style={{
+                  textShadow:
+                    "0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 20px rgba(0, 0, 0, 0.4)",
+                }}
+              >
+                Architectural purity. Sensory warmth.
+              </motion.h1>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4, ease: easeLarge }}
-              className="font-sans text-sm sm:text-base text-white/70 max-w-md mt-8 font-light tracking-wide leading-relaxed"
-            >
-              We sculpt premium residential, commercial, and hospitality
-              interiors that age gracefully.
-            </motion.p>
-          </motion.div>
+            {/* Right Column: Paragraph, Buttons */}
+            <div className="flex flex-col max-w-md">
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.4, ease: easeLarge }}
+                className="font-sans text-sm sm:text-base text-white/90 font-light tracking-wide leading-relaxed mb-6"
+                style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)" }}
+              >
+                We sculpt premium residential, commercial, and hospitality
+                interiors that age gracefully.
+              </motion.p>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            style={{ opacity }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-2"
-          >
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/50 font-light">
-              Scroll to explore
-            </span>
-            <motion.div
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="h-10 w-[1px] bg-white/30"
-            />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.5, ease: easeLarge }}
+                className="flex flex-wrap gap-4 items-center"
+              >
+                <Link
+                  href="/projects"
+                  className="inline-flex items-center gap-2 bg-white text-black hover:bg-white/90 px-6 py-3 rounded-full font-sans text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.25)]"
+                >
+                  <span>Explore Projects</span>
+                  <span className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-bold">
+                    &rarr;
+                  </span>
+                </Link>
+               
+              </motion.div>
+            </div>
           </motion.div>
         </motion.section>
       </div>
@@ -149,25 +151,31 @@ export default function Home() {
               className="inline-flex flex-wrap justify-center"
               style={{ gap: "0.25em 0" }}
             >
-              {"We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care.".split(" ").map((word, i) => (
-                <motion.span
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  transition={{ duration: 0.5, delay: i * 0.04, ease: easeLarge }}
-                  className="inline-block"
-                  style={{ marginRight: "0.25em" }}
-                >
-                  {word}
-                </motion.span>
-              ))}
+              {"We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care."
+                .split(" ")
+                .map((word, i) => (
+                  <motion.span
+                    key={i}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    transition={{
+                      duration: 0.5,
+                      delay: i * 0.04,
+                      ease: easeLarge,
+                    }}
+                    className="inline-block"
+                    style={{ marginRight: "0.25em" }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
             </motion.span>
           </h2>
 
           {/* Centered CTA Button */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -181,7 +189,7 @@ export default function Home() {
               <span>↳</span>
               <span>Who We Are</span>
             </Link>
-          </motion.div>
+          </motion.div> */}
         </div>
       </section>
 
@@ -205,7 +213,7 @@ export default function Home() {
           </div>
 
           {/* Symmetric Desktop Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-24">
+          <div className="hidden md:grid grid-cols-2 gap-x-16 gap-y-24">
             {featuredProjects.map((project, idx) => {
               return (
                 <motion.div
@@ -218,12 +226,39 @@ export default function Home() {
                     delay: (idx % 2) * 0.1,
                     ease: easeLarge,
                   }}
-                  className=""
                 >
                   <ProjectCard project={project} />
                 </motion.div>
               );
             })}
+          </div>
+
+          {/* Premium Mobile Horizontal Snap Slider */}
+          <div className="md:hidden flex flex-col w-full">
+            <div 
+              onScroll={handleMobileScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-6 -mx-6 px-6 pb-2"
+            >
+              {featuredProjects.map((project) => (
+                <div
+                  key={project.slug}
+                  className="flex-none w-[82vw] snap-center"
+                >
+                  <ProjectCard project={project} />
+                </div>
+              ))}
+            </div>
+            {/* Pagination Indicators */}
+            <div className="flex justify-center items-center space-x-2 mt-4">
+              {featuredProjects.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeSlide === idx ? "w-6 bg-brass" : "w-1.5 bg-bone-dark"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Bottom CTA */}
@@ -245,107 +280,8 @@ export default function Home() {
         </div>
       </section>
 
-
-
       {/* 5. PROCESS SECTION */}
-      <Link href="/process" className="block relative w-full group cursor-pointer">
-        <section 
-          ref={processSectionRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="relative bg-white overflow-hidden w-full cursor-none"
-          style={{ height: "100vh", minHeight: "100vh" }}
-        >
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
-            <motion.div
-              style={{
-                top: processInset,
-                bottom: processInset,
-                left: processInset,
-                right: processInset,
-                borderRadius: processBorderRadius,
-              }}
-              className="absolute overflow-hidden bg-bone"
-            >
-              <div className="relative w-full h-full">
-                <Image
-                  src="/interior/wallpaperflare.com_wallpaper (3).jpg"
-                  alt="The Path to Sanctuary"
-                  fill
-                  className="object-cover object-center"
-                />
-                {/* Dark overlay for contrast */}
-                <div className="absolute inset-0 bg-charcoal/30 z-10 transition-colors duration-500 group-hover:bg-charcoal/45" />
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Centered Heading */}
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.1, ease: easeLarge }}
-              className="flex flex-col items-center text-center"
-            >
-              <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/60 font-semibold block mb-3.5">
-                ◆ Workspace Method
-              </span>
-              <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl text-white font-light tracking-wide leading-tight max-w-4xl drop-shadow-md">
-                Explore Our Process
-              </h2>
-            </motion.div>
-          </div>
-
-          {/* Big Arrow Hover Overlay following cursor (Restored) */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                style={{
-                  x: arrowX,
-                  y: arrowY,
-                  translateX: "-50%",
-                  translateY: "-50%",
-                }}
-                className="absolute left-0 top-0 z-20 pointer-events-none"
-              >
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="flex items-center justify-center"
-                >
-                  <svg
-                    width="180"
-                    height="100"
-                    viewBox="0 0 180 100"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
-                    strokeWidth="1.75"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    {/* Shaft Lines */}
-                    <path d="M 20, 42 L 112, 42" />
-                    <path d="M 20, 50 L 120, 50" />
-                    <path d="M 20, 58 L 112, 58" />
-
-                    {/* Arrowhead Chevrons */}
-                    <path d="M 90, 20 L 120, 50 L 90, 80" />
-                    <path d="M 100, 20 L 130, 50 L 100, 80" />
-                    <path d="M 110, 20 L 140, 50 L 110, 80" />
-                  </svg>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-      </Link>
+      <InteractiveStage />
 
       {/* 6. TESTIMONIALS */}
       <section className="py-24 md:py-36 bg-white overflow-hidden">
@@ -418,5 +354,3 @@ export default function Home() {
     </div>
   );
 }
-
-
