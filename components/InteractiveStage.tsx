@@ -249,9 +249,17 @@ function InteractivePanel({
         variants={panelLabelVariants}
         className="relative z-20 font-space-grotesk text-xs md:text-sm font-bold tracking-[0.15em] uppercase leading-relaxed text-center"
       >
+        {/* Mobile Label: Always pure white to contrast against the dark background image */}
+        <div className="block md:hidden text-white">
+          {panel.label.split(" / ").map((line, idx) => (
+            <span key={idx} className="block">{line}</span>
+          ))}
+        </div>
+
+        {/* Desktop Label: Dynamic animated color */}
         <motion.div 
-          style={isMobile ? undefined : { color: labelColor }}
-          className="text-paper md:text-ink"
+          style={{ color: labelColor }}
+          className="hidden md:block"
         >
           {panel.label.split(" / ").map((line, idx) => (
             <span key={idx} className="block">{line}</span>
