@@ -39,7 +39,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           priority
           className="object-cover opacity-80 object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/30 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-studio-gray via-studio-gray/40 to-transparent z-10" />
 
         {/* Hero Metadata Overlay */}
         <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 pb-16 w-full flex flex-col space-y-4">
