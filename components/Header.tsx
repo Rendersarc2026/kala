@@ -185,7 +185,7 @@ export default function Header() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-charcoal/75 backdrop-blur-sm z-40 cursor-pointer pointer-events-auto"
+              className="fixed inset-0 bg-transparent backdrop-blur-sm z-40 cursor-pointer pointer-events-auto"
               style={{
                 WebkitBackdropFilter: "blur(4px)",
                 backdropFilter: "blur(4px)",

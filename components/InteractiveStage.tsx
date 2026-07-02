@@ -133,7 +133,7 @@ function InteractivePanel({
       });
 
       // Label color transitions in sync
-      animate(labelColor, ["#D2B58D", "#D2B58D", "#D2B58D", "#D2B58D"], {
+      animate(labelColor, ["#D2B58D", "#F6F1EA", "#F6F1EA", "#D2B58D"], {
         times: [0, 0.4, 0.6, 1.0],
         duration: shouldReduceMotion ? 0 : 2.2,
         ease: ["easeOut", "linear", "easeIn"],
@@ -181,7 +181,7 @@ function InteractivePanel({
       }
 
       if (isHovered) {
-        animate(labelColor, "#D2B58D", {
+        animate(labelColor, "#F6F1EA", {
           duration: shouldReduceMotion ? 0 : 0.8,
         });
       } else {
@@ -227,7 +227,7 @@ function InteractivePanel({
           sizes="(max-width: 768px) 100vw, 25vw"
           priority
         />
-        <div className="absolute inset-0 bg-ink/35 z-10" />
+        <div className="absolute inset-0 bg-black/50 z-10" />
       </div>
 
       {/* WHITE OVERLAY (slides to reveal/cover the image on desktop only) */}
