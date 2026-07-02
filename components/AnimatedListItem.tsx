@@ -23,7 +23,7 @@ export default function AnimatedListItem({
   heading,
   description,
   hideBigNumeral = false,
-  isDark = false,
+  isDark = true,
   once = true,
   children,
 }: AnimatedListItemProps) {
@@ -32,11 +32,11 @@ export default function AnimatedListItem({
   const isEven = index % 2 === 1;
 
   // Theme styling configurations
-  const headingColor = isDark ? 'text-white' : 'text-charcoal';
-  const dashColor = isDark ? 'bg-white/20' : 'bg-charcoal/20';
-  const descColor = isDark ? 'text-neutral-400' : 'text-charcoal-muted';
-  const borderColor = isDark ? 'border-neutral-800' : 'border-neutral-200';
-  const numeralColor = isDark ? 'text-white' : 'text-charcoal';
+  const headingColor = 'text-charcoal';
+  const dashColor = 'bg-charcoal/20';
+  const descColor = 'text-charcoal-muted';
+  const borderColor = 'border-charcoal/10';
+  const numeralColor = 'text-charcoal';
 
   // Horizontal offsets based on side
   const imageInitialX = isEven ? 80 : -80;

@@ -12,7 +12,7 @@ export default function Services() {
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
       {/* Intro Header */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 mb-20 md:mb-32">
         <motion.div

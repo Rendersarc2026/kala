@@ -31,7 +31,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
         duration: 0.9,
         ease: easeLarge,
       }}
-      className="w-full min-h-screen bg-white relative overflow-hidden origin-bottom"
+      className="w-full min-h-screen bg-studio-gray relative overflow-hidden origin-bottom"
     >
       {children}
     </motion.div>

@@ -38,7 +38,7 @@ export default function About() {
   };
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray about-page-white">
       {/* Editorial Profile / Story */}
       <section className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.div
@@ -107,7 +107,7 @@ export default function About() {
               className="object-cover"
             />
             <div className="absolute bottom-4 left-4 bg-white/95 px-4 py-2">
-              <span className="font-sans text-[9px] tracking-wider text-charcoal uppercase">
+              <span className="font-sans text-[9px] tracking-wider text-[#121212] uppercase">
                 Maison Serein Project, France
               </span>
             </div>
@@ -116,7 +116,7 @@ export default function About() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="bg-neutral-50 border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
+      <section className="bg-charcoal border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
             <motion.div
@@ -228,7 +228,7 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: idx * 0.05, ease: easeLarge }}
-                className="group relative flex flex-col bg-white border border-charcoal/5 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500"
+                className="group relative flex flex-col bg-white/5 border border-charcoal/5 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500"
               >
                 {/* Photo with Overlay */}
                 <div className="relative aspect-[3/5] w-full overflow-hidden bg-bone-dark">
@@ -243,7 +243,7 @@ export default function About() {
                     />
                   ) : (
                     // Stylized placeholder using member initials
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-bone-dark-light">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-bone-dark">
                       <span className="font-serif text-4xl text-charcoal/20 tracking-wider">
                         {member.name.split(' ').map(n => n[0]).join('')}
                       </span>
@@ -251,7 +251,7 @@ export default function About() {
                   )}
 
                   {/* Bio Hover Overlay */}
-                  <div className="absolute inset-0 bg-charcoal/90 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-[0.16,1,0.3,1] p-8 flex flex-col justify-end text-bone">
+                  <div className="absolute inset-0 bg-[#121212]/90 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-[0.16,1,0.3,1] p-8 flex flex-col justify-end text-bone">
                     <p className="font-sans text-xs leading-relaxed font-light opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
                       {member.bio}
                     </p>

@@ -125,7 +125,7 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
                 setActiveIndex(idx);
               }}
               className={`h-[3px] transition-all duration-500 ease-out ${
-                idx === activeIndex ? 'w-8 bg-terracotta' : 'w-3 bg-charcoal/15 hover:bg-charcoal/30'
+                idx === activeIndex ? 'w-8 bg-terracotta' : 'w-3 bg-white/20 hover:bg-white/45'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />

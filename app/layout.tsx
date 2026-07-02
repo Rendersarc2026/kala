@@ -39,7 +39,7 @@ export default function RootLayout({
       lang="en"
       className={`${montserrat.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-charcoal selection:bg-terracotta selection:text-bone">
+      <body className="min-h-full flex flex-col bg-studio-gray text-charcoal selection:bg-terracotta selection:text-bone">
         <Header />
         <SmoothScroll>
           <PageTransition>

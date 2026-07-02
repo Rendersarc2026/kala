@@ -106,7 +106,7 @@ export default function WhyChooseUsPage() {
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
       {/* Intro Header */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 mb-20 md:mb-32">
         <motion.div
@@ -161,7 +161,7 @@ export default function WhyChooseUsPage() {
                       {item.title}
                     </h3>
                   </div>
-                  <div className={`w-8 h-8 rounded-full bg-bone flex items-center justify-center text-charcoal transition-transform duration-300 ${isOpen ? 'rotate-180 bg-terracotta text-white' : ''}`}>
+                  <div className={`w-8 h-8 rounded-full bg-bone flex items-center justify-center text-[#121212] transition-transform duration-300 ${isOpen ? 'rotate-180 bg-terracotta text-white' : ''}`}>
                     <span className="text-xs">{isOpen ? '−' : '+'}</span>
                   </div>
                 </button>
@@ -242,7 +242,7 @@ export default function WhyChooseUsPage() {
 
           {/* Right Column: Dynamic Preview Screen */}
           <div className="col-span-7 sticky top-32">
-            <div className="border border-charcoal/5 rounded-2xl p-8 bg-neutral-50/50 shadow-sm space-y-6">
+            <div className="border border-charcoal/5 rounded-2xl p-8 bg-white/5 shadow-sm space-y-6">
               {/* Animated Image Container */}
               <div className="relative w-full aspect-[16/10] overflow-hidden rounded-xl bg-bone shadow-inner">
                 <AnimatePresence mode="wait">
@@ -267,7 +267,7 @@ export default function WhyChooseUsPage() {
               {/* Text details for active differentiator */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-white border border-charcoal/5 text-terracotta shadow-sm">
+                  <div className="p-2.5 rounded-lg bg-white/5 border border-charcoal/5 text-terracotta shadow-sm">
                     {React.createElement(WHY_CHOOSE_US[activeIndex].icon, { className: "w-5 h-5" })}
                   </div>
                   <h4 className="font-serif text-lg text-charcoal font-medium">
@@ -285,7 +285,7 @@ export default function WhyChooseUsPage() {
       </section>
 
       {/* Editorial Sourcing Spotlight (Middle Section) */}
-      <section className="bg-neutral-50 border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
+      <section className="bg-charcoal border-t border-b border-charcoal/5 py-24 my-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             <motion.div
@@ -339,7 +339,7 @@ export default function WhyChooseUsPage() {
           </h2>
         </div>
 
-        <div className="border border-charcoal/10 rounded-2xl overflow-hidden bg-white shadow-sm">
+        <div className="border border-charcoal/10 rounded-2xl overflow-hidden bg-white/5 shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -351,7 +351,7 @@ export default function WhyChooseUsPage() {
               </thead>
               <tbody className="divide-y divide-charcoal/5 font-sans text-xs">
                 {COMPARISON.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-neutral-50 transition-colors">
+                  <tr key={idx} className="hover:bg-white/5 transition-colors">
                     <td className="py-6 px-6 font-semibold text-charcoal">{row.feature}</td>
                     <td className="py-6 px-6 bg-terracotta/5 text-charcoal font-medium">
                       <div className="flex items-start gap-2.5">
@@ -391,10 +391,10 @@ export default function WhyChooseUsPage() {
           <div className="relative z-10 shrink-0">
             <Link
               href="/contact"
-              className="group inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-charcoal px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
+              className="group inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-[#121212] px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
             >
               <span>Contact Us</span>
-              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-charcoal" />
+              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-[#121212]" />
             </Link>
           </div>
         </div>

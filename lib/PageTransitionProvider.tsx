@@ -96,7 +96,7 @@ export default function PageTransitionProvider({
                   setPhase("idle");
                 }
               }}
-              className="bg-white shadow-2xl"
+              className="bg-studio-gray shadow-2xl"
             />
           </motion.div>
         )}

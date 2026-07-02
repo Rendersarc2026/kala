@@ -24,8 +24,8 @@ export default function ProjectCard({ project, className = '' }: ProjectCardProp
         />
         
         {/* Overlay Hover State */}
-        <div className="absolute inset-0 bg-charcoal/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out flex items-center justify-center">
-          <div className="bg-bone/95 backdrop-blur-sm text-charcoal flex items-center gap-2 px-6 py-3 shadow-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[0.16,1,0.3,1]">
+        <div className="absolute inset-0 bg-[#121212]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out flex items-center justify-center">
+          <div className="bg-bone/95 backdrop-blur-sm text-[#121212] flex items-center gap-2 px-6 py-3 shadow-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[0.16,1,0.3,1]">
             <span className="text-xs uppercase tracking-widest font-sans font-medium">View Project</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -123,16 +123,14 @@ export default function Header() {
   return (
     <>
       {/* 1. TOP HEADER (Absolute at top, scrolls away naturally) */}
-      <div className="absolute top-0 left-0 right-0 z-40 py-8 px-6 md:px-12 w-full">
+      <div className="absolute top-0 left-0 right-0 z-40 py-8 px-6 md:px-12 w-full bg-transparent">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Top Left: Location Info */}
-
           {/* Top Center: Logo */}
           <Link
             href="/"
-            className={`font-serif text-xl tracking-[0.25em] font-bold ${topTextColor} absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap`}
+            className="font-serif text-xl tracking-[0.25em] font-bold absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap text-[#FFFFFF]"
           >
-            KALA DESIGNS
+            THE KALA INTERIORS
           </Link>
         </div>
       </div>

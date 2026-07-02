@@ -288,7 +288,7 @@ export default function Contact() {
                         disabled={isSubmitting}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="group relative w-full flex items-center justify-center bg-bone text-charcoal hover:bg-terracotta hover:text-white py-4 transition-all duration-500 rounded-lg font-sans text-xs uppercase tracking-widest font-semibold disabled:opacity-50 overflow-hidden"
+                        className="group relative w-full flex items-center justify-center bg-bone text-[#121212] hover:bg-terracotta hover:text-white py-4 transition-all duration-500 rounded-lg font-sans text-xs uppercase tracking-widest font-semibold disabled:opacity-50 overflow-hidden"
                       >
                         <motion.span
                           className="relative z-10 flex items-center"
@@ -305,7 +305,7 @@ export default function Contact() {
                             animate={{ opacity: 1 }}
                             className="absolute inset-0 flex items-center justify-center"
                           >
-                            <div className="h-5 w-5 border-2 border-charcoal border-t-transparent rounded-full animate-spin" />
+                            <div className="h-5 w-5 border-2 border-[#121212] border-t-transparent rounded-full animate-spin" />
                           </motion.div>
                         )}
                       </motion.button>

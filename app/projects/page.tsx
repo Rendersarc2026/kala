@@ -22,7 +22,7 @@ export default function ProjectsIndex() {
   ];
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Intro */}
         <section className="mb-16 md:mb-24">

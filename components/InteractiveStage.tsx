@@ -96,7 +96,7 @@ function InteractivePanel({
 }: InteractivePanelProps) {
   // Motion values for scroll-linked and hover transitions
   const overlayY = useMotionValue("0%");
-  const labelColor = useMotionValue("#1C1714");
+  const labelColor = useMotionValue("#D2B58D");
   const asteriskOpacity = useMotionValue(0);
 
   const [isIntroActive, setIsIntroActive] = useState(true);
@@ -132,8 +132,8 @@ function InteractivePanel({
         setIsIntroActive(false);
       });
 
-      // Label color transitions in sync: ink (#1C1714) -> paper (#F6F1EA) -> ink (#1C1714)
-      animate(labelColor, ["#1C1714", "#F6F1EA", "#F6F1EA", "#1C1714"], {
+      // Label color transitions in sync
+      animate(labelColor, ["#D2B58D", "#D2B58D", "#D2B58D", "#D2B58D"], {
         times: [0, 0.4, 0.6, 1.0],
         duration: shouldReduceMotion ? 0 : 2.2,
         ease: ["easeOut", "linear", "easeIn"],
@@ -175,17 +175,17 @@ function InteractivePanel({
     if (isMobile) return; // Disable color transitions on mobile
     if (!isIntroActive) {
       if (!hasActivatedColorRef.current) {
-        labelColor.set("#1C1714");
+        labelColor.set("#D2B58D");
         hasActivatedColorRef.current = true;
         return;
       }
 
       if (isHovered) {
-        animate(labelColor, "#F6F1EA", {
+        animate(labelColor, "#D2B58D", {
           duration: shouldReduceMotion ? 0 : 0.8,
         });
       } else {
-        animate(labelColor, "#1C1714", {
+        animate(labelColor, "#D2B58D", {
           duration: shouldReduceMotion ? 0 : 0.8,
           delay: shouldReduceMotion ? 0 : 0.6,
         });
@@ -233,7 +233,7 @@ function InteractivePanel({
       {/* WHITE OVERLAY (slides to reveal/cover the image on desktop only) */}
       <motion.div
         style={{ y: overlayY }}
-        className="absolute inset-0 bg-white z-10 pointer-events-none hidden md:block"
+        className="absolute inset-0 bg-studio-gray z-10 pointer-events-none hidden md:block"
       />
 
       {/* HOVER OVERLAY: Accent asterisk */}
@@ -312,13 +312,13 @@ export default function InteractiveStage() {
   return (
     <div 
       ref={containerRef}
-      className={`${spaceGrotesk.variable} ${inter.variable} w-full h-screen bg-white overflow-hidden`}
+      className={`${spaceGrotesk.variable} ${inter.variable} w-full h-screen bg-studio-gray overflow-hidden`}
     >
       <motion.div
         variants={panelContainerVariants}
         initial="initial"
         animate="animate"
-        className="flex flex-col md:flex-row w-full h-full bg-white overflow-hidden"
+        className="flex flex-col md:flex-row w-full h-full bg-studio-gray overflow-hidden"
       >
         {PANELS_DATA.map((panel, index) => (
           <InteractivePanel

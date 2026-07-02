@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div className={`${spaceGrotesk.variable} ${inter.variable} w-full`}>
       {/* 1. HERO SECTION */}
-      <div className="relative h-screen w-full bg-white overflow-hidden">
+      <div className="relative h-screen w-full bg-[#FFFFFF] overflow-hidden">
         <motion.section
           style={{ scale, borderRadius }}
           className="relative w-full h-full flex items-end justify-center overflow-hidden bg-ink"
@@ -125,7 +125,7 @@ export default function Home() {
       </div>
 
       {/* 2. ABOUT TEASER (Centered layout matching screenshot) */}
-      <section className="py-24 md:py-36 bg-white overflow-hidden border-b border-charcoal/5">
+      <section className="py-24 md:py-36 bg-studio-gray overflow-hidden border-b border-charcoal/5 about-teaser-white">
         <div className="max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
           {/* Subtitle with Diamond */}
           <motion.div
@@ -182,7 +182,7 @@ export default function Home() {
           >
             <Link
               href="/about"
-              className="border border-charcoal text-charcoal hover:bg-charcoal hover:text-white transition-all duration-300 px-7 py-3.5 font-sans text-[10px] uppercase tracking-[0.25em] font-bold flex items-center gap-2"
+              className="border border-charcoal text-charcoal hover:bg-charcoal hover:text-[#121212] transition-all duration-300 px-7 py-3.5 font-sans text-[10px] uppercase tracking-[0.25em] font-bold flex items-center gap-2"
             >
               <span>↳</span>
               <span>Who We Are</span>
@@ -192,7 +192,7 @@ export default function Home() {
       </section>
 
       {/* 3. FEATURED PROJECTS (Asymmetric Grid) */}
-      <section className="py-24 md:py-32 bg-white border-t border-charcoal/5 overflow-hidden">
+      <section className="py-24 md:py-32 bg-studio-gray border-t border-charcoal/5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="mb-16 md:mb-24">
             <motion.div
@@ -269,10 +269,10 @@ export default function Home() {
           >
             <Link
               href="/projects"
-              className="group inline-flex items-center justify-center space-x-2 border border-charcoal text-charcoal hover:bg-charcoal hover:text-white px-8 py-4 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
+              className="group inline-flex items-center justify-center space-x-2 border border-charcoal text-charcoal hover:bg-charcoal hover:text-[#121212] px-8 py-4 transition-all duration-300 font-sans text-[10px] uppercase tracking-widest font-bold"
             >
               <span>Explore all works</span>
-              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-charcoal group-hover:text-white" />
+              <ArrowUpRight className="h-3.5 w-3.5 transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-300 text-charcoal group-hover:text-[#121212]" />
             </Link>
           </motion.div>
         </div>
@@ -282,7 +282,7 @@ export default function Home() {
       <InteractiveStage />
 
       {/* 6. TESTIMONIALS */}
-      <section className="py-24 md:py-36 bg-white overflow-hidden">
+      <section className="py-24 md:py-36 bg-studio-gray overflow-hidden testimonial-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -311,7 +311,7 @@ export default function Home() {
           fill
           className="object-cover opacity-60 object-center grayscale"
         />
-        <div className="absolute inset-0 bg-charcoal/45 z-10" />
+        <div className="absolute inset-0 bg-[#121212]/45 z-10" />
 
         <div className="relative z-20 text-center px-6 max-w-2xl flex flex-col items-center">
           <motion.h2
@@ -341,10 +341,10 @@ export default function Home() {
           >
             <Link
               href="/contact"
-              className="group relative inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-charcoal px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
+              className="group relative inline-flex items-center justify-center border border-white text-white hover:bg-white hover:text-[#121212] px-8 py-4 transition-all duration-500 rounded-none font-sans text-xs uppercase tracking-widest font-semibold"
             >
               <span>Contact Us</span>
-              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-charcoal" />
+              <ArrowUpRight className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300 text-white group-hover:text-[#121212]" />
             </Link>
           </motion.div>
         </div>

@@ -129,7 +129,7 @@ export default function ProcessPage() {
   const lineHeight = useTransform(scrollYProgress, [0.08, 0.9], ['0%', '100%']);
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 mb-20 md:mb-32">
         <motion.div
