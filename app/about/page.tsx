@@ -38,7 +38,7 @@ export default function About() {
   };
 
   return (
-    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray about-page-white">
+    <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
       {/* Editorial Profile / Story */}
       <section className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.div
