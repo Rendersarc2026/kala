@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     clientName: 'Alexandra & Peter Sterling',
     location: 'Aurelia Penthouse, New York',
     projectType: 'Residential',
-    image: '/testimonials/alexandra.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/alexandra.jpg',
   },
   {
     id: '2',
@@ -15,7 +15,7 @@ export const testimonials: Testimonial[] = [
     clientName: 'Jean-Pierre Laurent',
     location: 'The Brass Brasserie, London',
     projectType: 'Hospitality',
-    image: '/testimonials/jean.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/jean.jpg',
   },
   {
     id: '3',
@@ -23,7 +23,7 @@ export const testimonials: Testimonial[] = [
     clientName: 'Clara Hayes',
     location: 'Verdant HQ, San Francisco',
     projectType: 'Commercial',
-    image: '/testimonials/clara.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/clara.jpg',
   },
   {
     id: '4',
@@ -31,6 +31,6 @@ export const testimonials: Testimonial[] = [
     clientName: 'The Giraud Family',
     location: 'Maison Serein, France',
     projectType: 'Residential',
-    image: '/testimonials/giraud.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/giraud.jpg',
   },
 ];

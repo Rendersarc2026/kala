@@ -20,7 +20,7 @@ const WHY_CHOOSE_US = [
   {
     icon: Compass,
     title: 'Quality Craftsmanship',
-    image: '/interior/why-choose-us/customized-designs.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/customized-designs.jpg',
     description:
       'We reject cookie-cutter templates. Every layout, millwork detail, and fabric selection is custom-tailored to your habits.',
     extended:
@@ -29,7 +29,7 @@ const WHY_CHOOSE_US = [
   {
     icon: ShieldCheck,
     title: 'Turnkey Solutions',
-    image: '/interior/why-choose-us/turnkey-solutions.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/turnkey-solutions.jpg',
     description:
       'From structural alterations to placing the final coffee-table book, we manage all design and coordination logistics.',
     extended:
@@ -38,7 +38,7 @@ const WHY_CHOOSE_US = [
   {
     icon: Scale,
     title: 'Transparent Pricing',
-    image: '/interior/why-choose-us/transparent-pricing.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/transparent-pricing.jpg',
     description:
       'Detailed bills of quantities (BOQ) with itemized costs. No hidden fees, surprise markups, or structural cost overruns.',
     extended:
@@ -47,7 +47,7 @@ const WHY_CHOOSE_US = [
   {
     icon: Leaf,
     title: 'Quality Materials',
-    image: '/interior/why-choose-us/quality-materials.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/quality-materials.jpg',
     description:
       'We source premium natural stone, sustainable timber, and luxury textiles that age beautifully and last generations.',
     extended:
@@ -56,7 +56,7 @@ const WHY_CHOOSE_US = [
   {
     icon: Clock,
     title: 'On-Time Delivery',
-    image: '/interior/why-choose-us/on-time-delivery.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/on-time-delivery.jpg',
     description:
       'Rigorous project scheduling, buffer management, and vendor coordination ensure we hand over keys on the promised day.',
     extended:
@@ -65,7 +65,7 @@ const WHY_CHOOSE_US = [
   {
     icon: UserCheck,
     title: 'Dedicated Management',
-    image: '/interior/why-choose-us/dedicated-management.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/dedicated-management.jpg',
     description:
       'A single point of contact coordinates architects, engineers, and sub-contractors to maintain execution consistency.',
     extended:
@@ -317,7 +317,7 @@ export default function WhyChooseUsPage() {
 
             <div className="lg:col-span-6 relative w-full aspect-[4/3] overflow-hidden bg-bone-dark shadow-sm rounded-xl">
               <Image
-                src="/interior/why-choose-us/quality-materials.jpg"
+                src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/why-choose-us/quality-materials.jpg"
                 alt="Tactile materials close-up"
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"

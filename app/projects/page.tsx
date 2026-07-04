@@ -1,14 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { projects } from '@/data/projects';
+import { projects as staticProjects } from '@/data/projects';
+import type { Project } from '@/lib/types';
 import ProjectCard from '@/components/ProjectCard';
 
 type CategoryFilter = 'all' | 'residential' | 'commercial' | 'hospitality';
 
 export default function ProjectsIndex() {
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
+  const [projects, setProjects] = useState<Project[]>(staticProjects);
+
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        if (json?.data?.length) setProjects(json.data as Project[]);
+      })
+      .catch(() => {});
+  }, []);
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 

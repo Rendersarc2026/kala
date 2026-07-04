@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AboutSection {
+  id         String @id @default("about")
+  label      String
+  heading    String
+  paragraph  String
+  image1Url  String
+  image2Url  String
+  buttonText String
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AdminUser {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  username           String    @unique @default("admin")
+  hashedPassword     String
+  role               String    @default("ADMIN")
+  mustChangePassword Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  otps               Otp[]
+  sessions           Session[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model BlogPost {
+  id            String   @id
+  title         String
+  excerpt       String
+  imageUrl      String
+  categoryTag   String
+  publishedDate DateTime @default(now())
+  sortOrder     Int
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model CtaSection {
+  id                 String @id @default("cta")
+  heading            String
+  subtext            String
+  buttonText         String
+  backgroundImageUrl String
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model HeroContent {
+  id                 String @id
+  label              String
+  heading            String
+  buttonText         String
+  backgroundImageUrl String
+  slideOrder         Int
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Project {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  category    String
+  location    String
+  area        String
+  year        String
+  client      String
+  description String
+  narrative   String
+  heroImage   String
+  images      String
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Service {
+  id          String @id
+  iconName    String
+  title       String
+  description String
+  sortOrder   Int
+}
+
+model Otp {
+  id        String    @id @default(uuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  codeHash  String    // SHA-256 hash of the OTP
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([adminId])
+}
+
+model FailedAttempt {
+  id        String   @id @default(uuid())
+  email     String
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model Session {
+  id           String    @id @default(uuid())
+  adminId      String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  refreshToken String    @unique
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  @@index([adminId])
+}

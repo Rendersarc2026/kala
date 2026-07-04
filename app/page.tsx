@@ -21,14 +21,29 @@ const inter = Inter({
   display: "swap",
 });
 
-import { projects } from "@/data/projects";
+import { projects as staticProjects } from "@/data/projects";
+import type { Project } from "@/lib/types";
 import { testimonials } from "@/data/testimonials";
 import ProjectCard from "@/components/ProjectCard";
 import TestimonialSlider from "@/components/TestimonialSlider";
 import InteractiveStage from "@/components/InteractiveStage";
 
 export default function Home() {
-  const featuredProjects = projects.filter((p) => p.featured).slice(0, 4);
+  const [featuredProjects, setFeaturedProjects] = React.useState<Project[]>(
+    staticProjects.filter((p) => p.featured).slice(0, 4)
+  );
+
+  React.useEffect(() => {
+    fetch("/api/projects")
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        if (json?.data) {
+          const featured = json.data.filter((p: Project) => p.featured).slice(0, 4);
+          if (featured.length > 0) setFeaturedProjects(featured);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const [activeSlide, setActiveSlide] = React.useState(0);
 
@@ -71,7 +86,7 @@ export default function Home() {
             className="absolute inset-0 z-0 pointer-events-none"
           >
             <Image
-              src="/interior/wallpaperflare.com_wallpaper (1).jpg"
+              src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(1).jpg"
               alt="Luxury living space design by KALA"
               fill
               priority
@@ -306,7 +321,7 @@ export default function Home() {
       {/* 7. CLOSING CTA (Full-bleed) */}
       <section className="relative h-[65vh] w-full flex items-center justify-center overflow-hidden bg-charcoal">
         <Image
-          src="/interior/wallpaperflare.com_wallpaper (2).jpg"
+          src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
           alt="Minimalist design interior by KALA"
           fill
           className="object-cover opacity-60 object-center grayscale"

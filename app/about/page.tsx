@@ -100,7 +100,7 @@ export default function About() {
           {/* Full-bleed style image breaking column */}
           <div className="lg:col-span-5 lg:-mt-12 relative w-full aspect-[3/4] overflow-hidden bg-bone-dark shadow-sm">
             <Image
-              src="/interior/wallpaperflare.com_wallpaper (2).jpg"
+              src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
               alt="Maison Serein rustic project"
               fill
               sizes="(max-width: 1024px) 100vw, 40vw"

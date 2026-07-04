@@ -12,6 +12,10 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+  if (pathname.startsWith("/admin")) {
+    return <>{children}</>;
+  }
+
   return (
     <motion.div
       key={pathname}

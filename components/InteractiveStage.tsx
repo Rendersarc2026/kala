@@ -40,25 +40,25 @@ const PANELS_DATA: PanelItem[] = [
     id: "process",
     label: "Explore / Our Process",
     href: "/process",
-    image: "/interior/wallpaperflare.com_wallpaper (3).jpg",
+    image: "https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(3).jpg",
   },
   {
     id: "about",
     label: "Who / We Are",
     href: "/about",
-    image: "/interior/piqsels.com-id-frfbp.jpg",
+    image: "https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/piqsels.com-id-frfbp.jpg",
   },
   {
     id: "why-choose-us",
     label: "Why / Choose Us",
     href: "/why-choose-us",
-    image: "/interior/wallpaperflare.com_wallpaper (1).jpg",
+    image: "https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(1).jpg",
   },
   {
     id: "services",
     label: "Our / Services",
     href: "/services",
-    image: "/interior/wallpaperflare.com_wallpaper (4).jpg",
+    image: "https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(4).jpg",
   },
 ];
 

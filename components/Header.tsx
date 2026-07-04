@@ -120,6 +120,10 @@ export default function Header() {
 
   const topTextColor = isHeroOverlayPage ? "text-white" : "text-charcoal";
 
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <>
       {/* 1. TOP HEADER (Absolute at top, scrolls away naturally) */}

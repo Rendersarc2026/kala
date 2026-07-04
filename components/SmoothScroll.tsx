@@ -13,6 +13,8 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname.startsWith("/admin")) return;
+
     // Instantiate Lenis
     const lenis = new Lenis({
       duration: 2.2, // slow, luxurious scroll momentum duration
@@ -40,7 +42,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
-  }, []);
+  }, [pathname]);
 
   // Reset scroll to top instantly on route change
   useEffect(() => {

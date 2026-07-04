@@ -1,0 +1,162 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { authenticateAdmin } from "@/lib/auth-helper";
+import { addSecurityHeaders } from "@/app/api/auth/login/route";
+
+const updateProjectSchema = z.object({
+  slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens").optional(),
+  title: z.string().min(1).max(200).optional(),
+  category: z.enum(["residential", "commercial", "hospitality"]).optional(),
+  location: z.string().min(1).max(200).optional(),
+  area: z.string().min(1).max(100).optional(),
+  year: z.string().min(1).max(20).optional(),
+  client: z.string().min(1).max(200).optional(),
+  description: z.string().min(1).max(500).optional(),
+  narrative: z.string().min(1).optional(),
+  heroImage: z.string().min(1).max(500).optional(),
+  images: z.array(z.string()).min(1).optional(),
+  featured: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
+});
+
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  try {
+    const authResult = await authenticateAdmin(request);
+    if (!authResult.authenticated) {
+      const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return addSecurityHeaders(response);
+    }
+
+    const { id } = await context.params;
+
+    const project = await prisma.project.findUnique({ where: { id } });
+    if (!project) {
+      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return addSecurityHeaders(response);
+    }
+
+    const response = NextResponse.json({
+      success: true,
+      data: { ...project, images: JSON.parse(project.images) },
+    });
+    return addSecurityHeaders(response);
+  } catch (error) {
+    console.error("Project GET error:", error);
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return addSecurityHeaders(response);
+  }
+}
+
+export async function PATCH(request: NextRequest, context: RouteContext) {
+  try {
+    const authResult = await authenticateAdmin(request);
+    if (!authResult.authenticated) {
+      const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return addSecurityHeaders(response);
+    }
+
+    const { id } = await context.params;
+
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) {
+      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return addSecurityHeaders(response);
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const parseResult = updateProjectSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      const response = NextResponse.json(
+        { error: "Invalid inputs", details: parseResult.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+      return addSecurityHeaders(response);
+    }
+
+    const data = parseResult.data;
+
+    if (Object.keys(data).length === 0) {
+      const response = NextResponse.json({ error: "No fields to update provided" }, { status: 400 });
+      return addSecurityHeaders(response);
+    }
+
+    if (data.featured) {
+      const featuredCount = await prisma.project.count({
+        where: { 
+          featured: true,
+          id: { not: id }
+        },
+      });
+      if (featuredCount >= 4) {
+        const response = NextResponse.json(
+          { error: "You can only have up to 4 featured projects. Please unfeature another project first." },
+          { status: 400 }
+        );
+        return addSecurityHeaders(response);
+      }
+    }
+
+    if (data.slug) {
+      const slugExists = await prisma.project.findFirst({
+        where: { slug: data.slug, id: { not: id } },
+      });
+      if (slugExists) {
+        const response = NextResponse.json({ error: "A project with this slug already exists" }, { status: 409 });
+        return addSecurityHeaders(response);
+      }
+    }
+
+    const updateData: Record<string, unknown> = { ...data };
+    if (updateData.images) {
+      updateData.images = JSON.stringify(updateData.images);
+    }
+
+    const project = await prisma.project.update({
+      where: { id },
+      data: updateData,
+    });
+
+    const response = NextResponse.json({
+      success: true,
+      data: { ...project, images: JSON.parse(project.images) },
+    });
+    return addSecurityHeaders(response);
+  } catch (error) {
+    console.error("Project PATCH error:", error);
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return addSecurityHeaders(response);
+  }
+}
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const authResult = await authenticateAdmin(request);
+    if (!authResult.authenticated) {
+      const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return addSecurityHeaders(response);
+    }
+
+    const { id } = await context.params;
+
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) {
+      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return addSecurityHeaders(response);
+    }
+
+    await prisma.project.delete({ where: { id } });
+
+    const response = NextResponse.json({ success: true, message: "Project deleted successfully" });
+    return addSecurityHeaders(response);
+  } catch (error) {
+    console.error("Project DELETE error:", error);
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return addSecurityHeaders(response);
+  }
+}

@@ -5,7 +5,7 @@ export const services: Service[] = [
     id: 'residential',
     title: 'Residential Interiors',
     description: 'We craft deeply personal residential spaces that act as sanctuaries. Balancing architectural composition with sensory warmth, we tailor every detail to the daily rituals of our clients.',
-    image: '/interior/wallpaperflare.com_wallpaper.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper.jpg',
     details: [
       'Bespoke estate & penthouse design',
       'Custom furniture & lighting curation',
@@ -18,7 +18,7 @@ export const services: Service[] = [
     id: 'commercial',
     title: 'Commercial Interiors',
     description: 'Elevating brand identity through structural design. We build public, retail, and gallery environments that command attention, ease movement, and reflect core organizational cultures.',
-    image: '/interior/wallpaperflare.com_wallpaper (4).jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(4).jpg',
     details: [
       'Art galleries & exhibition spaces',
       'High-end retail concept stores',
@@ -31,7 +31,7 @@ export const services: Service[] = [
     id: 'hospitality',
     title: 'Hospitality Interiors',
     description: 'From atmospheric restaurants to immersive luxury resorts. We curate environments that emphasize guest comfort, narrative richness, and seamless operations behind the scenes.',
-    image: '/interior/piqsels.com-id-frfbp.jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/piqsels.com-id-frfbp.jpg',
     details: [
       'Boutique hotels & spas',
       'Fine dining restaurants & lounges',
@@ -44,7 +44,7 @@ export const services: Service[] = [
     id: 'office',
     title: 'Office Interiors',
     description: 'Biophilic, high-performance workspaces that inspire productivity and wellbeing. We design flexible environments that scale with teams while maintaining acoustic privacy.',
-    image: '/interior/wallpaperflare.com_wallpaper (1).jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(1).jpg',
     details: [
       'Collaborative & hybrid workspaces',
       'Acoustically insulated private cabins',
@@ -57,7 +57,7 @@ export const services: Service[] = [
     id: 'kitchens',
     title: 'Modular Kitchens',
     description: 'Engineered precision meeting culinary elegance. Our custom modular kitchens pair Italian hardware and German manufacturing with premium stone, wood, and metal finishes.',
-    image: '/interior/wallpaperflare.com_wallpaper (2).jpg',
+    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg',
     details: [
       'Monolithic marble & travertine islands',
       'Soft-close soft-touch premium cabinetry',
