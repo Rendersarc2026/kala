@@ -7,9 +7,17 @@ import nodemailer from "nodemailer";
 import { prisma } from "./prisma";
 
 // Token Secret Configuration
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || "kala_default_access_secret_32_chars_long_minimum";
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || `${JWT_SECRET}_refresh`;
-const PRE_AUTH_SECRET = process.env.PRE_AUTH_SECRET || `${JWT_SECRET}_pre_auth`;
+// Fail closed: never fall back to a hardcoded secret. A leaked/default signing
+// secret would let anyone forge admin access tokens (full authentication bypass).
+const configuredSecret = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET;
+if (!configuredSecret) {
+  throw new Error(
+    "Missing JWT signing secret. Set JWT_SECRET (or NEXTAUTH_SECRET) in the environment."
+  );
+}
+const JWT_SECRET: string = configuredSecret;
+const REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET || `${JWT_SECRET}_refresh`;
+const PRE_AUTH_SECRET: string = process.env.PRE_AUTH_SECRET || `${JWT_SECRET}_pre_auth`;
 
 // Expirations
 const ACCESS_TOKEN_EXPIRY = "2h"; // 2 hours
@@ -180,13 +188,16 @@ export async function resetFailedAttempts(email: string): Promise<void> {
 
 /**
  * Generate a 6-digit numeric OTP and its SHA-256 hash.
- * If DEVELOPMENT_OTP is set in .env, it uses that value for testing convenience.
+ * If DEVELOPMENT_OTP is set, it is only honored outside of production so a fixed
+ * test code can never weaken the real second factor in a deployed environment.
+ * The production code is drawn from a cryptographically secure RNG.
  */
 export function generateOtp(): { code: string; hash: string } {
   const devOtp = process.env.DEVELOPMENT_OTP;
-  const code = devOtp && devOtp.length === 6 && /^\d+$/.test(devOtp)
+  const allowDevOtp = process.env.NODE_ENV !== "production";
+  const code = allowDevOtp && devOtp && devOtp.length === 6 && /^\d+$/.test(devOtp)
     ? devOtp
-    : Math.floor(100000 + Math.random() * 900000).toString();
+    : crypto.randomInt(100000, 1000000).toString();
 
   const hash = crypto.createHash("sha256").update(code).digest("hex");
   return { code, hash };
@@ -216,8 +227,10 @@ This code is valid for 5 minutes. If you did not request this, please change you
     </div>
   `;
 
-  // Always log to terminal and debug file for dev convenience / failover visibility
-  const message = `
+  // Log the plaintext OTP to terminal and debug file only outside of production.
+  // The OTP is a live second factor; it must never be persisted or printed in prod.
+  if (process.env.NODE_ENV !== "production") {
+    const message = `
 =========================================
 [OTP SECURITY CODE]
 To: ${email}
@@ -225,16 +238,17 @@ Code: ${code}
 Expires in: 5 minutes
 =========================================
 `;
-  console.log(message);
+    console.log(message);
 
-  try {
-    const logPath = path.join(process.cwd(), "prisma", "otp-debug.log");
-    fs.appendFileSync(
-      logPath,
-      `[${new Date().toISOString()}] OTP for ${email}: ${code} (Expires in 5 minutes)\n`
-    );
-  } catch (err) {
-    console.error("Failed to write OTP to debug file:", err);
+    try {
+      const logPath = path.join(process.cwd(), "prisma", "otp-debug.log");
+      fs.appendFileSync(
+        logPath,
+        `[${new Date().toISOString()}] OTP for ${email}: ${code} (Expires in 5 minutes)\n`
+      );
+    } catch (err) {
+      console.error("Failed to write OTP to debug file:", err);
+    }
   }
 
   // Retrieve SMTP variables from environment

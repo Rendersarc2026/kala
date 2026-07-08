@@ -71,23 +71,49 @@ export default function AdminProjects() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
 
+  const [toast, setToast] = useState<{
+    id: string;
+    message: string;
+    type: "success" | "error" | "warning";
+  } | null>(null);
+
+  const showToast = useCallback((message: string, type: "success" | "error" | "warning" = "success") => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToast({ id, message, type });
+  }, []);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const [visibleCount, setVisibleCount] = useState(6);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchProjects = useCallback(async () => {
-    setLoading(true);
+  const fetchProjects = useCallback(async (showLoadingSpinner = true) => {
+    if (showLoadingSpinner) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await fetch("/api/admin/projects");
       if (!res.ok) throw new Error("Failed to fetch projects");
       const json = await res.json();
       setProjects(json.data);
-      setVisibleCount(6);
+      if (showLoadingSpinner) {
+        setVisibleCount(6);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch projects");
     } finally {
-      setLoading(false);
+      if (showLoadingSpinner) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -306,8 +332,8 @@ export default function AdminProjects() {
       errs.heroImage = "Hero image URL must be 500 characters or less";
     }
 
-    if (form.images.length === 0) {
-      errs.images = "At least one gallery image URL is required";
+    if (form.images.length > 3) {
+      errs.images = "You can upload a maximum of 3 gallery images";
     }
 
     setFieldErrors(errs);
@@ -396,8 +422,20 @@ export default function AdminProjects() {
 
         updateFormField("heroImage", json.url);
       } else {
+        const currentCount = form.images.length;
+        if (currentCount >= 3) {
+          throw new Error("You already have 3 gallery images. Please delete one first.");
+        }
+
+        const availableSlots = 3 - currentCount;
+        const uploadCount = Math.min(files.length, availableSlots);
+
+        if (uploadCount === 0) {
+          throw new Error("Cannot upload more than 3 gallery images.");
+        }
+
         const uploadedUrls: string[] = [];
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < uploadCount; i++) {
           const file = files[i];
           const formData = new FormData();
           formData.append("file", file);
@@ -413,6 +451,10 @@ export default function AdminProjects() {
         }
         const updatedImages = [...form.images, ...uploadedUrls];
         updateFormField("images", updatedImages);
+
+        if (files.length > uploadCount) {
+          setError(`Only uploaded the first ${uploadCount} files. A maximum of 3 gallery images is allowed.`);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload image");
@@ -446,6 +488,20 @@ export default function AdminProjects() {
     setError(null);
     setSuccess(null);
 
+    const trimmedForm = {
+      ...form,
+      slug: form.slug.trim(),
+      title: form.title.trim(),
+      location: form.location.trim(),
+      area: form.area.trim(),
+      year: form.year.trim(),
+      client: form.client.trim(),
+      description: form.description.trim(),
+      narrative: form.narrative.trim(),
+      heroImage: form.heroImage.trim(),
+      images: form.images.map((img) => img.trim()).filter((img) => img !== ""),
+    };
+
     try {
       const url = editingId ? `/api/admin/projects/${editingId}` : "/api/admin/projects";
       const method = editingId ? "PATCH" : "POST";
@@ -453,7 +509,7 @@ export default function AdminProjects() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(trimmedForm),
       });
 
       const json = await res.json();
@@ -515,7 +571,9 @@ export default function AdminProjects() {
     if (!project.featured) {
       const currentFeaturedCount = projects.filter((p) => p.featured).length;
       if (currentFeaturedCount >= 4) {
-        setError("You can only have up to 4 featured projects. Please unfeature another project first.");
+        const warningMsg = "You can only have up to 4 featured projects. Please unfeature another project first.";
+        setError(warningMsg);
+        showToast(warningMsg, "warning");
         return;
       }
     }
@@ -531,13 +589,26 @@ export default function AdminProjects() {
 
       if (!res.ok) {
         const json = await res.json();
-        setError(json.error || "Failed to toggle featured");
+        const errorMsg = json.error || "Failed to toggle featured";
+        setError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
-      fetchProjects();
+      setProjects((prev) =>
+        prev.map((p) => (p.id === project.id ? { ...p, featured: !project.featured } : p))
+      );
+      
+      const newFeaturedState = !project.featured;
+      showToast(
+        newFeaturedState ? "Project featured successfully!" : "Project unfeatured successfully!",
+        "success"
+      );
+
+      fetchProjects(false);
     } catch {
       setError("Connection error.");
+      showToast("Connection error.", "error");
     } finally {
       setTogglingFeaturedId(null);
     }
@@ -548,13 +619,7 @@ export default function AdminProjects() {
     validateField(field, value);
   };
 
-  const formatImages = (images: string[]) => images.join(", ");
 
-  const parseImages = (raw: string): string[] =>
-    raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
 
   const labelClass = "text-[10px] uppercase tracking-widest text-gray-500 font-semibold";
   const btnClass = "bg-black text-[#ffffff] font-semibold text-[10px] uppercase tracking-widest px-6 py-3 rounded-lg hover:bg-gray-800 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-55 disabled:cursor-not-allowed";
@@ -567,7 +632,7 @@ export default function AdminProjects() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-8 border-b border-gray-200 mb-10">
         <div>
           <h1 className="text-3xl font-light tracking-wide font-serif text-gray-900 flex items-center gap-3">
-            <FolderKanban className="w-6 h-6 text-gray-750" /> Projects
+            <FolderKanban className="w-6 h-6 text-gray-800" /> Projects
           </h1>
           <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest font-semibold">
             Manage your portfolio projects
@@ -831,52 +896,45 @@ export default function AdminProjects() {
             </div>
 
             <div className="space-y-1.5">
-              <label className={labelClass}>Hero Image URL</label>
-              <div className="flex gap-3">
-                <div className="relative flex-grow">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-300">
-                    <ImageIcon className="w-4 h-4" />
+              <label className={labelClass}>Hero Image</label>
+              <div className="flex items-center gap-6">
+                {form.heroImage ? (
+                  <div className="relative w-28 h-20 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                    <img src={form.heroImage} alt="Hero preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => updateFormField("heroImage", "")}
+                      disabled={saving || uploadingField !== null}
+                      className="absolute top-1 right-1 bg-black/75 hover:bg-black/90 text-[#ffffff] rounded-full p-1 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <input
-                    type="text"
-                    value={form.heroImage}
-                    readOnly
-                    placeholder="No hero image uploaded yet. Click Upload to select an image."
-                    className={`${getInputClass("heroImage")} cursor-not-allowed text-gray-500 font-light select-all`}
-                    required
-                    disabled={saving || uploadingField !== null}
-                  />
+                ) : (
+                  <div className="w-28 h-20 rounded-lg border border-dashed border-gray-200 flex items-center justify-center text-gray-300">
+                    <ImageIcon className="w-6 h-6 text-gray-200" />
+                  </div>
+                )}
+                
+                <div>
+                  <label className={`bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-lg px-4 py-2.5 text-xs uppercase tracking-widest font-semibold flex items-center justify-center cursor-pointer transition-colors ${
+                    saving || uploadingField !== null ? "opacity-50 pointer-events-none" : ""
+                  }`}>
+                    {uploadingField === "heroImage" ? (
+                      <Loader2 className="w-4.5 h-4.5 animate-spin text-black" />
+                    ) : (
+                      "Upload Hero Image"
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleUpload(e, "heroImage")}
+                      disabled={saving || uploadingField !== null}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-                <label className={`bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-lg px-4 py-2.5 text-xs uppercase tracking-widest font-semibold flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
-                  saving || uploadingField !== null ? "opacity-50 pointer-events-none" : ""
-                }`}>
-                  {uploadingField === "heroImage" ? (
-                    <Loader2 className="w-4.5 h-4.5 animate-spin text-black" />
-                  ) : (
-                    "Upload"
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleUpload(e, "heroImage")}
-                    disabled={saving || uploadingField !== null}
-                    className="hidden"
-                  />
-                </label>
               </div>
-              {form.heroImage && (
-                <div className="relative w-28 h-20 rounded-lg overflow-hidden border border-gray-200 mt-2 bg-gray-50">
-                  <img src={form.heroImage} alt="Hero preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => updateFormField("heroImage", "")}
-                    disabled={saving || uploadingField !== null}
-                    className="absolute top-1 right-1 bg-black/75 hover:bg-black/90 text-[#ffffff] rounded-full p-1 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
               {fieldErrors.heroImage && (
                 <p className="text-red-600 text-[10px] mt-1 font-medium">{fieldErrors.heroImage}</p>
               )}
@@ -884,42 +942,35 @@ export default function AdminProjects() {
 
             <div className="space-y-1.5">
               <label className={labelClass}>Gallery Images</label>
-              <div className="flex gap-3">
-                <div className="relative flex-grow">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-300">
-                    <ImageIcon className="w-4 h-4" />
+              <div className="flex items-center gap-6">
+                {form.images.length < 3 && (
+                  <div>
+                    <label className={`bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-lg px-4 py-2.5 text-xs uppercase tracking-widest font-semibold flex items-center justify-center cursor-pointer transition-colors ${
+                      saving || uploadingField !== null ? "opacity-50 pointer-events-none" : ""
+                    }`}>
+                      {uploadingField === "images" ? (
+                        <Loader2 className="w-4.5 h-4.5 animate-spin text-black" />
+                      ) : (
+                        "Upload Gallery Files"
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleUpload(e, "images")}
+                        disabled={saving || uploadingField !== null}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
-                  <input
-                    type="text"
-                    value={formatImages(form.images)}
-                    readOnly
-                    placeholder="No gallery images uploaded yet. Click Upload Files to select images."
-                    className={`${getInputClass("images")} cursor-not-allowed text-gray-500 font-light select-all`}
-                    required
-                    disabled={saving || uploadingField !== null}
-                  />
+                )}
+                <div className="text-[10px] text-gray-400 font-light">
+                  Up to 3 gallery images are allowed. Currently: {form.images.length}/3.
                 </div>
-                <label className={`bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-700 rounded-lg px-4 py-2.5 text-xs uppercase tracking-widest font-semibold flex items-center justify-center cursor-pointer shrink-0 transition-colors ${
-                  saving || uploadingField !== null ? "opacity-50 pointer-events-none" : ""
-                }`}>
-                  {uploadingField === "images" ? (
-                    <Loader2 className="w-4.5 h-4.5 animate-spin text-black" />
-                  ) : (
-                    "Upload Files"
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => handleUpload(e, "images")}
-                    disabled={saving || uploadingField !== null}
-                    className="hidden"
-                  />
-                </label>
               </div>
 
               {form.images.length > 0 && (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mt-2">
+                <div className="grid grid-cols-3 gap-3 mt-3">
                   {form.images.map((img, idx) => (
                     <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 bg-gray-50 group">
                       <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
@@ -930,7 +981,7 @@ export default function AdminProjects() {
                           updateFormField("images", updated);
                         }}
                         disabled={saving || uploadingField !== null}
-                        className="absolute top-1 right-1 bg-black/75 hover:bg-black/90 text-[#ffffff] rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="absolute top-1 right-1 bg-black/75 hover:bg-black/90 text-[#ffffff] rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -953,7 +1004,7 @@ export default function AdminProjects() {
               >
                 Cancel
               </button>
-              <button type="submit" disabled={saving} className={btnClass}>
+              <button type="submit" disabled={saving || uploadingField !== null} className={btnClass}>
                 {saving ? <Loader2 className="w-4 h-4 animate-spin text-[#ffffff]" /> : <Save className="w-4 h-4" />}
                 {editingId ? "Update Project" : "Create Project"}
               </button>
@@ -1052,7 +1103,7 @@ export default function AdminProjects() {
                       type="button"
                       onClick={() => setDeleteConfirm(null)}
                       disabled={deleting}
-                      className="px-3 py-1.5 text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-750 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="px-3 py-1.5 text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
@@ -1163,7 +1214,7 @@ export default function AdminProjects() {
                         type="button"
                         onClick={() => setDeleteConfirm(null)}
                         disabled={deleting}
-                        className="px-2 py-1.5 text-[9px] uppercase tracking-widest text-gray-750 hover:text-gray-755 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="px-2 py-1.5 text-[9px] uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         Cancel
                       </button>
@@ -1190,7 +1241,7 @@ export default function AdminProjects() {
       {projects.length > visibleCount && (
         <div ref={sentinelRef} className="flex items-center justify-center py-8 mt-4">
           {loadingMore && (
-            <div className="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-widest font-semibold">
+            <div className="flex items-center gap-2 text-xs text-gray-550 uppercase tracking-widest font-semibold">
               <Loader2 className="w-4 h-4 animate-spin text-black" /> Loading more projects...
             </div>
           )}

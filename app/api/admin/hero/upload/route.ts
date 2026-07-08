@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAdmin } from "@/lib/auth-helper";
 import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { prisma } from "@/lib/prisma";
 import path from "path";
 
 export async function POST(request: NextRequest) {
@@ -56,15 +57,31 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // 6. Generate a unique name
+    // 6. Query current hero configuration to find previous file to delete
+    let oldImageFilename: string | null = null;
+    try {
+      const currentHero = await prisma.heroContent.findUnique({
+        where: { id: "hero" },
+      });
+      if (currentHero && currentHero.backgroundImageUrl) {
+        const url = currentHero.backgroundImageUrl;
+        const bucketPathSegment = `/storage/v1/object/public/${encodeURIComponent(supabaseBucket)}/`;
+        if (url.includes(bucketPathSegment)) {
+          oldImageFilename = url.substring(url.indexOf(bucketPathSegment) + bucketPathSegment.length);
+        }
+      }
+    } catch (dbErr) {
+      console.error("Failed to query current hero for old image:", dbErr);
+    }
+
+    // 7. Generate a unique name for the new file
     const ext = path.extname(file.name) || `.${file.type.split("/")[1]}`;
-    // Sanitize original filename (keep only alphanumeric and hyphens/underscores)
     const safeBaseName = path.basename(file.name, ext)
       .toLowerCase()
       .replace(/[^a-z0-9_-]/g, "");
-    const uniqueName = `${safeBaseName}-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
+    const uniqueName = `banner-${safeBaseName}-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
 
-    // 7. Upload to Supabase Storage REST API
+    // 8. Upload to Supabase Storage REST API
     const encodedBucket = encodeURIComponent(supabaseBucket);
     const uploadUrl = `${supabaseUrl}/storage/v1/object/${encodedBucket}/${uniqueName}`;
     const buffer = await file.arrayBuffer();
@@ -88,7 +105,29 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // 8. Return success response with file URL
+    // 9. Safely delete the previous image file from Supabase Storage
+    if (oldImageFilename) {
+      try {
+        const deleteUrl = `${supabaseUrl}/storage/v1/object/${encodedBucket}`;
+        const deleteRes = await fetch(deleteUrl, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${supabaseServiceKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prefixes: [oldImageFilename] }),
+        });
+        if (deleteRes.ok) {
+          console.log("Successfully deleted old banner image from Supabase:", oldImageFilename);
+        } else {
+          console.warn("Failed to delete old banner image from Supabase:", await deleteRes.text());
+        }
+      } catch (deleteErr) {
+        console.error("Failed to delete old banner image from Supabase:", deleteErr);
+      }
+    }
+
+    // 10. Return success response with file URL
     const fileUrl = `${supabaseUrl}/storage/v1/object/public/${encodedBucket}/${uniqueName}`;
     const response = NextResponse.json({
       success: true,
@@ -97,7 +136,7 @@ export async function POST(request: NextRequest) {
     });
     return addSecurityHeaders(response);
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Hero Supabase upload error:", error);
     const response = NextResponse.json({ error: "Internal server error during upload." }, { status: 500 });
     return addSecurityHeaders(response);
   }

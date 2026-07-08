@@ -15,21 +15,28 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
 
   const handleNext = () => {
+    if (!testimonials || testimonials.length === 0) return;
     setDirection(1);
     setActiveIndex((prev) => (prev + 1) % testimonials.length);
   };
 
   const handlePrev = () => {
+    if (!testimonials || testimonials.length === 0) return;
     setDirection(-1);
     setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
   useEffect(() => {
+    if (!testimonials || testimonials.length === 0) return;
     const timer = setInterval(() => {
       handleNext();
     }, 10000);
     return () => clearInterval(timer);
   }, [activeIndex, testimonials.length]);
+
+  if (!testimonials || testimonials.length === 0) {
+    return null;
+  }
 
   const activeTestimonial = testimonials[activeIndex];
 

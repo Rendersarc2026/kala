@@ -8,6 +8,10 @@ import {
   Menu,
   X,
   FolderKanban,
+  MessageSquare,
+  Home,
+  Info,
+  MapPin,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -21,7 +25,11 @@ interface AdminSidebarProps {
 
 const TABS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "home", label: "Home Page", icon: Home },
   { id: "projects", label: "Projects", icon: FolderKanban },
+  { id: "about", label: "About Page", icon: Info },
+  { id: "testimonials", label: "Testimonials", icon: MessageSquare },
+  { id: "contact", label: "Contact Info", icon: MapPin },
 ];
 
 export default function AdminSidebar({
@@ -43,7 +51,7 @@ export default function AdminSidebar({
       {/* Mobile toggle */}
       <button
         onClick={onToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-[#121212] border border-[#ffffff]/20 rounded-lg p-2.5 text-[#ffffff] cursor-pointer"
+        className="lg:hidden fixed top-4 right-4 z-50 bg-[#121212] border border-[#ffffff]/20 rounded-lg p-2.5 text-[#ffffff] cursor-pointer"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -58,8 +66,10 @@ export default function AdminSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-[#121212] border-r border-[#ffffff]/10 flex flex-col transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        className={`fixed top-0 left-0 right-0 bottom-0 z-40 bg-[#121212] border-b lg:border-b-0 lg:border-r border-[#ffffff]/10 flex flex-col transition-all duration-300 h-screen overflow-y-auto lg:right-auto lg:w-64 lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto ${
+          isOpen
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-full opacity-0 pointer-events-none lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto"
         }`}
       >
         {/* Brand */}
@@ -82,7 +92,9 @@ export default function AdminSidebar({
                 key={tab.id}
                 onClick={() => {
                   onTabChange(tab.id);
-                  onToggle();
+                  if (isOpen) {
+                    onToggle();
+                  }
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-medium uppercase tracking-widest transition-all cursor-pointer ${
                   isActive

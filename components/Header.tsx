@@ -21,6 +21,7 @@ export default function Header() {
   const pathname = usePathname();
   const lastOpenedRef = useRef<number>(0);
   const lastScrollY = useRef<number>(0);
+  const hasTriggeredBottomRef = useRef<boolean>(false);
 
   const handleNav = (href: string) => {
     setIsMenuOpen(false);
@@ -42,65 +43,59 @@ export default function Header() {
     }
   }, [isMenuOpen]);
 
-  // Unified scroll effect: handles menu overlay closing
+  // Unified, high-performance scroll effect using requestAnimationFrame and passive listener
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Close menu overlay if open and user scrolls in either direction
-      if (isMenuOpen) {
-        const timeElapsed = Date.now() - lastOpenedRef.current;
-        if (Math.abs(currentScrollY - lastScrollY.current) > 5 && timeElapsed > 250) {
-          setIsMenuOpen(false);
-        }
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMenuOpen]);
-
-  // Track scroll position for home screen nav reveal
-  useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolled(window.scrollY > 60);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Automatically open menu when user scrolls to the bottom (home page only)
-  useEffect(() => {
-    if (pathname !== "/") return;
-
-    let hasTriggered = false;
+    let ticking = false;
 
     const handleScroll = () => {
-      const threshold = 50;
-      const resetThreshold = 100;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
 
-      const totalHeight = document.documentElement.scrollHeight;
-      const visibleHeight = window.innerHeight;
-      const scrollPosition = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+          // 1. Track scroll position for nav reveal
+          setHasScrolled(currentScrollY > 60);
 
-      const distanceToBottom = totalHeight - visibleHeight - scrollPosition;
+          // 2. Close menu overlay if open and user scrolls
+          if (isMenuOpen) {
+            const timeElapsed = Date.now() - lastOpenedRef.current;
+            if (Math.abs(currentScrollY - lastScrollY.current) > 5 && timeElapsed > 250) {
+              setIsMenuOpen(false);
+            }
+          }
 
-      if (distanceToBottom <= threshold) {
-        if (!hasTriggered) {
-          setIsMenuOpen(true);
-          hasTriggered = true;
-        }
-      } else if (distanceToBottom > resetThreshold) {
-        hasTriggered = false;
+          // 3. Automatically open menu when user scrolls to the bottom (home page only)
+          if (pathname === "/") {
+            const threshold = 50;
+            const resetThreshold = 100;
+
+            const totalHeight = document.documentElement.scrollHeight;
+            const visibleHeight = window.innerHeight;
+            const distanceToBottom = totalHeight - visibleHeight - currentScrollY;
+
+            if (distanceToBottom <= threshold) {
+              if (!hasTriggeredBottomRef.current) {
+                setIsMenuOpen(true);
+                hasTriggeredBottomRef.current = true;
+              }
+            } else if (distanceToBottom > resetThreshold) {
+              hasTriggeredBottomRef.current = false;
+            }
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+
+        ticking = true;
       }
     };
 
+    // Initialize state
+    setHasScrolled(window.scrollY > 60);
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
+  }, [pathname, isMenuOpen]);
 
   // Determine active page label
   const getActiveLabel = () => {

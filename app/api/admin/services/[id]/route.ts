@@ -4,19 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { authenticateAdmin } from "@/lib/auth-helper";
 import { addSecurityHeaders } from "@/app/api/auth/login/route";
 
-const updateProjectSchema = z.object({
-  slug: z.string().trim().min(1, "Slug is required").max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens").optional(),
+const updateServiceSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
-  category: z.enum(["residential", "commercial", "hospitality"]).optional(),
-  location: z.string().trim().min(1).max(200).optional(),
-  area: z.string().trim().min(1).max(100).optional(),
-  year: z.string().trim().min(1).max(20).optional(),
-  client: z.string().trim().min(1).max(200).optional(),
-  description: z.string().trim().min(1).max(500).optional(),
-  narrative: z.string().trim().min(1).optional(),
-  heroImage: z.string().trim().min(1).max(500).optional(),
-  images: z.array(z.string().trim().min(1)).max(3, "You can have a maximum of 3 gallery images").optional(),
-  featured: z.boolean().optional(),
+  description: z.string().trim().min(1).max(1000).optional(),
+  image: z.string().trim().min(1).max(500).optional(),
+  details: z.array(z.string().trim().min(1)).min(1).optional(),
   sortOrder: z.number().int().optional(),
 });
 
@@ -34,19 +26,19 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const project = await prisma.project.findUnique({ where: { id } });
-    if (!project) {
-      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+    const service = await prisma.service.findUnique({ where: { id } });
+    if (!service) {
+      const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
     const response = NextResponse.json({
       success: true,
-      data: { ...project, images: JSON.parse(project.images) },
+      data: { ...service, details: JSON.parse(service.details) as string[] },
     });
     return addSecurityHeaders(response);
   } catch (error) {
-    console.error("Project GET error:", error);
+    console.error("Service GET error:", error);
     const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return addSecurityHeaders(response);
   }
@@ -62,14 +54,14 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await prisma.service.findUnique({ where: { id } });
     if (!existing) {
-      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+      const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
     const body = await request.json().catch(() => ({}));
-    const parseResult = updateProjectSchema.safeParse(body);
+    const parseResult = updateServiceSchema.safeParse(body);
 
     if (!parseResult.success) {
       const response = NextResponse.json(
@@ -86,49 +78,23 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
-    if (data.featured) {
-      const featuredCount = await prisma.project.count({
-        where: { 
-          featured: true,
-          id: { not: id }
-        },
-      });
-      if (featuredCount >= 4) {
-        const response = NextResponse.json(
-          { error: "You can only have up to 4 featured projects. Please unfeature another project first." },
-          { status: 400 }
-        );
-        return addSecurityHeaders(response);
-      }
-    }
-
-    if (data.slug) {
-      const slugExists = await prisma.project.findFirst({
-        where: { slug: data.slug, id: { not: id } },
-      });
-      if (slugExists) {
-        const response = NextResponse.json({ error: "A project with this slug already exists" }, { status: 409 });
-        return addSecurityHeaders(response);
-      }
-    }
-
     const updateData: Record<string, unknown> = { ...data };
-    if (updateData.images) {
-      updateData.images = JSON.stringify(updateData.images);
+    if (updateData.details) {
+      updateData.details = JSON.stringify(updateData.details);
     }
 
-    const project = await prisma.project.update({
+    const service = await prisma.service.update({
       where: { id },
       data: updateData,
     });
 
     const response = NextResponse.json({
       success: true,
-      data: { ...project, images: JSON.parse(project.images) },
+      data: { ...service, details: JSON.parse(service.details) as string[] },
     });
     return addSecurityHeaders(response);
   } catch (error) {
-    console.error("Project PATCH error:", error);
+    console.error("Service PATCH error:", error);
     const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return addSecurityHeaders(response);
   }
@@ -144,18 +110,18 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await prisma.service.findUnique({ where: { id } });
     if (!existing) {
-      const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
+      const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
-    await prisma.project.delete({ where: { id } });
+    await prisma.service.delete({ where: { id } });
 
-    const response = NextResponse.json({ success: true, message: "Project deleted successfully" });
+    const response = NextResponse.json({ success: true, message: "Service deleted successfully" });
     return addSecurityHeaders(response);
   } catch (error) {
-    console.error("Project DELETE error:", error);
+    console.error("Service DELETE error:", error);
     const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return addSecurityHeaders(response);
   }

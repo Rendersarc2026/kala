@@ -79,15 +79,22 @@ model Project {
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@index([featured, sortOrder])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Service {
-  id          String @id
-  iconName    String
+  id          String   @id @default(uuid())
   title       String
   description String
-  sortOrder   Int
+  image       String
+  details     String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
 }
 
 model Otp {
@@ -120,4 +127,41 @@ model Session {
   createdAt    DateTime  @default(now())
 
   @@index([adminId])
+}
+
+model Testimonial {
+  id          String   @id @default(uuid())
+  quote       String
+  clientName  String
+  location    String
+  projectType String
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  image     String
+  bio       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model ContactSettings {
+  id          String   @id @default("contact")
+  phone       String
+  email       String
+  hoursMonFri String
+  hoursSat    String
+  hoursSun    String
+  mapEmbedUrl String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

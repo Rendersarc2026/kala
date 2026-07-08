@@ -5,17 +5,17 @@ import { authenticateAdmin } from "@/lib/auth-helper";
 import { addSecurityHeaders } from "@/app/api/auth/login/route";
 
 const createProjectSchema = z.object({
-  slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
-  title: z.string().min(1).max(200),
+  slug: z.string().trim().min(1, "Slug is required").max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
+  title: z.string().trim().min(1, "Title is required").max(200),
   category: z.enum(["residential", "commercial", "hospitality"]),
-  location: z.string().min(1).max(200),
-  area: z.string().min(1).max(100),
-  year: z.string().min(1).max(20),
-  client: z.string().min(1).max(200),
-  description: z.string().min(1).max(500),
-  narrative: z.string().min(1),
-  heroImage: z.string().min(1).max(500),
-  images: z.array(z.string()).min(1),
+  location: z.string().trim().min(1, "Location is required").max(200),
+  area: z.string().trim().min(1, "Area is required").max(100),
+  year: z.string().trim().min(1, "Year is required").max(20),
+  client: z.string().trim().min(1, "Client is required").max(200),
+  description: z.string().trim().min(1, "Description is required").max(500),
+  narrative: z.string().trim().min(1, "Narrative is required"),
+  heroImage: z.string().trim().min(1, "Hero image is required").max(500),
+  images: z.array(z.string().trim().min(1)).max(3, "You can have a maximum of 3 gallery images"),
   featured: z.boolean().default(false),
   sortOrder: z.number().int().default(0),
 });

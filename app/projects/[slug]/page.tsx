@@ -1,43 +1,69 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Maximize, User } from 'lucide-react';
-import { projects } from '@/data/projects';
+import { projects as staticProjects } from '@/data/projects';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
-}
-
 export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projectIndex = projects.findIndex((p) => p.slug === slug);
 
-  if (projectIndex === -1) {
-    notFound();
+  let project;
+  let nextProject;
+
+  const dbProject = await prisma.project.findUnique({
+    where: { slug },
+  });
+
+  if (dbProject) {
+    project = {
+      ...dbProject,
+      images: typeof dbProject.images === "string" ? JSON.parse(dbProject.images) as string[] : dbProject.images,
+    };
+
+    let nextDbProject = await prisma.project.findFirst({
+      where: {
+        sortOrder: {
+          gt: dbProject.sortOrder,
+        },
+      },
+      orderBy: { sortOrder: "asc" },
+    });
+
+    if (!nextDbProject) {
+      nextDbProject = await prisma.project.findFirst({
+        orderBy: { sortOrder: "asc" },
+      });
+    }
+
+    nextProject = nextDbProject ? {
+      ...nextDbProject,
+      images: typeof nextDbProject.images === "string" ? JSON.parse(nextDbProject.images) as string[] : nextDbProject.images,
+    } : project;
+  } else {
+    // Fallback to static projects
+    const projectIndex = staticProjects.findIndex((p) => p.slug === slug);
+    if (projectIndex === -1) {
+      notFound();
+    }
+    project = staticProjects[projectIndex];
+    nextProject = staticProjects[(projectIndex + 1) % staticProjects.length];
   }
-
-  const project = projects[projectIndex];
-  
-  // Find next project in list for bottom CTA
-  const nextProject = projects[(projectIndex + 1) % projects.length];
 
   return (
     <div className="w-full bg-studio-gray">
       {/* 1. Full-Screen Hero */}
       <section className="relative h-[85vh] w-full flex items-end overflow-hidden bg-charcoal">
-        <Image
+        <img
           src={project.heroImage}
           alt={project.title}
-          fill
-          priority
-          className="object-cover opacity-80 object-center"
+          className="absolute inset-0 w-full h-full object-cover opacity-80 object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-studio-gray via-studio-gray/40 to-transparent z-10" />
 
@@ -114,9 +140,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
       </section>
 
       {/* 3. Asymmetric Image Gallery */}
-      <section className="pb-24 md:pb-36 bg-studio-gray overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          
+      {project.images && project.images.length > 0 && (
+        <section className="pb-24 md:pb-36 bg-studio-gray overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 md:px-12">
+            
           <div className="mb-12">
             <h3 className="font-sans text-[10px] tracking-[0.25em] uppercase font-bold text-charcoal-light">
               Visual Documentation
@@ -124,52 +151,85 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           </div>
 
           {/* Gallery Layout */}
-          <div className="space-y-12 md:space-y-20">
-            {/* Image 1: Large full-bleed style container */}
+          {project.images.length === 1 && (
             <div className="relative aspect-[16/9] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
-              <Image
-                src={project.images[0] || project.heroImage}
+              <img
+                src={project.images[0]}
                 alt={`${project.title} Gallery 1`}
-                fill
-                sizes="100vw"
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
+          )}
 
-            {/* Images 2 & 3: Asymmetric Split Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
-              <div className="md:col-span-5 relative aspect-[4/5] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
-                <Image
-                  src={project.images[1] || project.heroImage}
-                  alt={`${project.title} Gallery 2`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover"
+          {project.images.length === 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+              <div className="relative aspect-[3/2] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
+                <img
+                  src={project.images[0]}
+                  alt={`${project.title} Gallery 1`}
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
-
-              <div className="md:col-span-7 md:mt-16 relative aspect-[4/3] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
-                <Image
-                  src={project.images[2] || project.heroImage}
-                  alt={`${project.title} Gallery 3`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 60vw"
-                  className="object-cover"
+              <div className="relative aspect-[3/2] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
+                <img
+                  src={project.images[1]}
+                  alt={`${project.title} Gallery 2`}
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             </div>
-          </div>
+          )}
 
-        </div>
-      </section>
+          {project.images.length >= 3 && (
+            <div className="space-y-12 md:space-y-20">
+              {/* Image 1: Large full-bleed style container */}
+              {project.images[0] && (
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
+                  <img
+                    src={project.images[0]}
+                    alt={`${project.title} Gallery 1`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Images 2 & 3: Asymmetric Split Grid */}
+              {(project.images[1] || project.images[2]) && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+                  {project.images[1] && (
+                    <div className="md:col-span-5 relative aspect-[4/5] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
+                      <img
+                        src={project.images[1]}
+                        alt={`${project.title} Gallery 2`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {project.images[2] && (
+                    <div className="md:col-span-7 md:mt-16 relative aspect-[4/3] w-full overflow-hidden bg-bone-dark border border-charcoal/5 shadow-sm">
+                      <img
+                        src={project.images[2]}
+                        alt={`${project.title} Gallery 3`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          </div>
+        </section>
+      )}
 
       {/* 4. Bottom CTA: Next Project Transition */}
       <Link href={`/projects/${nextProject.slug}`} className="group relative block h-[50vh] w-full bg-charcoal overflow-hidden">
-        <Image
+        <img
           src={nextProject.heroImage}
           alt={nextProject.title}
-          fill
-          className="object-cover opacity-40 transition-transform duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-1000 ease-[0.16,1,0.3,1] group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-[#121212]/50 z-10" />
 
