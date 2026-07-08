@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Project } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -7,7 +8,7 @@ export async function GET() {
       orderBy: { sortOrder: "asc" },
     });
 
-    const parsed = projects.map((p) => ({
+    const parsed = projects.map((p: Project) => ({
       ...p,
       images: JSON.parse(p.images),
     }));

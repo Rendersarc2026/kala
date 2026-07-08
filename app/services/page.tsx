@@ -44,7 +44,7 @@ export default async function ServicesPage() {
     }));
   }
 
-  const parsedServices = dbServices.map((s) => ({
+  const parsedServices = dbServices.map((s: { id: string; title: string; description: string; image: string; details: string; sortOrder: number }) => ({
     id: s.id,
     title: s.title,
     description: s.description,

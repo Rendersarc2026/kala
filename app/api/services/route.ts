@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Service } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { services as staticServices } from "@/data/services";
 
@@ -25,7 +26,7 @@ export async function GET() {
       });
     }
 
-    const parsed = services.map((s) => ({
+    const parsed = services.map((s: Service) => ({
       id: s.id,
       title: s.title,
       description: s.description,

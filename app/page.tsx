@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import HomeClient from "@/components/HomeClient";
 import type { Project } from "@/lib/types";
+import type { Project as PrismaProject, Testimonial as PrismaTestimonial } from "@prisma/client";
 
 // Force dynamic execution to guarantee fresh DB values on every render
 export const revalidate = 0;
@@ -11,7 +12,7 @@ export default async function Home() {
     orderBy: { sortOrder: "asc" },
   });
 
-  const projects: Project[] = dbProjects.map((p) => ({
+  const projects: Project[] = dbProjects.map((p: PrismaProject) => ({
     title: p.title,
     slug: p.slug,
     category: p.category as 'residential' | 'commercial' | 'hospitality',
@@ -92,7 +93,7 @@ export default async function Home() {
     });
   }
 
-  const testimonials = dbTestimonials.map((t) => ({
+  const testimonials = dbTestimonials.map((t: PrismaTestimonial) => ({
     id: t.id,
     quote: t.quote,
     clientName: t.clientName,
