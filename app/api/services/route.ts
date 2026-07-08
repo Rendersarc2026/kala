@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { Service } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { DbService } from "@/lib/types";
 import { services as staticServices } from "@/data/services";
 
 export async function GET() {
@@ -26,7 +26,7 @@ export async function GET() {
       });
     }
 
-    const parsed = services.map((s: Service) => ({
+    const parsed = services.map((s: DbService) => ({
       id: s.id,
       title: s.title,
       description: s.description,

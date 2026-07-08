@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import ProjectsClient from "@/components/ProjectsClient";
 import { projects as staticProjects } from "@/data/projects";
-import type { Project } from "@/lib/types";
-import type { Project as PrismaProject } from "@prisma/client";
+import type { Project, DbProject } from "@/lib/types";
 
 // Force dynamic execution to guarantee fresh DB values on every render
 export const revalidate = 0;
@@ -15,7 +14,7 @@ export default async function ProjectsPage() {
   let projects: Project[];
 
   if (dbProjects.length > 0) {
-    projects = dbProjects.map((p: PrismaProject) => ({
+    projects = dbProjects.map((p: DbProject) => ({
       title: p.title,
       slug: p.slug,
       category: p.category as 'residential' | 'commercial' | 'hospitality',

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { Project } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { DbProject } from "@/lib/types";
 import { authenticateAdmin } from "@/lib/auth-helper";
 import { addSecurityHeaders } from "@/app/api/auth/login/route";
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       orderBy: { sortOrder: "asc" },
     });
 
-    const parsed = projects.map((p: Project) => ({
+    const parsed = projects.map((p: DbProject) => ({
       ...p,
       images: JSON.parse(p.images),
     }));

@@ -2,11 +2,12 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { services as staticServices } from "@/data/services";
 import ServicesClient from "@/components/ServicesClient";
+import type { DbService } from "@/lib/types";
 
 export const revalidate = 0; // Dynamic server rendering
 
 export default async function ServicesPage() {
-  let dbServices = [];
+  let dbServices: DbService[] = [];
   try {
     const services = await prisma.service.findMany({
       orderBy: { sortOrder: "asc" },
@@ -41,10 +42,12 @@ export default async function ServicesPage() {
       image: s.image,
       details: JSON.stringify(s.details),
       sortOrder: idx,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
   }
 
-  const parsedServices = dbServices.map((s: { id: string; title: string; description: string; image: string; details: string; sortOrder: number }) => ({
+  const parsedServices = dbServices.map((s: DbService) => ({
     id: s.id,
     title: s.title,
     description: s.description,
