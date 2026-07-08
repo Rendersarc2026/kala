@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import {
   hashPassword,
   verifyPassword,
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     // 5. Hash and save the new password
     const newHashedPassword = await hashPassword(newPassword);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Update password and clear change flag
       await tx.adminUser.update({
         where: { id: adminId },
