@@ -27,7 +27,7 @@ export default async function AboutPage() {
     });
   }
 
-  const teamData = team.map((member) => ({
+  const teamData = team.map((member: { id: string; name: string; role: string; image: string; bio: string }) => ({
     id: member.id,
     name: member.name,
     role: member.role,
