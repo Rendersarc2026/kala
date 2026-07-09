@@ -222,19 +222,8 @@ This code is valid for 5 minutes. If you did not request this, please change you
     </div>
   `;
 
-  // Log the plaintext OTP to terminal and debug file only outside of production.
-  // The OTP is a live second factor; it must never be persisted or printed in prod.
+  // Log the OTP to debug file only outside of production.
   if (process.env.NODE_ENV !== "production") {
-    const message = `
-=========================================
-[OTP SECURITY CODE]
-To: ${email}
-Code: ${code}
-Expires in: 5 minutes
-=========================================
-`;
-    console.log(message);
-
     try {
       const logPath = path.join(process.cwd(), "prisma", "otp-debug.log");
       fs.appendFileSync(
@@ -272,13 +261,9 @@ Expires in: 5 minutes
         text: textMessage,
         html: htmlMessage,
       });
-
-      console.log(`Successfully sent OTP email to ${email} via SMTP.`);
     } catch (smtpError) {
       console.error("Failed to send OTP email via SMTP:", smtpError);
     }
-  } else {
-    console.log("SMTP is not fully configured (missing SMTP_HOST, SMTP_USER, or SMTP_PASS). Falling back to console/file logs.");
   }
 }
 

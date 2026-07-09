@@ -3,13 +3,9 @@ export async function register() {
     // Dynamically import prisma to avoid edge execution issues if next/server runs edge runtime somewhere
     const { prisma } = await import("@/lib/prisma");
     
-    console.log("[DB Ping Scheduler] Starting database keep-alive ping worker...");
-    
     const pingDatabase = async () => {
       try {
-        console.log(`[DB Ping] Pinging database at ${new Date().toISOString()}...`);
-        const result = await prisma.$queryRaw`SELECT 1`;
-        console.log("[DB Ping] Database ping successful:", result);
+        await prisma.$queryRaw`SELECT 1`;
       } catch (error) {
         console.error("[DB Ping] Database ping failed:", error);
       }

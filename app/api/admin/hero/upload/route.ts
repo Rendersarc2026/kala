@@ -117,9 +117,7 @@ export async function POST(request: NextRequest) {
           },
           body: JSON.stringify({ prefixes: [oldImageFilename] }),
         });
-        if (deleteRes.ok) {
-          console.log("Successfully deleted old banner image from Supabase:", oldImageFilename);
-        } else {
+        if (!deleteRes.ok) {
           console.warn("Failed to delete old banner image from Supabase:", await deleteRes.text());
         }
       } catch (deleteErr) {

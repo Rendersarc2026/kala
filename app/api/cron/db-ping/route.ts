@@ -13,8 +13,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log(`[DB Ping API] Triggering keep-alive query at ${new Date().toISOString()}...`);
-    
     // A simple query to wake up/keep database active
     const result = await prisma.$queryRaw`SELECT 1`;
 

@@ -110,7 +110,6 @@ export default function ContactClient({
 
     setIsSubmitting(true);
     setTimeout(() => {
-      console.log("KALA Studio - Form Submission:", formData);
       setIsSubmitting(false);
       setIsSuccess(true);
       setFormData({
