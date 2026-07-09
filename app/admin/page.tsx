@@ -9,6 +9,9 @@ import {
   UserCheck,
   LayoutDashboard,
   CheckCircle,
+  UserPlus,
+  Mail,
+  Trash2,
 } from "lucide-react";
 import AdminSidebar from "@/components/AdminSidebar";
 import AdminHome from "@/components/AdminHome";
@@ -27,6 +30,7 @@ interface AdminProfile {
 }
 
 export default function AdminDashboardPage() {
+  const superadminEmail = process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL;
   const router = useRouter();
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,24 +38,14 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Change Password fields
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [pwdSuccess, setPwdSuccess] = useState<string | null>(null);
-  const [pwdError, setPwdError] = useState<string | null>(null);
-  const [pwdLoading, setPwdLoading] = useState(false);
-  const [pwdFieldErrors, setPwdFieldErrors] = useState<Record<string, string>>({});
-
-  const clearPwdFieldError = (field: string) => {
-    if (pwdFieldErrors[field]) {
-      setPwdFieldErrors((prev) => {
-        const copy = { ...prev };
-        delete copy[field];
-        return copy;
-      });
-    }
-  };
+  // Admin User Management fields
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [adminsLoading, setAdminsLoading] = useState(false);
+  const [addingAdmin, setAddingAdmin] = useState(false);
+  const [adminError, setAdminError] = useState<string | null>(null);
+  const [adminSuccess, setAdminSuccess] = useState<string | null>(null);
+  const [removingAdminId, setRemovingAdminId] = useState<string | null>(null);
 
   // Handle back button after logout (bfcache restore) — re-check auth
   useEffect(() => {
@@ -88,63 +82,84 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Fetch admin profile on mount
+  async function fetchAdmins() {
+    setAdminsLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setAdmins(data.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch admins:", err);
+    } finally {
+      setAdminsLoading(false);
+    }
+  }
+
+  // Fetch admin profile and admins list on mount
   useEffect(() => {
     fetchProfile();
+    fetchAdmins();
   }, []);
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
+  const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
+    if (!newAdminEmail.trim()) return;
 
-    const errors: Record<string, string> = {};
-    if (!currentPassword.trim()) {
-      errors.currentPassword = "Current password is required.";
-    }
-    if (!newPassword.trim()) {
-      errors.newPassword = "New password is required.";
-    } else if (newPassword.length < 6) {
-      errors.newPassword = "New password must be at least 6 characters.";
-    }
-    if (!confirmPassword.trim()) {
-      errors.confirmPassword = "Confirm password is required.";
-    } else if (newPassword !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match.";
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setPwdFieldErrors(errors);
-      return;
-    }
-
-    setPwdLoading(true);
-    setPwdError(null);
-    setPwdSuccess(null);
-    setPwdFieldErrors({});
+    setAddingAdmin(true);
+    setAdminError(null);
+    setAdminSuccess(null);
 
     try {
-      const res = await fetch("/api/auth/change-password", {
+      const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ email: newAdminEmail }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setPwdError(data.error || "Failed to change password.");
-        setPwdLoading(false);
+        setAdminError(data.error || "Failed to add admin user.");
         return;
       }
 
-      setPwdSuccess("Password updated successfully!");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setAdminSuccess("Admin user added successfully!");
+      setNewAdminEmail("");
+      fetchAdmins(); // Refresh admin list
     } catch (err) {
-      setPwdError("Connection error.");
+      setAdminError("Connection error.");
     } finally {
-      setPwdLoading(false);
+      setAddingAdmin(false);
+    }
+  };
+
+  const handleRemoveAdmin = async (adminId: string) => {
+    if (!window.confirm("Are you sure you want to remove this admin?")) return;
+
+    setRemovingAdminId(adminId);
+    setAdminError(null);
+    setAdminSuccess(null);
+
+    try {
+      const res = await fetch(`/api/admin/users/${adminId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAdminError(data.error || "Failed to remove admin user.");
+        return;
+      }
+
+      setAdminSuccess("Admin user removed successfully!");
+      fetchAdmins(); // Refresh admin list
+    } catch (err) {
+      setAdminError("Connection error.");
+    } finally {
+      setRemovingAdminId(null);
     }
   };
 
@@ -242,114 +257,116 @@ export default function AdminDashboardPage() {
 
               {/* Dashboard Grid */}
               <div className="max-w-4xl space-y-8">
-                  {/* Password Change */}
-                  <div className="bg-[#ffffff] border border-gray-200 rounded-xl p-8 shadow-sm">
-                    <h2 className="text-lg font-light text-gray-900 border-b border-gray-100 pb-3 mb-6">
-                      Change Password
-                    </h2>
+                {/* Manage Admin Users */}
+                <div className="bg-[#ffffff] border border-gray-200 rounded-xl p-8 shadow-sm">
+                  <h2 className="text-lg font-light text-gray-900 border-b border-gray-100 pb-3 mb-6 flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-gray-800" /> Add New Admin Email
+                  </h2>
 
-                    {pwdError && (
-                      <div className="bg-red-55 border border-red-100 text-red-655 rounded-lg p-3.5 text-xs flex items-start gap-2.5 mb-5">
-                        <AlertCircle className="w-4.5 h-4.5 shrink-0" />
-                        <span>{pwdError}</span>
+                  {adminError && (
+                    <div className="bg-red-50 border border-red-100 text-red-600 rounded-lg p-3.5 text-xs flex items-start gap-2.5 mb-5">
+                      <AlertCircle className="w-4.5 h-4.5 shrink-0" />
+                      <span>{adminError}</span>
+                    </div>
+                  )}
+
+                  {adminSuccess && (
+                    <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-lg p-3.5 text-xs flex items-start gap-2.5 mb-5">
+                      <CheckCircle className="w-4.5 h-4.5 shrink-0" />
+                      <span>{adminSuccess}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddAdmin} className="flex flex-col sm:flex-row gap-4 mb-8">
+                    <div className="flex-1 relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <Mail className="w-4 h-4" />
                       </div>
-                    )}
+                      <input
+                        type="email"
+                        disabled={addingAdmin}
+                        value={newAdminEmail}
+                        onChange={(e) => setNewAdminEmail(e.target.value)}
+                        className="w-full bg-[#ffffff] border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={addingAdmin || !newAdminEmail.trim()}
+                      className="bg-black text-[#ffffff] font-semibold text-[10px] uppercase tracking-widest px-6 py-3 rounded-lg hover:bg-gray-800 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {addingAdmin ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-[#ffffff]" />
+                      ) : (
+                        "Add Admin"
+                      )}
+                    </button>
+                  </form>
 
-                    {pwdSuccess && (
-                      <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-lg p-3.5 text-xs flex items-start gap-2.5 mb-5">
-                        <CheckCircle className="w-4.5 h-4.5 shrink-0" />
-                        <span>{pwdSuccess}</span>
-                      </div>
-                    )}
-
-                    <form onSubmit={handlePasswordChange} noValidate className="space-y-5">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                            Current Password
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-300">
-                              <Lock className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="password"
-                              disabled={pwdLoading}
-                              value={currentPassword}
-                              onChange={(e) => { setCurrentPassword(e.target.value); clearPwdFieldError("currentPassword"); }}
-                              placeholder="••••••••"
-                              className={`w-full bg-[#ffffff] border rounded-lg py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                                pwdFieldErrors.currentPassword ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                              }`}
-                            />
-                          </div>
-                          {pwdFieldErrors.currentPassword && (
-                            <p className="text-xs text-red-500 mt-1">{pwdFieldErrors.currentPassword}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                            New Password
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-300">
-                              <Lock className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="password"
-                              disabled={pwdLoading}
-                              value={newPassword}
-                              onChange={(e) => { setNewPassword(e.target.value); clearPwdFieldError("newPassword"); }}
-                              placeholder="••••••••"
-                              className={`w-full bg-[#ffffff] border rounded-lg py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                                pwdFieldErrors.newPassword ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                              }`}
-                            />
-                          </div>
-                          {pwdFieldErrors.newPassword && (
-                            <p className="text-xs text-red-500 mt-1">{pwdFieldErrors.newPassword}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                            Confirm New Password
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-300">
-                              <Lock className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="password"
-                              disabled={pwdLoading}
-                              value={confirmPassword}
-                              onChange={(e) => { setConfirmPassword(e.target.value); clearPwdFieldError("confirmPassword"); }}
-                              placeholder="••••••••"
-                              className={`w-full bg-[#ffffff] border rounded-lg py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                                pwdFieldErrors.confirmPassword ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                              }`}
-                            />
-                          </div>
-                          {pwdFieldErrors.confirmPassword && (
-                            <p className="text-xs text-red-500 mt-1">{pwdFieldErrors.confirmPassword}</p>
-                          )}
-                        </div>
-
-                      </div>
-
-                      <div className="flex justify-end mt-2">
-                        <button
-                          type="submit"
-                          disabled={pwdLoading || !currentPassword || !newPassword || !confirmPassword}
-                          className="bg-black text-[#ffffff] font-semibold text-[10px] uppercase tracking-widest px-6 py-3 rounded-lg hover:bg-gray-800 transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
-                        >
-                          {pwdLoading ? <Loader2 className="w-4 h-4 animate-spin text-[#ffffff]" /> : "Update Password"}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-widest">
+                    Registered Admins
+                  </h3>
+                  
+                  {adminsLoading ? (
+                    <div className="flex justify-center py-6">
+                      <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <div className="border border-gray-150 rounded-lg overflow-hidden bg-[#fafafa]">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 font-semibold">
+                            <th className="p-3">Email Address</th>
+                            <th className="p-3">Username</th>
+                            <th className="p-3">Role</th>
+                            <th className="p-3">Date Added</th>
+                            {profile.role === "SUPERADMIN" && profile.email === superadminEmail && (
+                              <th className="p-3 text-right">Actions</th>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {admins.map((adminItem) => (
+                            <tr key={adminItem.id} className="border-b border-gray-200 hover:bg-white text-gray-700">
+                              <td className="p-3 font-medium select-text">{adminItem.email}</td>
+                              <td className="p-3 select-text">{adminItem.username}</td>
+                              <td className="p-3">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-200/60 text-gray-800 uppercase tracking-widest">
+                                  {adminItem.role}
+                                </span>
+                              </td>
+                              <td className="p-3 text-gray-500">
+                                {new Date(adminItem.createdAt).toLocaleDateString()}
+                              </td>
+                              {profile.role === "SUPERADMIN" && profile.email === superadminEmail && (
+                                <td className="p-3 text-right">
+                                  {adminItem.id !== profile.id ? (
+                                    <button
+                                      disabled={removingAdminId === adminItem.id}
+                                      onClick={() => handleRemoveAdmin(adminItem.id)}
+                                      className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 font-semibold uppercase tracking-wider text-[10px] border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-2.5 py-1.5 rounded transition-all cursor-pointer disabled:opacity-50"
+                                    >
+                                      {removingAdminId === adminItem.id ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-3 h-3" />
+                                      )}
+                                      Remove
+                                    </button>
+                                  ) : (
+                                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest italic pr-2">
+                                      You
+                                    </span>
+                                  )}
+                                </td>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           )}

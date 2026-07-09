@@ -7,6 +7,9 @@ import {
   verifyPreAuthToken,
   signAccessToken,
   signRefreshToken,
+  checkLockout,
+  recordFailedAttempt,
+  resetFailedAttempts,
 } from "@/lib/auth";
 import { addSecurityHeaders } from "../login/route";
 
@@ -40,6 +43,21 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || null;
+
+    // Check lockout status
+    const lockout = await checkLockout(payload.email);
+    if (lockout.isLocked) {
+      const response = NextResponse.json(
+        {
+          error: `Too many failed login attempts. This account is locked. Please try again after ${lockout.retryAfterSeconds} seconds.`,
+          retryAfter: lockout.retryAfterSeconds,
+        },
+        { status: 423 }
+      );
+      return addSecurityHeaders(response);
+    }
+
     // 2. Parse and validate body
     const body = await request.json().catch(() => ({}));
     const parseResult = otpVerifySchema.safeParse(body);
@@ -67,6 +85,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!activeOtp) {
+      await recordFailedAttempt(payload.email, ip);
       const response = NextResponse.json(
         { error: "Invalid or expired OTP code." },
         { status: 400 }
@@ -84,10 +103,11 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // OTP succeeded: delete all OTPs for this admin
+    // OTP succeeded: delete all OTPs for this admin and reset failed attempts
     await prisma.otp.deleteMany({
       where: { adminId: admin.id },
     });
+    await resetFailedAttempts(payload.email);
 
     // 5. Generate Access & Refresh Tokens
     const claims = { adminId: admin.id, role: admin.role };

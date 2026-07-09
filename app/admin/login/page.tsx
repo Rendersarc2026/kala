@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, KeyRound, ArrowRight, ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import {
+  Lock,
+  Mail,
+  KeyRound,
+  ArrowRight,
+  ShieldCheck,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 type FormStep = "credentials" | "otp" | "change-password";
 
@@ -11,20 +19,16 @@ export default function AdminLoginPage() {
   const [step, setStep] = useState<FormStep>("credentials");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string[]>
+  >({});
 
   // Step 1: Credentials
   const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
 
   // Step 2: OTP
   const [otpCode, setOtpCode] = useState("");
   const [otpSentMessage, setOtpSentMessage] = useState("");
-
-  // Step 3: Force Change Password
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Lockout State
   const [lockoutTimeLeft, setLockoutTimeLeft] = useState<number>(0);
@@ -42,7 +46,7 @@ export default function AdminLoginPage() {
   useEffect(() => {
     setError(null);
     setValidationErrors({});
-  }, [identifier, password, otpCode, newPassword, confirmPassword]);
+  }, [identifier, otpCode]);
 
   // Redirect to dashboard if already authenticated (handles back button after login via bfcache)
   useEffect(() => {
@@ -71,7 +75,7 @@ export default function AdminLoginPage() {
   // Step 1 Submission: Login Credentials
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier || !password) {
+    if (!identifier) {
       setError("Please fill in all fields.");
       return;
     }
@@ -83,7 +87,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier }),
       });
 
       const data = await res.json();
@@ -106,15 +110,15 @@ export default function AdminLoginPage() {
       // Succeeded. If OTP is required, move to step 2.
       if (data.requireOtp) {
         setOtpSentMessage(data.message);
-        // Pre-fill the current password in case they need to change it in step 3
-        setCurrentPassword(password);
         setStep("otp");
       } else {
         // Fallback if OTP is bypassed (should not happen)
         router.push("/admin");
       }
     } catch (err) {
-      setError("Unable to connect to the authentication server. Please try again.");
+      setError(
+        "Unable to connect to the authentication server. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -141,51 +145,17 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Verification failed.");
+        if (res.status === 423) {
+          // Locked out
+          setLockoutTimeLeft(data.retryAfter || 300);
+          setError(data.error);
+        } else {
+          setError(data.error || "Verification failed.");
+        }
         setLoading(false);
         return;
       }
 
-      router.push("/admin");
-    } catch (err) {
-      setError("Connection error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 3 Submission: Force Change Password
-  const handleChangePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPassword || !confirmPassword) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch("/api/auth/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Password change failed.");
-        setLoading(false);
-        return;
-      }
-
-      // Success - user is now logged in with updated credentials
       router.push("/admin");
     } catch (err) {
       setError("Connection error. Please try again.");
@@ -202,7 +172,6 @@ export default function AdminLoginPage() {
 
       {/* Main Container */}
       <div className="w-full max-w-md z-10 transition-all duration-500 transform scale-100">
-        
         {/* Brand Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-light tracking-[0.3em] text-[#ffffff] mb-2 select-text font-serif">
@@ -215,7 +184,6 @@ export default function AdminLoginPage() {
 
         {/* Form Box */}
         <div className="bg-[#121212]/90 border border-[#ffffff]/10 rounded-xl p-8 backdrop-blur-md shadow-2xl relative">
-          
           {/* Top Line Decor */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ffffff]/30 to-transparent rounded-t-xl" />
 
@@ -224,12 +192,13 @@ export default function AdminLoginPage() {
             <h2 className="text-xl font-light tracking-wide text-[#ffffff]">
               {step === "credentials" && "Sign In"}
               {step === "otp" && "Verification"}
-              {step === "change-password" && "Reset Password"}
             </h2>
             <p className="text-xs text-[#ffffff]/50 mt-1">
-              {step === "credentials" && "Please enter your administrative credentials."}
-              {step === "otp" && (otpSentMessage || "A 2FA authentication code has been sent to your email.")}
-              {step === "change-password" && "Your account has default credentials. You must change your password to continue."}
+              {step === "credentials" &&
+                "Please enter your administrative email address."}
+              {step === "otp" &&
+                (otpSentMessage ||
+                  "A 2FA authentication code has been sent to your email.")}
             </p>
           </div>
 
@@ -264,34 +233,14 @@ export default function AdminLoginPage() {
                     disabled={loading || lockoutTimeLeft > 0}
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="admin@kala.design"
+                    placeholder="example@gmail.com"
                     className="w-full bg-[#1A1A1A] border border-[#ffffff]/10 rounded-lg py-2.5 pl-10 pr-4 text-sm text-[#ffffff] placeholder-[#ffffff]/20 focus:outline-none focus:border-[#ffffff]/30 transition-colors disabled:opacity-55"
                   />
                 </div>
                 {validationErrors.identifier && (
-                  <p className="text-[10px] text-red-400 mt-1">{validationErrors.identifier[0]}</p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-[#ffffff]/60 font-semibold">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#ffffff]/20">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    disabled={loading || lockoutTimeLeft > 0}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full bg-[#1A1A1A] border border-[#ffffff]/10 rounded-lg py-2.5 pl-10 pr-4 text-sm text-[#ffffff] placeholder-[#ffffff]/20 focus:outline-none focus:border-[#ffffff]/30 transition-colors disabled:opacity-55"
-                  />
-                </div>
-                {validationErrors.password && (
-                  <p className="text-[10px] text-red-400 mt-1">{validationErrors.password[0]}</p>
+                  <p className="text-[10px] text-red-400 mt-1">
+                    {validationErrors.identifier[0]}
+                  </p>
                 )}
               </div>
 
@@ -304,7 +253,8 @@ export default function AdminLoginPage() {
                   <Loader2 className="w-4 h-4 animate-spin text-[#000000]" />
                 ) : (
                   <>
-                    Continue <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    Continue{" "}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </>
                 )}
               </button>
@@ -321,9 +271,11 @@ export default function AdminLoginPage() {
                 <input
                   type="text"
                   maxLength={6}
-                  disabled={loading}
+                  disabled={loading || lockoutTimeLeft > 0}
                   value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                  onChange={(e) =>
+                    setOtpCode(e.target.value.replace(/\D/g, ""))
+                  }
                   placeholder="000000"
                   className="w-full bg-[#1A1A1A] border border-[#ffffff]/10 rounded-lg py-3 text-center text-xl font-bold tracking-[6px] text-[#ffffff] focus:outline-none focus:border-[#ffffff]/30 transition-colors disabled:opacity-55"
                 />
@@ -340,7 +292,9 @@ export default function AdminLoginPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading || otpCode.length !== 6}
+                  disabled={
+                    loading || lockoutTimeLeft > 0 || otpCode.length !== 6
+                  }
                   className="w-2/3 bg-[#ffffff] text-[#000000] font-semibold text-[10px] uppercase tracking-widest rounded-lg py-3 hover:bg-gray-200 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
@@ -354,64 +308,7 @@ export default function AdminLoginPage() {
               </div>
             </form>
           )}
-
-          {/* STEP 3: FORCE CHANGE PASSWORD FORM */}
-          {step === "change-password" && (
-            <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-[#ffffff]/60 font-semibold">
-                  New Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#ffffff]/20">
-                    <KeyRound className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    disabled={loading}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Min 10 characters, upper, lower, symbol"
-                    className="w-full bg-[#1A1A1A] border border-[#ffffff]/10 rounded-lg py-2.5 pl-10 pr-4 text-sm text-[#ffffff] placeholder-[#ffffff]/20 focus:outline-none focus:border-[#ffffff]/30 transition-colors disabled:opacity-55"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-[#ffffff]/60 font-semibold">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#ffffff]/20">
-                    <KeyRound className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    disabled={loading}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    className="w-full bg-[#1A1A1A] border border-[#ffffff]/10 rounded-lg py-2.5 pl-10 pr-4 text-sm text-[#ffffff] placeholder-[#ffffff]/20 focus:outline-none focus:border-[#ffffff]/30 transition-colors disabled:opacity-55"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || !newPassword || newPassword !== confirmPassword}
-                className="w-full bg-[#ffffff] text-[#000000] font-semibold text-xs uppercase tracking-widest rounded-lg py-3 hover:bg-gray-200 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 mt-3"
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-[#000000]" />
-                ) : (
-                  "Change Password & Sign In"
-                )}
-              </button>
-            </form>
-          )}
-
         </div>
-
       </div>
     </div>
   );

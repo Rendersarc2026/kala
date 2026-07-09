@@ -20,10 +20,6 @@ const loginSchema = z.object({
     .min(1, "Username or email is required")
     .max(100, "Identifier must be under 100 characters")
     .trim(),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .max(100, "Password must be under 100 characters"),
 });
 
 // Helper to set security headers to prevent XSS, clickjacking, etc.
@@ -53,13 +49,25 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    const { identifier, password } = parseResult.data;
+    const { identifier } = parseResult.data;
 
     // Sanitization to prevent simple injection or control character attacks
     const sanitizedIdentifier = identifier.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
 
-    // 3. Lockout Check
-    const lockout = await checkLockout(sanitizedIdentifier);
+    // 3. Find Admin User by email or username
+    const admin = await prisma.adminUser.findFirst({
+      where: {
+        OR: [
+          { email: sanitizedIdentifier },
+          { username: sanitizedIdentifier },
+        ],
+      },
+    });
+
+    const targetIdentifier = admin ? admin.email : sanitizedIdentifier;
+
+    // 4. Lockout Check
+    const lockout = await checkLockout(targetIdentifier);
     if (lockout.isLocked) {
       const response = NextResponse.json(
         {
@@ -71,40 +79,9 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // 4. Find Admin User by email or username
-    const admin = await prisma.adminUser.findFirst({
-      where: {
-        OR: [
-          { email: sanitizedIdentifier },
-          { username: sanitizedIdentifier },
-        ],
-      },
-    });
-
     if (!admin) {
-      await recordFailedAttempt(sanitizedIdentifier, ip);
-      const response = NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-      return addSecurityHeaders(response);
-    }
-
-    // 5. Verify Password
-    const passwordMatches = await verifyPassword(password, admin.hashedPassword);
-    if (!passwordMatches) {
-      await recordFailedAttempt(sanitizedIdentifier, ip);
-      const response = NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-      return addSecurityHeaders(response);
-    }
-
-    // Success - reset failed attempts
-    await resetFailedAttempts(sanitizedIdentifier);
-
-    // 6. Check OTP request rate limiting (max 3 per 5 min)
-    const isRateLimited = await checkOtpRateLimit(admin.id);
-    if (isRateLimited) {
-      const response = NextResponse.json(
-        { error: "Too many OTP requests. Please wait 5 minutes before trying again." },
-        { status: 429 }
-      );
+      await recordFailedAttempt(targetIdentifier, ip);
+      const response = NextResponse.json({ error: "Admin user not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
@@ -139,9 +116,8 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      message: "Password verified. OTP code sent to your registered email.",
+      message: "OTP code sent to your registered email.",
       requireOtp: true,
-      mustChangePassword: admin.mustChangePassword,
     });
 
     return addSecurityHeaders(response);

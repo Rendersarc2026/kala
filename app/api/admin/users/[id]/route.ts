@@ -201,3 +201,73 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return addSecurityHeaders(response);
   }
 }
+
+// DELETE: Delete a specific admin user with strict authorization checks
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    // 1. Authenticate the acting admin from session cookie
+    const authResult = await authenticateAdmin(request);
+    if (!authResult.authenticated) {
+      const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return addSecurityHeaders(response);
+    }
+
+    const actingAdmin = authResult.admin;
+
+    // 2. Strict Authorization Check: Only the Super Admin can delete
+    const superadminEmail = process.env.SUPERADMIN_EMAIL || process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL;
+    if (actingAdmin.role !== "SUPERADMIN" || actingAdmin.email !== superadminEmail) {
+      const response = NextResponse.json(
+        { error: `Access Denied: Only the Super Admin (${superadminEmail}) can remove other admins.` },
+        { status: 403 }
+      );
+      return addSecurityHeaders(response);
+    }
+
+    // 3. Validate URL parameter ID
+    const { id: rawTargetId } = await context.params;
+    const targetIdResult = uuidParamSchema.safeParse(rawTargetId);
+
+    if (!targetIdResult.success) {
+      const response = NextResponse.json({ error: "Invalid resource identifier" }, { status: 400 });
+      return addSecurityHeaders(response);
+    }
+
+    const targetId = targetIdResult.data;
+
+    // 4. Prevent self-deletion
+    if (actingAdmin.id === targetId) {
+      const response = NextResponse.json(
+        { error: "Access Denied: You cannot delete your own admin account." },
+        { status: 400 }
+      );
+      return addSecurityHeaders(response);
+    }
+
+    // 5. Check if the target admin exists
+    const targetAdmin = await prisma.adminUser.findUnique({
+      where: { id: targetId },
+    });
+
+    if (!targetAdmin) {
+      const response = NextResponse.json({ error: "Admin user not found" }, { status: 404 });
+      return addSecurityHeaders(response);
+    }
+
+    // 6. Delete the admin user
+    await prisma.adminUser.delete({
+      where: { id: targetId },
+    });
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Admin user removed successfully.",
+    });
+    return addSecurityHeaders(response);
+  } catch (error) {
+    console.error("DELETE admin user error:", error);
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return addSecurityHeaders(response);
+  }
+}
+

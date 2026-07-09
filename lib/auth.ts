@@ -193,13 +193,7 @@ export async function resetFailedAttempts(email: string): Promise<void> {
  * The production code is drawn from a cryptographically secure RNG.
  */
 export function generateOtp(): { code: string; hash: string } {
-  const devOtp = process.env.DEVELOPMENT_OTP || "000000";
-  const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
-  const allowDevOtp = process.env.NODE_ENV !== "production" || !hasSmtp;
-  const code = allowDevOtp && devOtp && devOtp.length === 6 && /^\d+$/.test(devOtp)
-    ? devOtp
-    : crypto.randomInt(100000, 1000000).toString();
-
+  const code = crypto.randomInt(100000, 1000000).toString();
   const hash = crypto.createHash("sha256").update(code).digest("hex");
   return { code, hash };
 }
