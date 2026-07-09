@@ -3,7 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { DbService } from "@/lib/types";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
+import { parseStringArray } from "@/lib/json";
 
 const createServiceSchema = z.object({
   title: z.string().trim().min(1).max(200),
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     const parsed = services.map((s: DbService) => ({
       ...s,
-      details: JSON.parse(s.details) as string[],
+      details: parseStringArray(s.details),
     }));
 
     const response = NextResponse.json({ success: true, data: parsed });
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...service, details: JSON.parse(service.details) as string[] },
+      data: { ...service, details: parseStringArray(service.details) },
     }, { status: 201 });
     return addSecurityHeaders(response);
   } catch (error) {

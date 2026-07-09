@@ -1,3 +1,4 @@
+import { parseStringArray } from "@/lib/json";
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -24,27 +25,52 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   if (dbProject) {
     project = {
       ...dbProject,
-      images: typeof dbProject.images === "string" ? JSON.parse(dbProject.images) as string[] : dbProject.images,
+      images: parseStringArray(dbProject.images),
     };
 
     let nextDbProject = await prisma.project.findFirst({
       where: {
-        sortOrder: {
-          gt: dbProject.sortOrder,
-        },
+        OR: [
+          {
+            sortOrder: {
+              gt: dbProject.sortOrder,
+            },
+          },
+          {
+            sortOrder: dbProject.sortOrder,
+            createdAt: {
+              gt: dbProject.createdAt,
+            },
+          },
+          {
+            sortOrder: dbProject.sortOrder,
+            createdAt: dbProject.createdAt,
+            id: {
+              gt: dbProject.id,
+            },
+          },
+        ],
       },
-      orderBy: { sortOrder: "asc" },
+      orderBy: [
+        { sortOrder: "asc" },
+        { createdAt: "asc" },
+        { id: "asc" },
+      ],
     });
 
     if (!nextDbProject) {
       nextDbProject = await prisma.project.findFirst({
-        orderBy: { sortOrder: "asc" },
+        orderBy: [
+          { sortOrder: "asc" },
+          { createdAt: "asc" },
+          { id: "asc" },
+        ],
       });
     }
 
     nextProject = nextDbProject ? {
       ...nextDbProject,
-      images: typeof nextDbProject.images === "string" ? JSON.parse(nextDbProject.images) as string[] : nextDbProject.images,
+      images: parseStringArray(nextDbProject.images),
     } : project;
   } else {
     // Fallback to static projects

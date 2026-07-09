@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { authenticateAdmin, isSuperAdmin } from "@/lib/auth-helper";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
 // Validation schema for target ID in URL
 const uuidParamSchema = z.string().uuid("Invalid user ID format");
@@ -48,11 +48,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const targetId = targetIdResult.data;
 
     // 3. Authorization Check (IDOR Prevention)
-    // A user can only access their OWN record, unless they are a SUPERADMIN
+    // A user can only access their OWN record, unless they are the super admin
     const isOwner = actingAdmin.id === targetId;
-    const isSuperAdmin = actingAdmin.role === "SUPERADMIN";
 
-    if (!isOwner && !isSuperAdmin) {
+    if (!isOwner && !isSuperAdmin(actingAdmin)) {
       const response = NextResponse.json(
         { error: "Access Denied: You do not have permission to view this resource." },
         { status: 403 }
@@ -112,11 +111,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const targetId = targetIdResult.data;
 
     // 3. Authorization Check (IDOR Prevention)
-    // A user can only modify their OWN record, unless they are a SUPERADMIN
+    // A user can only modify their OWN record, unless they are the super admin
     const isOwner = actingAdmin.id === targetId;
-    const isSuperAdmin = actingAdmin.role === "SUPERADMIN";
 
-    if (!isOwner && !isSuperAdmin) {
+    if (!isOwner && !isSuperAdmin(actingAdmin)) {
       const response = NextResponse.json(
         { error: "Access Denied: You do not have permission to modify this resource." },
         { status: 403 }
@@ -214,11 +212,12 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const actingAdmin = authResult.admin;
 
-    // 2. Strict Authorization Check: Only the Super Admin can delete
-    const superadminEmail = process.env.SUPERADMIN_EMAIL || process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL;
-    if (actingAdmin.role !== "SUPERADMIN" || actingAdmin.email !== superadminEmail) {
+    // 2. Strict Authorization Check: Only the Super Admin can delete.
+    // The configured super-admin address is not echoed back — an unauthorised
+    // caller has no need to learn it.
+    if (!isSuperAdmin(actingAdmin)) {
       const response = NextResponse.json(
-        { error: `Access Denied: Only the Super Admin (${superadminEmail}) can remove other admins.` },
+        { error: "Access Denied: Only the Super Admin can remove other admins." },
         { status: 403 }
       );
       return addSecurityHeaders(response);

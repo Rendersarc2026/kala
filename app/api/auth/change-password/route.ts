@@ -11,7 +11,7 @@ import {
   signRefreshToken,
 } from "@/lib/auth";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "../login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
 const changePasswordSchema = z.object({
   currentPassword: z

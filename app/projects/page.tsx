@@ -1,3 +1,4 @@
+import { parseStringArray } from "@/lib/json";
 import { prisma } from "@/lib/prisma";
 import ProjectsClient from "@/components/ProjectsClient";
 import { projects as staticProjects } from "@/data/projects";
@@ -8,7 +9,11 @@ export const revalidate = 0;
 
 export default async function ProjectsPage() {
   const dbProjects = await prisma.project.findMany({
-    orderBy: { sortOrder: "asc" },
+    orderBy: [
+      { sortOrder: "asc" },
+      { createdAt: "asc" },
+      { id: "asc" },
+    ],
   });
 
   let projects: Project[];
@@ -25,7 +30,7 @@ export default async function ProjectsPage() {
       description: p.description,
       narrative: p.narrative,
       heroImage: p.heroImage,
-      images: typeof p.images === "string" ? JSON.parse(p.images) as string[] : p.images,
+      images: parseStringArray(p.images),
       featured: p.featured,
     }));
   } else {

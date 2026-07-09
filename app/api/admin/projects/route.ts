@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { DbProject } from "@/lib/types";
+import { parseStringArray } from "@/lib/json";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
 const createProjectSchema = z.object({
   slug: z.string().trim().min(1, "Slug is required").max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
@@ -30,12 +31,16 @@ export async function GET(request: NextRequest) {
     }
 
     const projects = await prisma.project.findMany({
-      orderBy: { sortOrder: "asc" },
+      orderBy: [
+        { sortOrder: "asc" },
+        { createdAt: "asc" },
+        { id: "asc" },
+      ],
     });
 
     const parsed = projects.map((p: DbProject) => ({
       ...p,
-      images: JSON.parse(p.images),
+      images: parseStringArray(p.images),
     }));
 
     const response = NextResponse.json({ success: true, data: parsed });
@@ -107,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...project, images: JSON.parse(project.images) },
+      data: { ...project, images: parseStringArray(project.images) },
     }, { status: 201 });
     return addSecurityHeaders(response);
   } catch (error) {

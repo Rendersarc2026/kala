@@ -1,136 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
 import { prisma } from "@/lib/prisma";
-import path from "path";
+import { deleteImage, getSupabaseConfig, uploadImage } from "@/lib/upload";
+
+/**
+ * Extracts the storage object name from a previously stored public URL, or null
+ * if the URL does not point into our own bucket.
+ */
+function objectNameFromPublicUrl(url: string): string | null {
+  const config = getSupabaseConfig();
+  if (!config) return null;
+
+  const marker = `/storage/v1/object/public/${config.encodedBucket}/`;
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+
+  return url.substring(index + marker.length) || null;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Authenticate admin
     const authResult = await authenticateAdmin(request);
     if (!authResult.authenticated) {
       const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
       return addSecurityHeaders(response);
     }
 
-    // 2. Parse form data
     const formData = await request.formData();
-    const file = formData.get("file") as File | null;
+    const file = formData.get("file");
 
-    if (!file) {
+    if (!(file instanceof File)) {
       const response = NextResponse.json({ error: "No file uploaded" }, { status: 400 });
       return addSecurityHeaders(response);
     }
 
-    // 3. Validate file type (raster images only).
-    // SVG is intentionally excluded: it can embed <script>/onload handlers and
-    // become a stored-XSS vector, and file.type here is client-controlled.
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (!allowedMimeTypes.includes(file.type)) {
-      const response = NextResponse.json(
-        { error: "Invalid file type. Only JPG, PNG, GIF, and WEBP images are allowed." },
-        { status: 400 }
-      );
-      return addSecurityHeaders(response);
-    }
-
-    // 4. Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      const response = NextResponse.json(
-        { error: "File size exceeds the 5MB limit." },
-        { status: 400 }
-      );
-      return addSecurityHeaders(response);
-    }
-
-    // 5. Get Supabase Configuration
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseBucket = process.env.SUPABASE_BUCKET_NAME || "kala images";
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      const response = NextResponse.json(
-        { error: "Supabase storage is not configured on the server." },
-        { status: 500 }
-      );
-      return addSecurityHeaders(response);
-    }
-
-    // 6. Query current hero configuration to find previous file to delete
-    let oldImageFilename: string | null = null;
+    // Note the current banner before replacing it, so the old object can be
+    // reclaimed once the new upload has succeeded.
+    let previousObjectName: string | null = null;
     try {
-      const currentHero = await prisma.heroContent.findUnique({
-        where: { id: "hero" },
-      });
-      if (currentHero && currentHero.backgroundImageUrl) {
-        const url = currentHero.backgroundImageUrl;
-        const bucketPathSegment = `/storage/v1/object/public/${encodeURIComponent(supabaseBucket)}/`;
-        if (url.includes(bucketPathSegment)) {
-          oldImageFilename = url.substring(url.indexOf(bucketPathSegment) + bucketPathSegment.length);
-        }
+      const currentHero = await prisma.heroContent.findUnique({ where: { id: "hero" } });
+      if (currentHero?.backgroundImageUrl) {
+        previousObjectName = objectNameFromPublicUrl(currentHero.backgroundImageUrl);
       }
     } catch (dbErr) {
       console.error("Failed to query current hero for old image:", dbErr);
     }
 
-    // 7. Generate a unique name for the new file
-    const ext = path.extname(file.name) || `.${file.type.split("/")[1]}`;
-    const safeBaseName = path.basename(file.name, ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]/g, "");
-    const uniqueName = `banner-${safeBaseName}-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
-
-    // 8. Upload to Supabase Storage REST API
-    const encodedBucket = encodeURIComponent(supabaseBucket);
-    const uploadUrl = `${supabaseUrl}/storage/v1/object/${encodedBucket}/${uniqueName}`;
-    const buffer = await file.arrayBuffer();
-
-    const uploadRes = await fetch(uploadUrl, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${supabaseServiceKey}`,
-        "Content-Type": file.type,
-      },
-      body: buffer,
-    });
-
-    if (!uploadRes.ok) {
-      const errorText = await uploadRes.text();
-      console.error("Supabase Storage upload failed response:", errorText);
-      const response = NextResponse.json(
-        { error: `Supabase upload failed: ${uploadRes.statusText}` },
-        { status: 502 }
-      );
+    const result = await uploadImage(file, { prefix: "banner-" });
+    if (!result.ok) {
+      const response = NextResponse.json({ error: result.error }, { status: result.status });
       return addSecurityHeaders(response);
     }
 
-    // 9. Safely delete the previous image file from Supabase Storage
-    if (oldImageFilename) {
-      try {
-        const deleteUrl = `${supabaseUrl}/storage/v1/object/${encodedBucket}`;
-        const deleteRes = await fetch(deleteUrl, {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${supabaseServiceKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prefixes: [oldImageFilename] }),
-        });
-        if (!deleteRes.ok) {
-          console.warn("Failed to delete old banner image from Supabase:", await deleteRes.text());
-        }
-      } catch (deleteErr) {
-        console.error("Failed to delete old banner image from Supabase:", deleteErr);
-      }
+    if (previousObjectName && previousObjectName !== result.objectName) {
+      await deleteImage(previousObjectName);
     }
 
-    // 10. Return success response with file URL
-    const fileUrl = `${supabaseUrl}/storage/v1/object/public/${encodedBucket}/${uniqueName}`;
     const response = NextResponse.json({
       success: true,
-      url: fileUrl,
-      name: file.name
+      url: result.url,
+      name: file.name,
     });
     return addSecurityHeaders(response);
   } catch (error) {

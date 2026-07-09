@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
+  { href: "/process", label: "Our Process" },
   { href: "/why-choose-us", label: "Why Us" },
   { href: "/about", label: "About" },
 ];
@@ -228,28 +229,6 @@ export default function Header() {
                       </button>
                     );
                   })}
-                </div>
-
-                {/* Two Columns of Extra Information */}
-                <div className="grid grid-cols-2 gap-6 border-t border-white/5 pt-6 mt-6 text-left font-sans text-[10px] tracking-wider">
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => handleNav("/about")}
-                      className="block text-white/50 hover:text-white transition-colors uppercase text-left w-full"
-                    >
-                      News
-                    </button>
-                    <button
-                      onClick={() => handleNav("/contact")}
-                      className="block text-white/50 hover:text-white transition-colors uppercase text-left w-full"
-                    >
-                      Showroom
-                    </button>
-                  </div>
-                  <div className="space-y-1 text-white/40 leading-normal">
-                    <p className="text-white/60 font-medium">+1 (555) 0199</p>
-                    <p className="lowercase">studio@kaladesign.com</p>
-                  </div>
                 </div>
 
                 {/* Action Button: Contact Us */}

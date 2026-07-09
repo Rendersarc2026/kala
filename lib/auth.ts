@@ -188,9 +188,8 @@ export async function resetFailedAttempts(email: string): Promise<void> {
 
 /**
  * Generate a 6-digit numeric OTP and its SHA-256 hash.
- * If DEVELOPMENT_OTP is set, it is only honored outside of production so a fixed
- * test code can never weaken the real second factor in a deployed environment.
- * The production code is drawn from a cryptographically secure RNG.
+ * The code is always drawn from a cryptographically secure RNG; there is no
+ * fixed-code bypass in any environment.
  */
 export function generateOtp(): { code: string; hash: string } {
   const code = crypto.randomInt(100000, 1000000).toString();
@@ -222,13 +221,18 @@ This code is valid for 5 minutes. If you did not request this, please change you
     </div>
   `;
 
-  // Log the OTP to debug file only outside of production.
-  if (process.env.NODE_ENV !== "production") {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // The OTP is the *only* authentication factor, so a plaintext log of it is a
+  // credential store. Require an explicit opt-in on top of the non-production
+  // check, write with owner-only permissions, and never do it in production.
+  if (!isProduction && process.env.OTP_DEBUG_LOG === "true") {
     try {
       const logPath = path.join(process.cwd(), "prisma", "otp-debug.log");
-      fs.appendFileSync(
+      await fs.promises.appendFile(
         logPath,
-        `[${new Date().toISOString()}] OTP for ${email}: ${code} (Expires in 5 minutes)\n`
+        `[${new Date().toISOString()}] OTP for ${email}: ${code} (Expires in 5 minutes)\n`,
+        { mode: 0o600 }
       );
     } catch (err) {
       console.error("Failed to write OTP to debug file:", err);
@@ -242,27 +246,38 @@ This code is valid for 5 minutes. If you did not request this, please change you
   const pass = process.env.SMTP_PASS;
   const from = process.env.SMTP_FROM || "noreply@kala.design";
 
-  if (host && user && pass) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465, // true for port 465 (SMTPS), false for 587 or others (STARTTLS)
-        auth: {
-          user,
-          pass,
-        },
-      });
+  if (!host || !user || !pass) {
+    // Without SMTP the code cannot reach the admin. Failing loudly in production
+    // beats reporting "code sent" for a code that was never delivered.
+    if (isProduction) {
+      throw new Error("SMTP is not configured; cannot deliver admin OTP.");
+    }
+    console.warn(`[dev] SMTP not configured. OTP for ${email}: ${code}`);
+    return;
+  }
 
-      await transporter.sendMail({
-        from: `"Kala Admin Security" <${from}>`,
-        to: email,
-        subject,
-        text: textMessage,
-        html: htmlMessage,
-      });
-    } catch (smtpError) {
-      console.error("Failed to send OTP email via SMTP:", smtpError);
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465, // true for port 465 (SMTPS), false for 587 or others (STARTTLS)
+      auth: {
+        user,
+        pass,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Kala Admin Security" <${from}>`,
+      to: email,
+      subject,
+      text: textMessage,
+      html: htmlMessage,
+    });
+  } catch (smtpError) {
+    console.error("Failed to send OTP email via SMTP:", smtpError);
+    if (isProduction) {
+      throw new Error("Failed to deliver admin OTP.");
     }
   }
 }

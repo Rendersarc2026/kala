@@ -2,65 +2,32 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { services as staticServices } from "@/data/services";
 import ServicesClient from "@/components/ServicesClient";
-import type { DbService } from "@/lib/types";
+import { parseStringArray } from "@/lib/json";
 
 export const revalidate = 0; // Dynamic server rendering
 
 export default async function ServicesPage() {
-  let dbServices: DbService[] = [];
-  try {
-    const services = await prisma.service.findMany({
-      orderBy: { sortOrder: "asc" },
-    });
+  let dbServices: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
 
-    if (services.length === 0) {
-      // Auto-seed initial services in database
-      await prisma.service.createMany({
-        data: staticServices.map((s, idx) => ({
+  try {
+    dbServices = await prisma.service.findMany({ orderBy: { sortOrder: "asc" } });
+  } catch (error) {
+    console.error("Failed to fetch services in Server Component:", error);
+  }
+
+  // Fall back to the bundled copy when the table is empty or unreachable.
+  // Seeding is a deliberate action (`npm run db:seed`), never a page-view side effect.
+  const parsedServices =
+    dbServices.length > 0
+      ? dbServices.map((s) => ({
+          id: s.id,
           title: s.title,
           description: s.description,
           image: s.image,
-          details: JSON.stringify(s.details),
-          sortOrder: idx,
-        })),
-      });
-
-      const seeded = await prisma.service.findMany({
-        orderBy: { sortOrder: "asc" },
-      });
-      dbServices = seeded;
-    } else {
-      dbServices = services;
-    }
-  } catch (error) {
-    console.error("Failed to fetch services in Server Component:", error);
-    // Fallback to static services
-    dbServices = staticServices.map((s, idx) => ({
-      id: s.id,
-      title: s.title,
-      description: s.description,
-      image: s.image,
-      details: JSON.stringify(s.details),
-      sortOrder: idx,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }));
-  }
-
-  const parsedServices = dbServices.map((s: DbService) => ({
-    id: s.id,
-    title: s.title,
-    description: s.description,
-    image: s.image,
-    details: (() => {
-      try {
-        return JSON.parse(s.details) as string[];
-      } catch {
-        return [];
-      }
-    })(),
-    sortOrder: s.sortOrder,
-  }));
+          details: parseStringArray(s.details),
+          sortOrder: s.sortOrder,
+        }))
+      : staticServices.map((s, idx) => ({ ...s, sortOrder: idx }));
 
   return <ServicesClient initialServices={parsedServices} />;
 }

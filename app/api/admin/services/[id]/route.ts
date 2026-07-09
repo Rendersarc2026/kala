@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
+import { parseStringArray } from "@/lib/json";
 
 const updateServiceSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...service, details: JSON.parse(service.details) as string[] },
+      data: { ...service, details: parseStringArray(service.details) },
     });
     return addSecurityHeaders(response);
   } catch (error) {
@@ -90,7 +91,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...service, details: JSON.parse(service.details) as string[] },
+      data: { ...service, details: parseStringArray(service.details) },
     });
     return addSecurityHeaders(response);
   } catch (error) {

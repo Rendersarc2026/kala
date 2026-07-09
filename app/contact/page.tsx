@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import ContactClient from "@/components/ContactClient";
+import { isSafeMapEmbedUrl } from "@/lib/validation";
+
+const DEFAULT_MAP_EMBED_URL =
+  "https://maps.google.com/maps?q=Thalassery+Kerala+India&t=k&z=14&output=embed";
 
 // Force dynamic execution to guarantee fresh DB values on every render
 export const revalidate = 0;
@@ -18,7 +22,7 @@ export default async function ContactPage() {
       hoursMonFri: "9:00 AM — 7:00 PM",
       hoursSat: "10:00 AM — 5:00 PM",
       hoursSun: "Closed",
-      mapEmbedUrl: "https://maps.google.com/maps?q=Thalassery+Kerala+India&t=k&z=14&output=embed",
+      mapEmbedUrl: DEFAULT_MAP_EMBED_URL,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -30,7 +34,10 @@ export default async function ContactPage() {
     hoursMonFri: contact.hoursMonFri,
     hoursSat: contact.hoursSat,
     hoursSun: contact.hoursSun,
-    mapEmbedUrl: contact.mapEmbedUrl,
+    // Rows written before the embed URL was validated may hold an unsafe scheme.
+    mapEmbedUrl: isSafeMapEmbedUrl(contact.mapEmbedUrl)
+      ? contact.mapEmbedUrl
+      : DEFAULT_MAP_EMBED_URL,
   };
 
   return <ContactClient initialContact={contactData} />;

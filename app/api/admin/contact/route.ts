@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
+import { isSafeMapEmbedUrl } from "@/lib/validation";
 
 const contactSettingsSchema = z.object({
   phone: z.string().trim().min(1, "Phone is required").max(100),
@@ -10,7 +11,15 @@ const contactSettingsSchema = z.object({
   hoursMonFri: z.string().trim().min(1, "Monday-Friday hours are required").max(100),
   hoursSat: z.string().trim().min(1, "Saturday hours are required").max(100),
   hoursSun: z.string().trim().min(1, "Sunday hours are required").max(100),
-  mapEmbedUrl: z.string().trim().min(1, "Map embed URL is required").max(1000),
+  // Rendered into <iframe src>, so it must be constrained to https Google Maps.
+  mapEmbedUrl: z
+    .string()
+    .trim()
+    .min(1, "Map embed URL is required")
+    .max(1000)
+    .refine(isSafeMapEmbedUrl, {
+      message: "Map embed URL must be an https:// link to google.com or maps.google.com.",
+    }),
 });
 
 export async function GET(request: NextRequest) {

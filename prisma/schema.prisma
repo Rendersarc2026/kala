@@ -106,6 +106,10 @@ model Otp {
   createdAt DateTime  @default(now())
 
   @@index([adminId])
+  // Verification looks up (adminId, codeHash) with an expiry bound.
+  @@index([adminId, codeHash])
+  // OTP issuance rate limit counts rows per admin within a time window.
+  @@index([adminId, createdAt])
 }
 
 model FailedAttempt {
@@ -114,8 +118,9 @@ model FailedAttempt {
   ip        String?
   createdAt DateTime @default(now())
 
-  @@index([email])
   @@index([createdAt])
+  // Lockout checks always filter on email AND a createdAt window together.
+  @@index([email, createdAt])
 }
 
 model Session {
@@ -127,6 +132,8 @@ model Session {
   createdAt    DateTime  @default(now())
 
   @@index([adminId])
+  // Supports periodic pruning of expired sessions.
+  @@index([expiresAt])
 }
 
 model Testimonial {

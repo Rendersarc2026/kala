@@ -4,28 +4,15 @@ import { testimonials as staticTestimonials } from "@/data/testimonials";
 
 export async function GET() {
   try {
-    let testimonials = await prisma.testimonial.findMany({
+    const testimonials = await prisma.testimonial.findMany({
       orderBy: { createdAt: "asc" },
     });
 
-    if (testimonials.length === 0) {
-      // Auto-seed initial testimonials into database
-      await prisma.testimonial.createMany({
-        data: staticTestimonials.map((t) => ({
-          quote: t.quote,
-          clientName: t.clientName,
-          location: t.location,
-          projectType: t.projectType,
-          image: t.image || null,
-        })),
-      });
+    // Fall back to the bundled copy when the table is empty. A public GET must
+    // never write to the database — concurrent requests would insert duplicates.
+    const data = testimonials.length > 0 ? testimonials : staticTestimonials;
 
-      testimonials = await prisma.testimonial.findMany({
-        orderBy: { createdAt: "asc" },
-      });
-    }
-
-    return NextResponse.json({ success: true, data: testimonials });
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("Public testimonials GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

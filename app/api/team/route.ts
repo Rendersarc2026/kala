@@ -4,27 +4,15 @@ import { teamMembers as staticTeam } from "@/data/team";
 
 export async function GET() {
   try {
-    let team = await prisma.teamMember.findMany({
+    const team = await prisma.teamMember.findMany({
       orderBy: { createdAt: "asc" },
     });
 
-    if (team.length === 0) {
-      // Auto-seed initial team members into database
-      await prisma.teamMember.createMany({
-        data: staticTeam.map((m) => ({
-          name: m.name,
-          role: m.role,
-          image: m.image,
-          bio: m.bio,
-        })),
-      });
+    // Fall back to the bundled roster when the table is empty. A public GET must
+    // never write to the database — concurrent requests would insert duplicates.
+    const data = team.length > 0 ? team : staticTeam;
 
-      team = await prisma.teamMember.findMany({
-        orderBy: { createdAt: "asc" },
-      });
-    }
-
-    return NextResponse.json({ success: true, data: team });
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("Public team GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

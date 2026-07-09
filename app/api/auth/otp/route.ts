@@ -11,7 +11,7 @@ import {
   recordFailedAttempt,
   resetFailedAttempts,
 } from "@/lib/auth";
-import { addSecurityHeaders } from "../login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
 const otpVerifySchema = z.object({
   code: z

@@ -2,15 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { addSecurityHeaders } from "@/lib/security-headers";
 import {
   checkLockout,
   recordFailedAttempt,
-  resetFailedAttempts,
   generateOtp,
   deliverOtp,
   checkOtpRateLimit,
   signPreAuthToken,
-  verifyPassword,
 } from "@/lib/auth";
 
 // Schema validation for input
@@ -22,15 +21,14 @@ const loginSchema = z.object({
     .trim(),
 });
 
-// Helper to set security headers to prevent XSS, clickjacking, etc.
-export function addSecurityHeaders(response: NextResponse): NextResponse {
-  response.headers.set("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none'; object-src 'none';");
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
-  return response;
-}
+// Returned whether or not the identifier resolves to a real admin, so that the
+// response cannot be used to enumerate valid admin accounts. Authentication is
+// passwordless, so a valid identifier is half of the credential.
+const GENERIC_LOGIN_RESPONSE = {
+  success: true,
+  message: "If that account exists, an OTP code has been sent to its registered email.",
+  requireOtp: true,
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,24 +79,48 @@ export async function POST(request: NextRequest) {
 
     if (!admin) {
       await recordFailedAttempt(targetIdentifier, ip);
-      const response = NextResponse.json({ error: "Admin user not found" }, { status: 404 });
+      return addSecurityHeaders(NextResponse.json(GENERIC_LOGIN_RESPONSE));
+    }
+
+    // 5. Throttle OTP issuance per account. Without this an attacker can mint an
+    // unbounded number of simultaneously-valid codes (mail-bombing the admin and
+    // shrinking the search space for a blind guess).
+    const otpRateLimited = await checkOtpRateLimit(admin.id);
+    if (otpRateLimited) {
+      const response = NextResponse.json(
+        {
+          error: "Too many OTP requests. Please wait a few minutes before requesting another code.",
+          retryAfter: 300,
+        },
+        { status: 429, headers: { "Retry-After": "300" } }
+      );
       return addSecurityHeaders(response);
     }
 
-    // 7. Generate and save OTP
+    // 6. Issue a fresh OTP, invalidating any codes still outstanding for this
+    // account so that exactly one code is live at a time. Outstanding codes are
+    // expired in place rather than deleted, because checkOtpRateLimit counts
+    // rows in the window — deleting them would reset the limiter each issuance.
+    const now = new Date();
     const { code, hash } = generateOtp();
-    await prisma.otp.create({
-      data: {
-        adminId: admin.id,
-        codeHash: hash,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minute expiry
-      },
-    });
+    await prisma.$transaction([
+      prisma.otp.updateMany({
+        where: { adminId: admin.id, expiresAt: { gt: now } },
+        data: { expiresAt: now },
+      }),
+      prisma.otp.create({
+        data: {
+          adminId: admin.id,
+          codeHash: hash,
+          expiresAt: new Date(now.getTime() + 5 * 60 * 1000), // 5 minute expiry
+        },
+      }),
+    ]);
 
-    // 8. Deliver OTP
+    // 7. Deliver OTP
     await deliverOtp(admin.email, code);
 
-    // 9. Set Pre-Auth Token Cookie
+    // 8. Set Pre-Auth Token Cookie
     const preAuthToken = signPreAuthToken({
       adminId: admin.id,
       email: admin.email,
@@ -114,13 +136,7 @@ export async function POST(request: NextRequest) {
       path: "/",
     });
 
-    const response = NextResponse.json({
-      success: true,
-      message: "OTP code sent to your registered email.",
-      requireOtp: true,
-    });
-
-    return addSecurityHeaders(response);
+    return addSecurityHeaders(NextResponse.json(GENERIC_LOGIN_RESPONSE));
   } catch (error) {
     console.error("Login error:", error);
     const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });

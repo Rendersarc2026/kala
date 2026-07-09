@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
+import { parseStringArray } from "@/lib/json";
 
 const updateProjectSchema = z.object({
   slug: z.string().trim().min(1, "Slug is required").max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens").optional(),
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...project, images: JSON.parse(project.images) },
+      data: { ...project, images: parseStringArray(project.images) },
     });
     return addSecurityHeaders(response);
   } catch (error) {
@@ -124,7 +125,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const response = NextResponse.json({
       success: true,
-      data: { ...project, images: JSON.parse(project.images) },
+      data: { ...project, images: parseStringArray(project.images) },
     });
     return addSecurityHeaders(response);
   } catch (error) {

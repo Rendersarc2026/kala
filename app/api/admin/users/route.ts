@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { authenticateAdmin } from "@/lib/auth-helper";
-import { addSecurityHeaders } from "@/app/api/auth/login/route";
+import { authenticateAdmin, isSuperAdmin } from "@/lib/auth-helper";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
 const createUserSchema = z.object({
   email: z.string().email("Invalid email format").max(100),
@@ -41,6 +41,16 @@ export async function POST(request: NextRequest) {
     const authResult = await authenticateAdmin(request);
     if (!authResult.authenticated) {
       const response = NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return addSecurityHeaders(response);
+    }
+
+    // Creating an admin grants standing access to every admin route, so it is
+    // restricted to the super admin — matching the guard on DELETE.
+    if (!isSuperAdmin(authResult.admin)) {
+      const response = NextResponse.json(
+        { error: "Access Denied: Only the Super Admin can create new admin users." },
+        { status: 403 }
+      );
       return addSecurityHeaders(response);
     }
 

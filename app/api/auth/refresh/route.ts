@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
@@ -6,9 +6,9 @@ import {
   signAccessToken,
   signRefreshToken,
 } from "@/lib/auth";
-import { addSecurityHeaders } from "../login/route";
+import { addSecurityHeaders } from "@/lib/security-headers";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const refreshTokenCookie = cookieStore.get("admin_refresh_token");

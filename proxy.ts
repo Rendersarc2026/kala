@@ -1,16 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// In-memory cache for IP requests
-// Map key: IP address
-// Map value: Array of timestamps of requests
+// In-memory sliding-window counters, keyed by client IP.
+//
+// NOTE: this is per-instance state. On a multi-instance or serverless
+// deployment each instance keeps its own window, so the effective limit is
+// (limit x instances). It is a speed bump, not a guarantee — the authoritative
+// controls are the per-account lockout and OTP throttle in lib/auth.ts.
 const ipCache = new Map<string, number[]>();
 
-// Keep track of total requests to occasionally prune old cache entries
-let totalRequests = 0;
-const PRUNE_THRESHOLD = 200; // Prune every 200 requests
+const WINDOW_MS = 60 * 1000; // 1 minute sliding window
+const MAX_TRACKED_IPS = 10_000; // hard ceiling so the map cannot grow without bound
+const PRUNE_INTERVAL_MS = 30 * 1000;
 
-const pruneCache = (now: number, limitTime: number) => {
+let lastPruneAt = 0;
+
+const pruneCache = (limitTime: number) => {
   for (const [ip, timestamps] of ipCache.entries()) {
     const valid = timestamps.filter((t) => t > limitTime);
     if (valid.length === 0) {
@@ -21,24 +26,41 @@ const pruneCache = (now: number, limitTime: number) => {
   }
 };
 
+/**
+ * Resolve the client IP.
+ *
+ * `x-forwarded-for` is attacker-controlled unless a trusted proxy overwrites it,
+ * and a spoofed value would let a caller mint a fresh rate-limit bucket per
+ * request. Prefer the headers that hosting platforms set themselves, and only
+ * then fall back to the left-most forwarded hop.
+ */
+const getClientIp = (request: NextRequest): string => {
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+
+  const vercelIp = request.headers.get("x-vercel-forwarded-for");
+  if (vercelIp) return vercelIp.split(",")[0].trim();
+
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+
+  return "127.0.0.1";
+};
+
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-
-  // Get client IP address
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+  const ip = getClientIp(request);
   const now = Date.now();
-  const windowMs = 60 * 1000; // 1 minute sliding window
-  const limitTime = now - windowMs;
+  const limitTime = now - WINDOW_MS;
 
-  // Periodic pruning to prevent memory leaks
-  totalRequests++;
-  if (totalRequests >= PRUNE_THRESHOLD) {
-    totalRequests = 0;
-    pruneCache(now, limitTime);
+  // Time-based pruning, plus a hard ceiling to bound memory under IP churn.
+  if (now - lastPruneAt >= PRUNE_INTERVAL_MS || ipCache.size > MAX_TRACKED_IPS) {
+    lastPruneAt = now;
+    pruneCache(limitTime);
+    if (ipCache.size > MAX_TRACKED_IPS) ipCache.clear();
   }
 
-  // Retrieve request history for this IP
-  const timestamps = ipCache.get(ip) || [];
+  const timestamps = ipCache.get(ip) ?? [];
   const validTimestamps = timestamps.filter((t) => t > limitTime);
 
   // Rate limits configuration:
@@ -52,11 +74,14 @@ export function proxy(request: NextRequest) {
   const limit = isHighRisk ? 15 : 100;
 
   if (validTimestamps.length >= limit) {
-    console.warn(`[Rate Limit] Blocked request from IP ${ip} to ${pathname}`);
-    
-    // Calculate Retry-After time in seconds based on the oldest timestamp in the window
-    const oldestTimestamp = validTimestamps[0];
-    const retryAfterSeconds = Math.ceil((oldestTimestamp + windowMs - now) / 1000);
+    // Persist the trimmed window so the entry still expires on schedule.
+    ipCache.set(ip, validTimestamps);
+
+    // Oldest timestamp in the window determines when a slot frees up.
+    const retryAfterSeconds = Math.max(
+      1,
+      Math.ceil((validTimestamps[0] + WINDOW_MS - now) / 1000)
+    );
 
     return new NextResponse(
       JSON.stringify({
@@ -68,15 +93,13 @@ export function proxy(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           "Retry-After": String(retryAfterSeconds),
-          // CORS & Security Headers
-          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store",
           "X-Content-Type-Options": "nosniff",
         },
       }
     );
   }
 
-  // Record the request timestamp
   validTimestamps.push(now);
   ipCache.set(ip, validTimestamps);
 

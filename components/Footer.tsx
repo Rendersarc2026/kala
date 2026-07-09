@@ -1,12 +1,37 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
+
+  const [contactInfo, setContactInfo] = useState({
+    phone: "+1 (555) 0199",
+    email: "studio@kaladesign.com",
+  });
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      try {
+        const res = await fetch("/api/contact");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setContactInfo({
+              phone: json.data.phone || "+1 (555) 0199",
+              email: json.data.email || "studio@kaladesign.com",
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch contact details in footer:", err);
+      }
+    };
+    fetchContact();
+  }, []);
 
   if (pathname.startsWith("/admin")) {
     return null;
@@ -64,13 +89,13 @@ export default function Footer() {
             <h4 className="font-sans text-xs uppercase tracking-widest font-bold text-bone/40">Enquiries</h4>
             <ul className="space-y-3 text-sm text-bone/75 font-light">
               <li>
-                <a href="tel:+15550199" className="hover:text-terracotta transition-colors">
-                  +1 (555) 0199
+                <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, "")}`} className="hover:text-terracotta transition-colors">
+                  {contactInfo.phone}
                 </a>
               </li>
               <li>
-                <a href="mailto:studio@kaladesign.com" className="hover:text-terracotta transition-colors">
-                  studio@kaladesign.com
+                <a href={`mailto:${contactInfo.email}`} className="hover:text-terracotta transition-colors">
+                  {contactInfo.email}
                 </a>
               </li>
               <li>
@@ -94,7 +119,7 @@ export default function Footer() {
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">
               Facebook
             </a>
-            <a href="https://wa.me/15550199" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">
+            <a href={`https://wa.me/${contactInfo.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">
               WhatsApp
             </a>
           </div>

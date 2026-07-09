@@ -60,7 +60,7 @@ export default function AdminProjects() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<ProjectData, "id">>(emptyForm);
+  const [form, setForm] = useState<Omit<ProjectData, "id" | "sortOrder"> & { sortOrder: number | "" }>(emptyForm);
   const [saving, setSaving] = useState(false);
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -163,7 +163,7 @@ export default function AdminProjects() {
       title: project.title,
       category: project.category,
       location: project.location,
-      area: project.area,
+      area: project.area.replace(/[^0-9]/g, ""),
       year: project.year,
       client: project.client,
       description: project.description,
@@ -208,8 +208,8 @@ export default function AdminProjects() {
       case "area":
         if (!value.trim()) {
           errorMsg = "Area is required";
-        } else if (value.length > 100) {
-          errorMsg = "Area must be 100 characters or less";
+        } else if (!/^[0-9]+$/.test(value)) {
+          errorMsg = "Area must contain numbers only";
         }
         break;
       case "year":
@@ -229,7 +229,7 @@ export default function AdminProjects() {
         }
         break;
       case "sortOrder":
-        if (value === undefined || value === null || isNaN(Number(value))) {
+        if (value === undefined || value === null || value === "" || isNaN(Number(value))) {
           errorMsg = "Sort order is required";
         } else if (Number(value) < 0) {
           errorMsg = "Sort order must be 0 or greater";
@@ -292,8 +292,8 @@ export default function AdminProjects() {
 
     if (!form.area.trim()) {
       errs.area = "Area is required";
-    } else if (form.area.length > 100) {
-      errs.area = "Area must be 100 characters or less";
+    } else if (!/^[0-9]+$/.test(form.area)) {
+      errs.area = "Area must contain numbers only";
     }
 
     if (!form.year.trim()) {
@@ -310,9 +310,9 @@ export default function AdminProjects() {
       errs.client = "Client must be 200 characters or less";
     }
 
-    if (form.sortOrder === undefined || form.sortOrder === null || isNaN(form.sortOrder)) {
+    if (form.sortOrder === undefined || form.sortOrder === null || form.sortOrder === "" || isNaN(Number(form.sortOrder))) {
       errs.sortOrder = "Sort order is required";
-    } else if (form.sortOrder < 0) {
+    } else if (Number(form.sortOrder) < 0) {
       errs.sortOrder = "Sort order must be 0 or greater";
     }
 
@@ -370,7 +370,11 @@ export default function AdminProjects() {
     const pastedText = e.clipboardData.getData("text");
     const cleanText = pastedText.replace(/[^0-9]/g, "");
     if (field === "sortOrder") {
-      const parsedVal = cleanText === "" ? 0 : parseInt(cleanText, 10);
+      let sanitizedVal = cleanText;
+      if (/^0[0-9]+/.test(cleanText)) {
+        sanitizedVal = cleanText.replace(/^0+/, "");
+      }
+      const parsedVal = sanitizedVal === "" ? "" : parseInt(sanitizedVal, 10);
       updateFormField(field, parsedVal);
     } else {
       updateFormField(field, cleanText);
@@ -380,8 +384,18 @@ export default function AdminProjects() {
   const handleSortOrderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawVal = e.target.value;
     const cleanVal = rawVal.replace(/[^0-9]/g, "");
-    const parsedVal = cleanVal === "" ? 0 : parseInt(cleanVal, 10);
+    let sanitizedVal = cleanVal;
+    if (/^0[0-9]+/.test(cleanVal)) {
+      sanitizedVal = cleanVal.replace(/^0+/, "");
+    }
+    const parsedVal = sanitizedVal === "" ? "" : parseInt(sanitizedVal, 10);
     updateFormField("sortOrder", parsedVal);
+  };
+
+  const handleAreaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    const cleanVal = rawVal.replace(/[^0-9]/g, "");
+    updateFormField("area", cleanVal);
   };
 
   const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -488,14 +502,18 @@ export default function AdminProjects() {
     setError(null);
     setSuccess(null);
 
+    const rawArea = form.area.replace(/[^0-9]/g, "");
+    const formattedArea = rawArea ? `${Number(rawArea).toLocaleString("en-US")} sq.ft` : "";
+
     const trimmedForm = {
       ...form,
       slug: form.slug.trim(),
       title: form.title.trim(),
       location: form.location.trim(),
-      area: form.area.trim(),
+      area: formattedArea,
       year: form.year.trim(),
       client: form.client.trim(),
+      sortOrder: form.sortOrder === "" ? 0 : Number(form.sortOrder),
       description: form.description.trim(),
       narrative: form.narrative.trim(),
       heroImage: form.heroImage.trim(),
@@ -793,8 +811,10 @@ export default function AdminProjects() {
                 <input
                   type="text"
                   value={form.area}
-                  onChange={(e) => updateFormField("area", e.target.value)}
-                  placeholder="3,800 sq.ft"
+                  onChange={handleAreaChange}
+                  onKeyDown={blockInvalidNumberKeys}
+                  onPaste={(e) => handleNumberPaste(e, "area")}
+                  placeholder="3800"
                   className={getInputClass("area")}
                   required
                   disabled={saving || uploadingField !== null}
@@ -840,7 +860,7 @@ export default function AdminProjects() {
                 <input
                   type="number"
                   min="0"
-                  value={form.sortOrder}
+                  value={form.sortOrder === "" ? "" : String(form.sortOrder)}
                   onChange={handleSortOrderChange}
                   onKeyDown={blockInvalidNumberKeys}
                   onPaste={(e) => handleNumberPaste(e, "sortOrder")}
@@ -850,18 +870,6 @@ export default function AdminProjects() {
                 {fieldErrors.sortOrder && (
                   <p className="text-red-400 text-[10px] mt-1 font-medium">{fieldErrors.sortOrder}</p>
                 )}
-              </div>
-              <div className="space-y-1.5 flex items-end pb-2.5">
-                <label className={`flex items-center gap-2 cursor-pointer ${saving || uploadingField !== null ? "opacity-55 pointer-events-none" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={form.featured}
-                    onChange={(e) => updateFormField("featured", e.target.checked)}
-                    className="w-4 h-4 accent-black"
-                    disabled={saving || uploadingField !== null}
-                  />
-                  <span className="text-xs text-gray-700 font-medium">Featured Project</span>
-                </label>
               </div>
             </div>
 
