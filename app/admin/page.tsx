@@ -20,6 +20,7 @@ import AdminAbout from "@/components/AdminAbout";
 import AdminTestimonials from "@/components/AdminTestimonials";
 import AdminContact from "@/components/AdminContact";
 import AdminTeam from "@/components/AdminTeam";
+import AdminEnquiries from "@/components/AdminEnquiries";
 
 interface AdminProfile {
   id: string;
@@ -235,6 +236,10 @@ export default function AdminDashboardPage() {
 
           {activeTab === "testimonials" && (
             <AdminTestimonials />
+          )}
+
+          {activeTab === "enquiries" && (
+            <AdminEnquiries />
           )}
 
           {activeTab === "contact" && (

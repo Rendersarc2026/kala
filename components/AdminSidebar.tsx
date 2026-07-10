@@ -12,6 +12,7 @@ import {
   Home,
   Info,
   MapPin,
+  Mail,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ const TABS = [
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "about", label: "About Page", icon: Info },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
+  { id: "enquiries", label: "Enquiries", icon: Mail },
   { id: "contact", label: "Contact Info", icon: MapPin },
 ];
 

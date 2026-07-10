@@ -7,6 +7,7 @@ import { Mail, Phone, CheckCircle, Send } from "lucide-react";
 interface FormData {
   name: string;
   email: string;
+  phone: string;
   projectType: string;
   message: string;
 }
@@ -14,6 +15,7 @@ interface FormData {
 interface FormErrors {
   name?: string;
   email?: string;
+  phone?: string;
   message?: string;
 }
 
@@ -51,6 +53,7 @@ export default function ContactClient({
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
+    phone: "",
     projectType: "residential",
     message: "",
   });
@@ -74,6 +77,11 @@ export default function ContactClient({
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       tempErrors.email = "Please provide a valid email address.";
+      isValid = false;
+    }
+
+    if (!formData.phone.trim()) {
+      tempErrors.phone = "Please provide your mobile number.";
       isValid = false;
     }
 
@@ -104,21 +112,42 @@ export default function ContactClient({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to send enquiry");
+      }
+
       setIsSuccess(true);
       setFormData({
         name: "",
         email: "",
+        phone: "",
         projectType: "residential",
         message: "",
       });
-    }, 1500);
+    } catch (err) {
+      console.error("Error submitting enquiry:", err);
+      setErrors((prev) => ({
+        ...prev,
+        message: err instanceof Error ? err.message : "Failed to send enquiry. Please try again.",
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -161,7 +190,7 @@ export default function ContactClient({
                       </h3>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div className="space-y-1.5">
+                        <div className="space-y-1.5 sm:col-span-2">
                           <label
                             htmlFor="name"
                             className="font-sans text-[9px] tracking-[0.25em] uppercase font-bold text-bone/50"
@@ -219,6 +248,37 @@ export default function ContactClient({
                           {errors.email && (
                             <p className="font-sans text-[10px] text-red-400 font-light mt-1">
                               {errors.email}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label
+                            htmlFor="phone"
+                            className="font-sans text-[9px] tracking-[0.25em] uppercase font-bold text-bone/50"
+                          >
+                            Mobile Number *
+                          </label>
+                          <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            onFocus={() => setFocusedField("phone")}
+                            onBlur={() => setFocusedField(null)}
+                            className={`w-full bg-white/5 border rounded-lg py-3 px-4 text-sm font-sans focus:outline-none transition-all duration-300 font-light text-bone ${
+                              errors.phone
+                                ? "border-red-400"
+                                : focusedField === "phone"
+                                  ? "border-terracotta-light ring-1 ring-terracotta-light/15"
+                                  : "border-white/10"
+                            }`}
+                            placeholder="+91 98765 43210"
+                          />
+                          {errors.phone && (
+                            <p className="font-sans text-[10px] text-red-400 font-light mt-1">
+                              {errors.phone}
                             </p>
                           )}
                         </div>
