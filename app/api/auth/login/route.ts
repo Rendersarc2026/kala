@@ -16,8 +16,9 @@ import {
 const loginSchema = z.object({
   identifier: z
     .string()
-    .min(1, "Username or email is required")
-    .max(100, "Identifier must be under 100 characters")
+    .min(1, "Email is required")
+    .email("Invalid email format")
+    .max(100, "Email must be under 100 characters")
     .trim(),
 });
 
@@ -52,14 +53,9 @@ export async function POST(request: NextRequest) {
     // Sanitization to prevent simple injection or control character attacks
     const sanitizedIdentifier = identifier.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
 
-    // 3. Find Admin User by email or username
-    const admin = await prisma.adminUser.findFirst({
-      where: {
-        OR: [
-          { email: sanitizedIdentifier },
-          { username: sanitizedIdentifier },
-        ],
-      },
+    // 3. Find Admin User strictly by email
+    const admin = await prisma.adminUser.findUnique({
+      where: { email: sanitizedIdentifier },
     });
 
     const targetIdentifier = admin ? admin.email : sanitizedIdentifier;
@@ -79,7 +75,11 @@ export async function POST(request: NextRequest) {
 
     if (!admin) {
       await recordFailedAttempt(targetIdentifier, ip);
-      return addSecurityHeaders(NextResponse.json(GENERIC_LOGIN_RESPONSE));
+      const response = NextResponse.json(
+        { error: "Username or email does not exist." },
+        { status: 400 }
+      );
+      return addSecurityHeaders(response);
     }
 
     // 5. Throttle OTP issuance per account. Without this an attacker can mint an

@@ -222,7 +222,7 @@ export default function AdminLoginPage() {
             <form onSubmit={handleCredentialsSubmit} className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[10px] uppercase tracking-widest text-[#ffffff]/60 font-semibold">
-                  Username or Email
+                  Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#ffffff]/20">
