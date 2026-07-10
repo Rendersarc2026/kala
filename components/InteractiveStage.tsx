@@ -83,6 +83,8 @@ interface InteractivePanelProps {
   scrollYProgress: any;
   shouldReduceMotion: boolean;
   isMobile: boolean;
+  isActiveMobile: boolean;
+  panelRef: (node: HTMLAnchorElement | null) => void;
 }
 
 function InteractivePanel({
@@ -93,6 +95,8 @@ function InteractivePanel({
   scrollYProgress,
   shouldReduceMotion,
   isMobile,
+  isActiveMobile,
+  panelRef,
 }: InteractivePanelProps) {
   // Motion values for scroll-linked and hover transitions
   const overlayY = useMotionValue("0%");
@@ -212,13 +216,18 @@ function InteractivePanel({
 
   return (
     <Link
+      ref={panelRef}
       href={panel.href}
       onMouseEnter={() => setHoveredIndex(index)}
       onMouseLeave={() => setHoveredIndex(null)}
       className="relative flex-1 w-full md:h-full overflow-hidden border-b md:border-b-0 md:border-r border-sand last:border-b-0 md:last:border-r-0 focus-visible:ring-2 focus-visible:ring-brass-accent focus-visible:outline-none select-none cursor-pointer group flex flex-col items-center justify-center text-center p-6 md:p-8"
     >
       {/* IMAGE (revealed when white overlay slides away) */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <motion.div 
+        animate={isMobile ? { scale: isActiveMobile ? 1.05 : 1.0 } : {}}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-0 z-0 pointer-events-none"
+      >
         <Image
           src={panel.image}
           alt={panel.label}
@@ -228,13 +237,23 @@ function InteractivePanel({
           priority
         />
         <div className="absolute inset-0 bg-black/50 z-10" />
-      </div>
+      </motion.div>
 
       {/* WHITE OVERLAY (slides to reveal/cover the image on desktop only) */}
       <motion.div
         style={{ y: overlayY }}
         className="absolute inset-0 bg-studio-gray z-10 pointer-events-none hidden md:block"
       />
+
+      {/* BLACK SHUTTER FOR MOBILE (slides to reveal/cover image) */}
+      {isMobile && (
+        <motion.div
+          initial={{ y: "0%" }}
+          animate={{ y: isActiveMobile ? "-100%" : "0%" }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 bg-[#121212] z-10 pointer-events-none"
+        />
+      )}
 
       {/* HOVER OVERLAY: Accent asterisk */}
       <motion.div 
@@ -249,12 +268,20 @@ function InteractivePanel({
         variants={panelLabelVariants}
         className="relative z-20 font-space-grotesk text-xs md:text-sm font-bold tracking-[0.15em] uppercase leading-relaxed text-center"
       >
-        {/* Mobile Label: Always pure white to contrast against the dark background image */}
-        <div className="block md:hidden text-white">
+        {/* Mobile Label: Animates color/scale/opacity based on active state */}
+        <motion.div 
+          animate={{ 
+            color: isActiveMobile ? "#F6F1EA" : "#D2B58D",
+            opacity: isActiveMobile ? 1 : 0.6,
+            scale: isActiveMobile ? 1.05 : 0.95
+          }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="block md:hidden text-center"
+        >
           {panel.label.split(" / ").map((line, idx) => (
             <span key={idx} className="block">{line}</span>
           ))}
-        </div>
+        </motion.div>
 
         {/* Desktop Label: Dynamic animated color */}
         <motion.div 
@@ -278,6 +305,9 @@ export default function InteractiveStage() {
   const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  const panelRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const [activeMobileIndex, setActiveMobileIndex] = useState<number | null>(null);
+
   useEffect(() => {
     if (prefersReducedMotion) {
       setShouldReduceMotion(true);
@@ -292,6 +322,56 @@ export default function InteractiveStage() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setActiveMobileIndex(null);
+      return;
+    }
+
+    const handleScroll = () => {
+      const viewportCenter = window.innerHeight / 2;
+      let closestIndex = -1;
+      let minDistance = Infinity;
+      const threshold = window.innerHeight * 0.18; // 18% of viewport height threshold
+
+      panelRefs.current.forEach((el, idx) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const elCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(elCenter - viewportCenter);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = idx;
+        }
+      });
+
+      if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        if (containerRect.bottom < 0 || containerRect.top > window.innerHeight) {
+          setActiveMobileIndex(null);
+          return;
+        }
+      }
+
+      if (closestIndex !== -1 && minDistance <= threshold) {
+        setActiveMobileIndex(closestIndex);
+      } else {
+        setActiveMobileIndex(null);
+      }
+    };
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [isMobile]);
 
   // Scroll tracking container
   const { scrollYProgress } = useScroll({
@@ -309,6 +389,10 @@ export default function InteractiveStage() {
     },
   };
 
+  const setPanelRef = (index: number) => (node: HTMLAnchorElement | null) => {
+    panelRefs.current[index] = node;
+  };
+
   return (
     <div 
       ref={containerRef}
@@ -318,7 +402,7 @@ export default function InteractiveStage() {
         variants={panelContainerVariants}
         initial="initial"
         animate="animate"
-        className="flex flex-col md:flex-row w-full h-full bg-studio-gray overflow-hidden"
+        className="flex flex-col md:flex-row w-full h-full bg-[#121212] overflow-hidden"
       >
         {PANELS_DATA.map((panel, index) => (
           <InteractivePanel
@@ -330,6 +414,8 @@ export default function InteractiveStage() {
             scrollYProgress={scrollYProgress}
             shouldReduceMotion={shouldReduceMotion}
             isMobile={isMobile}
+            isActiveMobile={activeMobileIndex === index}
+            panelRef={setPanelRef(index)}
           />
         ))}
       </motion.div>
