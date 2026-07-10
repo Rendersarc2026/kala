@@ -9,8 +9,8 @@ export default function Footer() {
   const pathname = usePathname();
 
   const [contactInfo, setContactInfo] = useState({
-    phone: "+1 (555) 0199",
-    email: "studio@kaladesign.com",
+    phone: "+91 87141 81942",
+    email: "kalaarchitect4@gmail.com",
   });
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export default function Footer() {
           const json = await res.json();
           if (json.success && json.data) {
             setContactInfo({
-              phone: json.data.phone || "+1 (555) 0199",
-              email: json.data.email || "studio@kaladesign.com",
+              phone: json.data.phone || "+91 87141 81942",
+              email: json.data.email || "kalaarchitect4@gmail.com",
             });
           }
         }
@@ -100,8 +100,8 @@ export default function Footer() {
               </li>
               <li>
                 <p className="leading-relaxed">
-                  85 Mercer Street, 4th Floor<br />
-                  Soho, New York, NY 10012
+                  Door No:48/34, 2nd Floor<br />
+                  Pilakandy Arcade, near Axis Bank Thalassery
                 </p>
               </li>
             </ul>

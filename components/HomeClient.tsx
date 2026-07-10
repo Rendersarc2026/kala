@@ -150,7 +150,7 @@ export default function HomeClient({
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             transition={{ duration: 1.1, delay: 0.1, ease: easeLarge }}
-                            className="block text-brass-accent whitespace-nowrap"
+                            className="block text-paper whitespace-nowrap"
                           >
                             {line2}
                           </motion.span>

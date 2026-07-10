@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     if (!contact) {
       contact = {
         id: "contact",
-        phone: "+1 (555) 0199",
-        email: "studio@kaladesign.com",
+        phone: "+91 87141 81942",
+        email: "kalaarchitect4@gmail.com",
         hoursMonFri: "9:00 AM — 7:00 PM",
         hoursSat: "10:00 AM — 5:00 PM",
         hoursSun: "Closed",

@@ -477,40 +477,6 @@ export default function ContactClient({
                 </div>
               </motion.div>
 
-              <motion.div
-                {...stagger}
-                transition={{ ...stagger.transition, delay: 0.2 }}
-              >
-                <h3 className="font-serif text-xl text-bone font-light mb-6 tracking-wide">
-                  Studio Hours
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="font-sans text-xs text-bone/60 font-light">
-                      Mon — Fri
-                    </span>
-                    <span className="font-sans text-xs text-bone font-light">
-                      {contact.hoursMonFri}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="font-sans text-xs text-bone/60 font-light">
-                      Saturday
-                    </span>
-                    <span className="font-sans text-xs text-bone font-light">
-                      {contact.hoursSat}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-sans text-xs text-bone/60 font-light">
-                      Sunday
-                    </span>
-                    <span className="font-sans text-xs text-bone/30 font-light">
-                      {contact.hoursSun}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
 

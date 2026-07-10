@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -125,12 +126,21 @@ export default function Header() {
       {/* 1. TOP HEADER (Absolute at top, scrolls away naturally) */}
       <div className="absolute top-0 left-0 right-0 z-40 py-8 px-6 md:px-12 w-full bg-transparent">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Top Center: Logo */}
           <Link
             href="/"
-            className="font-serif text-xl tracking-[0.25em] font-bold absolute left-1/2 -translate-x-1/2 text-center whitespace-nowrap text-[#FFFFFF]"
+            className="absolute left-1/2 -translate-x-1/2 text-center flex items-center gap-2 md:gap-3 whitespace-nowrap"
           >
-            THE KALA INTERIORS
+            <Image
+              src="/logo.png"
+              alt="KALA Logo"
+              width={240}
+              height={155}
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain transition-all duration-300"
+              priority
+            />
+            <span className="font-serif text-[10px] sm:text-base md:text-xl tracking-[0.2em] sm:tracking-[0.25em] font-bold transition-colors duration-300 text-[#FFFFFF]">
+              THE KALA INTERIORS
+            </span>
           </Link>
         </div>
       </div>
@@ -208,10 +218,20 @@ export default function Header() {
                 }}
               >
                 
-                {/* Small Menu Title */}
-                <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-white/40 block mb-6 text-left">
-                  MENU
-                </span>
+                {/* Small Menu Title + Logo */}
+                <div className="flex items-center justify-between mb-6">
+                  <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-white/40 block">
+                    MENU
+                  </span>
+                  <Image
+                    src="/logo.png"
+                    alt="KALA Logo"
+                    width={120}
+                    height={78}
+                    className="h-12 md:h-16 w-auto object-contain"
+                    priority
+                  />
+                </div>
 
                 {/* Vertically Stacked Links */}
                 <div className="flex flex-col space-y-3.5 my-auto text-left">
