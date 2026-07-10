@@ -110,7 +110,7 @@ export default function HomeClient({
           {/* Hero Content */}
           <motion.div
             style={{ opacity }}
-            className="relative z-20 w-full px-10 md:px-16 lg:px-36 pb-10 md:pb-16 lg:pb-36 flex flex-col items-center md:items-start justify-end text-center md:text-left pointer-events-auto"
+            className="relative z-20 w-full px-10 md:px-16 lg:px-36 pb-56 md:pb-16 lg:pb-36 flex flex-col items-center md:items-start justify-end text-center md:text-left pointer-events-auto"
           >
             {/* Left Column: Eyebrow + Staggered Headline */}
             <div className="flex flex-col items-center md:items-start max-w-2xl w-full">
