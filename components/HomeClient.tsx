@@ -110,7 +110,7 @@ export default function HomeClient({
           {/* Hero Content */}
           <motion.div
             style={{ opacity }}
-            className="relative z-20 w-full px-4 sm:px-6 md:px-8 pb-40 md:pb-24 flex flex-col items-center md:items-start justify-end text-center md:text-left pointer-events-auto"
+            className="relative z-20 w-full px-10 md:px-16 lg:px-36 pb-10 md:pb-16 lg:pb-36 flex flex-col items-center md:items-start justify-end text-center md:text-left pointer-events-auto"
           >
             {/* Left Column: Eyebrow + Staggered Headline */}
             <div className="flex flex-col items-center md:items-start max-w-2xl w-full">
@@ -123,7 +123,7 @@ export default function HomeClient({
                 <span className="w-1.5 h-1.5 rounded-full bg-brass-accent" /> {heroContent.label}
               </motion.span>
 
-              <h1 className="font-space-grotesk text-4xl sm:text-7xl lg:text-8xl font-light text-paper leading-[0.95] tracking-tight uppercase">
+              <h1 className="font-space-grotesk text-4xl md:text-8xl font-light text-paper leading-[0.95] tracking-tight uppercase">
                 {(() => {
                   const parts = heroContent.heading.split("|");
                   const line1 = parts[0] || "";

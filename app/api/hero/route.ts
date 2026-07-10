@@ -14,7 +14,7 @@ export async function GET() {
         label: "From concept to completion.",
         heading: "WE TURN SPACE|INTO PLACE",
         buttonText: "Discover Projects",
-        backgroundImageUrl: "https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/piqsels.com-id-frfbp.jpg",
+        backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg",
         slideOrder: 1,
       };
     }
