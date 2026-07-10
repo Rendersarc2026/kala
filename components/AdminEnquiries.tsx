@@ -45,6 +45,14 @@ export default function AdminEnquiries() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, categoryFilter]);
+
   // Selected enquiry for details modal
   const [selectedEnquiry, setSelectedEnquiry] = useState<EnquiryData | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -177,6 +185,14 @@ export default function AdminEnquiries() {
       return matchesSearch && matchesStatus && matchesCategory;
     });
   }, [enquiries, searchQuery, statusFilter, categoryFilter]);
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredEnquiries.length / itemsPerPage);
+
+  const paginatedEnquiries = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredEnquiries.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredEnquiries, currentPage]);
 
   return (
     <div className="space-y-6 relative font-sans text-gray-800">
@@ -327,7 +343,7 @@ export default function AdminEnquiries() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredEnquiries.map((item) => (
+                {paginatedEnquiries.map((item) => (
                   <tr
                     key={item.id}
                     onClick={() => openDetailsModal(item)}
@@ -408,6 +424,35 @@ export default function AdminEnquiries() {
                 ))}
               </tbody>
             </table>
+
+            {/* Client-side Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-4 text-xs font-light text-gray-500">
+                <div className="text-gray-400">
+                  Showing {Math.min(filteredEnquiries.length, (currentPage - 1) * itemsPerPage + 1)} to{" "}
+                  {Math.min(filteredEnquiries.length, currentPage * itemsPerPage)} of {filteredEnquiries.length} entries
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-400 px-1">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
