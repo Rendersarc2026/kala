@@ -415,7 +415,7 @@ export default function AdminEnquiries() {
       {/* Detail Slideout Modal */}
       <AnimatePresence>
         {selectedEnquiry && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-end">
+          <div className="fixed top-16 lg:top-0 bottom-0 left-0 right-0 z-[70] flex items-center justify-end">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
