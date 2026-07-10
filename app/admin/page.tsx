@@ -318,57 +318,59 @@ export default function AdminDashboardPage() {
                     </div>
                   ) : (
                     <div className="border border-gray-150 rounded-lg overflow-hidden bg-[#fafafa]">
-                      <table className="w-full text-left text-xs border-collapse">
-                        <thead>
-                          <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 font-semibold">
-                            <th className="p-3">Email Address</th>
-                            <th className="p-3">Username</th>
-                            <th className="p-3">Role</th>
-                            <th className="p-3">Date Added</th>
-                            {profile.role === "SUPERADMIN" && profile.email === superadminEmail && (
-                              <th className="p-3 text-right">Actions</th>
-                            )}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {admins.map((adminItem) => (
-                            <tr key={adminItem.id} className="border-b border-gray-200 hover:bg-white text-gray-700">
-                              <td className="p-3 font-medium select-text">{adminItem.email}</td>
-                              <td className="p-3 select-text">{adminItem.username}</td>
-                              <td className="p-3">
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-200/60 text-gray-800 uppercase tracking-widest">
-                                  {adminItem.role}
-                                </span>
-                              </td>
-                              <td className="p-3 text-gray-500">
-                                {new Date(adminItem.createdAt).toLocaleDateString()}
-                              </td>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 font-semibold">
+                              <th className="p-3">Email Address</th>
+                              <th className="p-3">Username</th>
+                              <th className="p-3">Role</th>
+                              <th className="p-3">Date Added</th>
                               {profile.role === "SUPERADMIN" && profile.email === superadminEmail && (
-                                <td className="p-3 text-right">
-                                  {adminItem.id !== profile.id ? (
-                                    <button
-                                      disabled={removingAdminId === adminItem.id}
-                                      onClick={() => handleRemoveAdmin(adminItem.id)}
-                                      className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 font-semibold uppercase tracking-wider text-[10px] border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-2.5 py-1.5 rounded transition-all cursor-pointer disabled:opacity-50"
-                                    >
-                                      {removingAdminId === adminItem.id ? (
-                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-3 h-3" />
-                                      )}
-                                      Remove
-                                    </button>
-                                  ) : (
-                                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest italic pr-2">
-                                      You
-                                    </span>
-                                  )}
-                                </td>
+                                <th className="p-3 text-right">Actions</th>
                               )}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {admins.map((adminItem) => (
+                              <tr key={adminItem.id} className="border-b border-gray-200 hover:bg-white text-gray-700">
+                                <td className="p-3 font-medium select-text">{adminItem.email}</td>
+                                <td className="p-3 select-text">{adminItem.username}</td>
+                                <td className="p-3">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-200/60 text-gray-800 uppercase tracking-widest">
+                                    {adminItem.role}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-gray-500">
+                                  {new Date(adminItem.createdAt).toLocaleDateString()}
+                                </td>
+                                {profile.role === "SUPERADMIN" && profile.email === superadminEmail && (
+                                  <td className="p-3 text-right">
+                                    {adminItem.id !== profile.id ? (
+                                      <button
+                                        disabled={removingAdminId === adminItem.id}
+                                        onClick={() => handleRemoveAdmin(adminItem.id)}
+                                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 font-semibold uppercase tracking-wider text-[10px] border border-red-200 hover:border-red-400 bg-red-50/50 hover:bg-red-50 px-2.5 py-1.5 rounded transition-all cursor-pointer disabled:opacity-50"
+                                      >
+                                        {removingAdminId === adminItem.id ? (
+                                          <Loader2 className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                          <Trash2 className="w-3 h-3" />
+                                        )}
+                                        Remove
+                                      </button>
+                                    ) : (
+                                      <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest italic pr-2">
+                                        You
+                                      </span>
+                                    )}
+                                  </td>
+                                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </div>

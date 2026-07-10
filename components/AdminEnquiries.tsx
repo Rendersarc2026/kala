@@ -415,7 +415,7 @@ export default function AdminEnquiries() {
       {/* Detail Slideout Modal */}
       <AnimatePresence>
         {selectedEnquiry && (
-          <div className="fixed inset-0 z-50 flex items-center justify-end">
+          <div className="fixed inset-0 z-[60] flex items-center justify-end">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -434,12 +434,19 @@ export default function AdminEnquiries() {
               className="relative w-full max-w-md h-full bg-[#ffffff] shadow-xl flex flex-col justify-between z-10 border-l border-gray-150"
             >
               {/* Header */}
-              <div className="px-6 pt-10 pb-5 flex justify-between items-start">
-                <div>
-                  <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1">
+              <div className="px-6 pt-10 pb-5 flex items-start gap-4 border-b border-gray-150">
+                <button
+                  onClick={() => setSelectedEnquiry(null)}
+                  className="text-gray-400 hover:text-gray-950 p-1 hover:bg-gray-50 rounded-full transition-colors cursor-pointer mt-1"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-0.5">
                     Enquiry Details
                   </span>
-                  <h2 className="text-xl font-light font-serif text-gray-900 select-text">
+                  <h2 className="text-xl font-light font-serif text-gray-900 select-text break-words pr-8 sm:pr-0">
                     {selectedEnquiry.name}
                   </h2>
                   <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-gray-450 font-light">
@@ -452,19 +459,13 @@ export default function AdminEnquiries() {
                     {selectedEnquiry.phone && (
                       <a
                         href={`tel:${selectedEnquiry.phone.replace(/[^0-9+]/g, "")}`}
-                        className="hover:text-gray-900 select-text underline underline-offset-2"
+                        className="hover:text-gray-900 select-text underline underline-offset-2 break-all"
                       >
                         {selectedEnquiry.phone}
                       </a>
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => setSelectedEnquiry(null)}
-                  className="text-gray-400 hover:text-gray-900 p-1 transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
 
               {/* Body */}
@@ -498,7 +499,7 @@ export default function AdminEnquiries() {
                   <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block">
                     Project Brief
                   </span>
-                  <div className="bg-gray-50/50 border border-gray-100 rounded-lg p-4 text-xs text-gray-800 font-light leading-relaxed whitespace-pre-wrap select-text max-h-96 overflow-y-auto">
+                  <div className="bg-gray-50/50 border border-gray-100 rounded-lg p-4 text-xs text-gray-800 font-light leading-relaxed whitespace-pre-wrap select-text max-h-96 overflow-y-auto break-words">
                     {selectedEnquiry.message}
                   </div>
                 </div>
