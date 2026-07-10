@@ -98,6 +98,7 @@ export default function HomeClient({
                 src={heroContent.backgroundImageUrl}
                 alt="Luxury living space design by KALA"
                 fill
+                sizes="100vw"
                 priority
                 className="object-cover object-center"
               />
@@ -332,6 +333,7 @@ export default function HomeClient({
           src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
           alt="Minimalist design interior by KALA"
           fill
+          sizes="100vw"
           className="object-cover opacity-60 object-center grayscale"
         />
         <div className="absolute inset-0 bg-[#121212]/45 z-10" />

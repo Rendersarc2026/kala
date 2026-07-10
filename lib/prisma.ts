@@ -11,8 +11,12 @@ const createPrismaClient = () => {
   if (!connectionString) {
     throw new Error("DATABASE_URL environment variable is missing.");
   }
-  // Setup standard PostgreSQL connection pool
-  const pool = new pg.Pool({ connectionString });
+  // Setup standard PostgreSQL connection pool with limits to prevent EMAXCONNSESSION
+  const pool = new pg.Pool({
+    connectionString,
+    max: 2, // Cap pool size per process to stay safely below Supabase's limit of 15 (7 workers * 2 = 14)
+    idleTimeoutMillis: 10000, // Free up idle connections after 10 seconds
+  });
   const adapter = new PrismaPg(pool);
 
   return new PrismaClient({

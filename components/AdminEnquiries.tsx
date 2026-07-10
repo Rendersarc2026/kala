@@ -415,7 +415,7 @@ export default function AdminEnquiries() {
       {/* Detail Slideout Modal */}
       <AnimatePresence>
         {selectedEnquiry && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-end">
+          <div className="fixed inset-0 z-[70] flex items-center justify-end">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -433,20 +433,22 @@ export default function AdminEnquiries() {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="relative w-full max-w-md h-full bg-[#ffffff] shadow-xl flex flex-col justify-between z-10 border-l border-gray-150"
             >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedEnquiry(null)}
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-950 p-1.5 hover:bg-gray-50 rounded-full transition-colors cursor-pointer z-20"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
               {/* Header */}
-              <div className="px-6 pt-10 pb-5 flex items-start gap-4 border-b border-gray-150">
-                <button
-                  onClick={() => setSelectedEnquiry(null)}
-                  className="text-gray-400 hover:text-gray-950 p-1 hover:bg-gray-50 rounded-full transition-colors cursor-pointer mt-1"
-                  title="Close"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="px-6 pt-10 pb-5 border-b border-gray-150 pr-12">
                 <div className="flex-1 min-w-0">
                   <span className="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-0.5">
                     Enquiry Details
                   </span>
-                  <h2 className="text-xl font-light font-serif text-gray-900 select-text break-words pr-8 sm:pr-0">
+                  <h2 className="text-xl font-light font-serif text-gray-900 select-text break-words">
                     {selectedEnquiry.name}
                   </h2>
                   <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-gray-450 font-light">

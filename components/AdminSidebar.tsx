@@ -50,25 +50,35 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        onClick={onToggle}
-        className="lg:hidden fixed top-4 right-4 z-50 bg-[#121212] border border-[#ffffff]/20 rounded-lg p-2.5 text-[#ffffff] cursor-pointer"
-      >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+      {/* Mobile Header Bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#121212] border-b border-[#ffffff]/10 px-6 flex items-center justify-between z-[60]">
+        <div>
+          <h1 className="text-lg tracking-[0.3em] text-[#ffffff] font-serif font-bold">
+            KALA
+          </h1>
+          <p className="text-[8px] uppercase tracking-widest text-[#ffffff]/40 font-semibold mt-0.5">
+            Admin Panel
+          </p>
+        </div>
+        <button
+          onClick={onToggle}
+          className="bg-[#1a1a1a] border border-[#ffffff]/10 rounded-lg p-2 text-[#ffffff] cursor-pointer hover:bg-[#222] transition-colors"
+        >
+          {isOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
+        </button>
+      </div>
 
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          className="lg:hidden fixed inset-0 bg-black/50 z-45"
           onClick={onToggle}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 right-0 bottom-0 z-40 bg-[#121212] border-b lg:border-b-0 lg:border-r border-[#ffffff]/10 flex flex-col transition-all duration-300 h-screen overflow-y-auto lg:right-auto lg:w-64 lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto ${
+        className={`fixed top-16 left-0 right-0 bottom-0 z-50 bg-[#121212] border-b lg:border-b-0 lg:border-r border-[#ffffff]/10 flex flex-col transition-all duration-300 h-[calc(100vh-4rem)] overflow-y-auto lg:top-0 lg:h-screen lg:right-auto lg:w-64 lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto ${
           isOpen
             ? "translate-y-0 opacity-100 pointer-events-auto"
             : "-translate-y-full opacity-0 pointer-events-none lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto"

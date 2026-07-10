@@ -21,21 +21,17 @@ export default function PageTransition({ children }: PageTransitionProps) {
       key={pathname}
       initial={{
         opacity: 0,
-        y: "50vh",
-        scale: 0.94,
-        borderRadius: "24px",
+        y: 12,
       }}
       animate={{
         opacity: 1,
         y: 0,
-        scale: 1,
-        borderRadius: "0px",
       }}
       transition={{
-        duration: 0.9,
-        ease: easeLarge,
+        duration: 0.35,
+        ease: [0.215, 0.61, 0.355, 1], // easeOutCubic for a refined, responsive feel
       }}
-      className="w-full min-h-screen bg-studio-gray relative overflow-hidden origin-bottom"
+      className="w-full min-h-screen bg-studio-gray relative overflow-hidden"
     >
       {children}
     </motion.div>

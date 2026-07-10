@@ -181,6 +181,7 @@ export default function WhyChooseUsPage() {
                         src={item.image}
                         alt={item.title}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 50vw"
                         className="object-cover"
                       />
                     </div>
@@ -258,6 +259,7 @@ export default function WhyChooseUsPage() {
                       src={WHY_CHOOSE_US[activeIndex].image}
                       alt={WHY_CHOOSE_US[activeIndex].title}
                       fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
                       className="object-cover"
                     />
                   </motion.div>
