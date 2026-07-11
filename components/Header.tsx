@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
   { href: "/process", label: "Our Process" },
-  { href: "/why-choose-us", label: "Why Us" },
+  { href: "/why-choose-us", label: "Why Choose Us" },
   { href: "/about", label: "About" },
 ];
 
