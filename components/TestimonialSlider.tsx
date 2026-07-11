@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
-import { Testimonial } from '@/lib/types';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { Testimonial } from "@/lib/types";
 
 interface TestimonialSliderProps {
   testimonials: Testimonial[];
 }
 
-export default function TestimonialSlider({ testimonials }: TestimonialSliderProps) {
+export default function TestimonialSlider({
+  testimonials,
+}: TestimonialSliderProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
 
@@ -23,7 +25,9 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
   const handlePrev = () => {
     if (!testimonials || testimonials.length === 0) return;
     setDirection(-1);
-    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setActiveIndex(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+    );
   };
 
   useEffect(() => {
@@ -62,8 +66,8 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
         {/* Quote details */}
         <div className="lg:col-span-8 space-y-6">
           <Quote className="h-10 w-10 text-terracotta/40 stroke-[1px]" />
-          
-          <div className="relative overflow-hidden min-h-[160px] flex items-center">
+
+          <div className="relative overflow-hidden h-[400px] sm:h-[360px] lg:h-[320px] flex items-center">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={activeIndex}
@@ -78,13 +82,14 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
                 <blockquote className="font-serif text-xl md:text-2xl italic text-charcoal leading-relaxed font-light">
                   &ldquo;{activeTestimonial.quote}&rdquo;
                 </blockquote>
-                
+
                 <div className="mt-8 flex flex-col space-y-1">
                   <cite className="font-sans text-sm font-semibold text-charcoal not-italic">
                     {activeTestimonial.clientName}
                   </cite>
                   <span className="font-sans text-xs text-charcoal-light uppercase tracking-wider">
-                    {activeTestimonial.location} &bull; {activeTestimonial.projectType}
+                    {activeTestimonial.location} &bull;{" "}
+                    {activeTestimonial.projectType}
                   </span>
                 </div>
               </motion.div>
@@ -96,22 +101,22 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
         <div className="lg:col-span-4 flex justify-center lg:justify-end">
           <div className="relative w-40 h-40 md:w-52 md:h-52 overflow-hidden bg-bone-dark grayscale hover:grayscale-0 transition-all duration-700">
             {activeTestimonial.image ? (
-              <Image
+              <img
                 src={activeTestimonial.image}
                 alt={activeTestimonial.clientName}
-                fill
-                sizes="(max-width: 768px) 160px, 208px"
-                className="object-cover"
+                className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Fallback to stylized placeholder if image load fails
-                  (e.target as HTMLElement).style.display = 'none';
+                  (e.target as HTMLElement).style.display = "none";
                 }}
               />
             ) : (
               // Stylized visual placeholder with client initials if image doesn't exist
               <div className="w-full h-full flex items-center justify-center bg-bone-dark border border-charcoal/5">
                 <span className="font-serif text-3xl text-charcoal-light tracking-wider uppercase">
-                  {activeTestimonial.clientName.split(' ').map(n => n[0]).join('')}
+                  {activeTestimonial.clientName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </span>
               </div>
             )}
@@ -132,7 +137,9 @@ export default function TestimonialSlider({ testimonials }: TestimonialSliderPro
                 setActiveIndex(idx);
               }}
               className={`h-[3px] transition-all duration-500 ease-out ${
-                idx === activeIndex ? 'w-8 bg-terracotta' : 'w-3 bg-white/20 hover:bg-white/45'
+                idx === activeIndex
+                  ? "w-8 bg-terracotta"
+                  : "w-3 bg-white/20 hover:bg-white/45"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
