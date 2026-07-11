@@ -251,7 +251,7 @@ function InteractivePanel({
           initial={{ y: "0%" }}
           animate={{ y: isActiveMobile ? "-100%" : "0%" }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute inset-0 bg-[#121212] z-10 pointer-events-none"
+          className="absolute inset-0 bg-studio-gray z-10 pointer-events-none"
         />
       )}
 
@@ -402,7 +402,7 @@ export default function InteractiveStage() {
         variants={panelContainerVariants}
         initial="initial"
         animate="animate"
-        className="flex flex-col md:flex-row w-full h-full bg-[#121212] overflow-hidden"
+        className="flex flex-col md:flex-row w-full h-full bg-studio-gray overflow-hidden"
       >
         {PANELS_DATA.map((panel, index) => (
           <InteractivePanel

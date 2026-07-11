@@ -74,7 +74,7 @@ body {
 
 /* Force bg-charcoal to remain dark gray in dark theme layout */
 .bg-charcoal {
-  background-color: #121212 !important;
+  background-color: #1A1A1A !important;
 }
 
 /* Minimalist, luxury floating scrollbar design matching editorial theme */

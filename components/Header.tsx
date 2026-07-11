@@ -212,7 +212,7 @@ export default function Header() {
             >
               {/* Central Menu Card (Solid Background, No Glassmorphism) */}
               <div 
-                className="bg-[#121212] border border-white/10 shadow-2xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
+                className="bg-[#1A1A1A] border border-white/10 shadow-2xl w-full max-w-[420px] p-8 md:p-10 flex flex-col justify-between min-h-[480px] pointer-events-auto"
                 style={{ 
                   transform: "translateZ(0)"
                 }}
