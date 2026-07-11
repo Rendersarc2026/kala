@@ -14,7 +14,7 @@ export async function GET() {
         label: "From concept to completion.",
         heading: "WE TURN SPACE|INTO PLACE",
         buttonText: "Discover Projects",
-        backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg",
+        backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg.jpeg",
         slideOrder: 1,
       };
     }

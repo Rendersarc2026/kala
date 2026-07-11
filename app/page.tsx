@@ -10,7 +10,7 @@ export const revalidate = 0;
 const FALLBACK_HERO = {
   label: "From concept to completion.",
   heading: "WE TURN SPACE|INTO PLACE",
-  backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg",
+  backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg.jpeg",
 };
 
 const FALLBACK_ABOUT = {

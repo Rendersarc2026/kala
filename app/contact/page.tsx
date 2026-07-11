@@ -3,7 +3,7 @@ import ContactClient from "@/components/ContactClient";
 import { isSafeMapEmbedUrl } from "@/lib/validation";
 
 const DEFAULT_MAP_EMBED_URL =
-  "https://maps.google.com/maps?q=Thalassery+Kerala+India&t=k&z=14&output=embed";
+  "https://maps.google.com/maps?q=11.7474785,75.4945499&z=17&output=embed";
 
 // Force dynamic execution to guarantee fresh DB values on every render
 export const revalidate = 0;

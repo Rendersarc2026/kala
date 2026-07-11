@@ -632,9 +632,28 @@ export default function AdminProjects() {
     }
   };
 
+  const slugify = (str: string) => {
+    return str
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 100);
+  };
+
   const updateFormField = (field: string, value: unknown) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => {
+      const updated = { ...prev, [field]: value };
+      if (field === "title" && typeof value === "string") {
+        updated.slug = slugify(value);
+      }
+      return updated;
+    });
     validateField(field, value);
+    if (field === "title" && typeof value === "string") {
+      validateField("slug", slugify(value));
+    }
   };
 
 
@@ -745,21 +764,7 @@ export default function AdminProjects() {
 
             <form onSubmit={handleSave} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              <div className="space-y-1.5">
-                <label className={labelClass}>Slug</label>
-                <input
-                  type="text"
-                  value={form.slug}
-                  onChange={(e) => updateFormField("slug", e.target.value)}
-                  placeholder="my-project-slug"
-                  className={getInputClass("slug")}
-                  required
-                  disabled={saving || uploadingField !== null}
-                />
-                {fieldErrors.slug && (
-                  <p className="text-red-400 text-[10px] mt-1 font-medium">{fieldErrors.slug}</p>
-                )}
-              </div>
+
               <div className="space-y-1.5">
                 <label className={labelClass}>Title</label>
                 <input
