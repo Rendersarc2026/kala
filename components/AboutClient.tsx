@@ -80,24 +80,24 @@ export default function AboutClient({
             className="lg:col-span-7 space-y-6 text-charcoal-muted font-sans text-sm md:text-base font-light leading-relaxed"
           >
             <p>
-              Founded in 2012, KALA began with a singular premise: that interior environments are not merely decorated containers, but architectural extensions of the human experience. We design from the inside out, aligning structural flow with the daily rituals of our clients.
+              Kala design and build is a Thalassery-based interior firm founded in 2017 by Rehiyan Raheem K. Our practice is driven by a passion for creating meaningful, elegant, and functional spaces that respond thoughtfully to their context and the aspirations of our clients.
             </p>
             <p>
-              Operating as an integrated design and supervision practice, our team coordinates projects from initial schematics to carpentry details. We do not design for magazines or accolades; we build spaces that stand up to the texture of real life.
+              With extensive experience in architectural design and contracting, we offer comprehensive solutions from concept development to project execution. Our design approach balances aesthetics, practicality, and sustainability, ensuring each project is both timeless and purposeful.
             </p>
             
             {/* Pull Quote */}
             <div className="py-8 border-t border-b border-charcoal/10 my-8">
               <p className="font-serif text-xl md:text-2xl text-charcoal italic font-light leading-relaxed">
-                &ldquo;Design is a negotiation between space and time. A well-designed kitchen, bedroom, or restaurant should feel as compelling in twenty years as it does today.&rdquo;
+                &ldquo;We believe architecture is more than building structures—it is about shaping experiences and environments that enhance everyday living.&rdquo;
               </p>
               <cite className="block mt-4 font-sans text-xs uppercase tracking-wider font-semibold text-charcoal not-italic">
-                &mdash; Elena Rostova, Founder
+                &mdash; Rehiyan Raheem K, Founder
               </cite>
             </div>
             
             <p>
-              With studios in Soho and Milan, our residential, commercial, and hospitality portfolio spans three continents. By engaging local suppliers and master artisans on every project site, we embed regional authenticity and detailed execution in every project.
+              At Kala design and build, we believe architecture is more than building structures—it is about shaping experiences and environments that enhance everyday living. Every project is treated as a unique collaboration, crafted with attention to detail, quality, and integrity.
             </p>
           </motion.div>
 
@@ -132,13 +132,13 @@ export default function AboutClient({
               className="space-y-4"
             >
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal-light font-bold">
-                The Vision
+                Our Vision
               </span>
               <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-light leading-snug">
-                Restoring spatial clarity to a complex world.
+                Shaping environments that enrich everyday life.
               </h2>
               <p className="font-sans text-xs md:text-sm text-charcoal-muted leading-relaxed font-light">
-                We envision a future where interior spaces are designed as biophilic, quiet shelters. By marrying structural precision with tactile materiality, we seek to reduce cognitive load and design homes and workplaces that nurture creative focus and calm.
+                To become a trusted architectural practice known for thoughtful design, quality craftsmanship, and innovative solutions—shaping built environments that enrich everyday life and stand the test of time.
               </p>
             </motion.div>
             
@@ -150,14 +150,17 @@ export default function AboutClient({
               className="space-y-4"
             >
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-charcoal-light font-bold">
-                The Mission
+                Our Mission
               </span>
               <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-light leading-snug">
-                Honoring materials, craft, and transparent service.
+                Thoughtful design, functionality, and sustainability.
               </h2>
-              <p className="font-sans text-xs md:text-sm text-charcoal-muted leading-relaxed font-light">
-                Our mission is to lead a design-build model where artistic ideas and construction craftsmanship are aligned. We commit to absolute transparency in costing, biophilic materials that respect ecosystems, and bespoke details that reflect our clients.
-              </p>
+              <div className="font-sans text-xs md:text-sm text-charcoal-muted leading-relaxed font-light space-y-2">
+                <p>• To create meaningful architecture that balances aesthetics, functionality, and sustainability.</p>
+                <p>• To provide end-to-end design and contracting solutions with professionalism and integrity.</p>
+                <p>• To collaborate closely with clients, understanding their needs and transforming ideas into built reality.</p>
+                <p>• To continuously evolve through innovation, research, and responsible design practices.</p>
+              </div>
             </motion.div>
           </div>
         </div>
