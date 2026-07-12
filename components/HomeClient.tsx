@@ -330,7 +330,7 @@ export default function HomeClient({
       {/* 7. CLOSING CTA (Full-bleed) */}
       <section className="relative h-[65vh] w-full flex items-center justify-center overflow-hidden bg-charcoal">
         <Image
-          src="https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
+          src="https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
           alt="Minimalist design interior by KALA"
           fill
           sizes="100vw"

@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     clientName: 'Fairoz Riyaz',
     location: 'Founder, Plumber Store',
     projectType: 'Commercial',
-    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/fairoz-1783766423111-f22895400ea1.png',
+    image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/testimonials/fairoz-1783766423111-f22895400ea1.png',
   },
   {
     id: '2',
@@ -15,6 +15,6 @@ export const testimonials: Testimonial[] = [
     clientName: 'Ar Lukman',
     location: 'Architect',
     projectType: 'Professional Collaboration',
-    image: 'https://vwyjryydpalialkrbtwk.supabase.co/storage/v1/object/public/kala%20images/testimonials/lukman-1783766424485-3ce694413a66.png',
+    image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/testimonials/lukman-1783766424485-3ce694413a66.png',
   }
 ];

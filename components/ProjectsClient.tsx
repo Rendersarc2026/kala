@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '@/lib/types';
 import ProjectCard from '@/components/ProjectCard';
@@ -13,11 +13,50 @@ interface ProjectsClientProps {
 
 export default function ProjectsClient({ initialProjects }: ProjectsClientProps) {
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
+  const [visibleCount, setVisibleCount] = useState(6);
+  const observerTarget = useRef<HTMLDivElement>(null);
+  
   const projects = initialProjects;
 
   const filteredProjects = activeFilter === 'all' 
     ? projects 
     : projects.filter((p) => p.category === activeFilter);
+
+  const displayedProjects = filteredProjects.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredProjects.length;
+
+  // Reset visible count when active filter changes
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [activeFilter]);
+
+  // Intersection Observer for Infinite Scroll
+  useEffect(() => {
+    if (!hasMore) return;
+
+    const target = observerTarget.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => prev + 6);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '200px',
+      }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      if (target) {
+        observer.unobserve(target);
+      }
+    };
+  }, [hasMore, filteredProjects.length]);
 
   const filterTabs: { id: CategoryFilter; label: string }[] = [
     { id: 'all', label: 'All Projects' },
@@ -75,7 +114,7 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
           className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-24 md:gap-y-32"
         >
           <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => {
+            {displayedProjects.map((project) => {
               return (
                 <motion.div
                   key={project.slug}
@@ -91,6 +130,13 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
             })}
           </AnimatePresence>
         </motion.div>
+
+        {/* Sentinel Element for Infinite Scroll */}
+        {hasMore && (
+          <div ref={observerTarget} className="h-20 w-full flex items-center justify-center mt-16">
+            <div className="w-8 h-8 border-2 border-terracotta border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-20">

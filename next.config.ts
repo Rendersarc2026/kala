@@ -34,10 +34,14 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
+    // This dev machine is on a NAT64 network, so the image optimizer sees the
+    // NAT64-mapped upstream IPs as "private" and refuses to fetch remote images.
+    // Serve originals directly in dev; keep full optimization in production.
+    unoptimized: isDev,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'vwyjryydpalialkrbtwk.supabase.co',
+        hostname: 'paifcnthsfxutublwcja.supabase.co',
         port: '',
         pathname: '/storage/v1/object/public/**',
       },
