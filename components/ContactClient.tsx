@@ -83,6 +83,9 @@ export default function ContactClient({
     if (!formData.phone.trim()) {
       tempErrors.phone = "Please provide your mobile number.";
       isValid = false;
+    } else if (!/^[0-9+\s()-]+$/.test(formData.phone)) {
+      tempErrors.phone = "Please provide a valid phone number.";
+      isValid = false;
     }
 
     if (!formData.message.trim()) {
@@ -100,6 +103,22 @@ export default function ContactClient({
     >,
   ) => {
     const { name, value } = e.target;
+
+    if (name === "phone") {
+      const filteredValue = value.replace(/[^0-9+\s()-]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        phone: filteredValue,
+      }));
+      if (errors.phone) {
+        setErrors((prev) => ({
+          ...prev,
+          phone: undefined,
+        }));
+      }
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -132,6 +151,7 @@ export default function ContactClient({
       }
 
       setIsSuccess(true);
+      setErrors({});
       setFormData({
         name: "",
         email: "",
@@ -184,6 +204,7 @@ export default function ContactClient({
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="space-y-5"
+                      autoComplete="off"
                     >
                       <h3 className="font-serif text-2xl text-bone font-light mb-8 tracking-wide">
                         Enquiry Form
@@ -201,6 +222,7 @@ export default function ContactClient({
                             type="text"
                             id="name"
                             name="name"
+                            autoComplete="off"
                             value={formData.name}
                             onChange={handleChange}
                             onFocus={() => setFocusedField("name")}
@@ -232,6 +254,7 @@ export default function ContactClient({
                             type="email"
                             id="email"
                             name="email"
+                            autoComplete="off"
                             value={formData.email}
                             onChange={handleChange}
                             onFocus={() => setFocusedField("email")}
@@ -263,6 +286,7 @@ export default function ContactClient({
                             type="tel"
                             id="phone"
                             name="phone"
+                            autoComplete="off"
                             value={formData.phone}
                             onChange={handleChange}
                             onFocus={() => setFocusedField("phone")}
@@ -335,6 +359,7 @@ export default function ContactClient({
                         <textarea
                           id="message"
                           name="message"
+                          autoComplete="off"
                           rows={5}
                           value={formData.message}
                           onChange={handleChange}
@@ -414,7 +439,17 @@ export default function ContactClient({
                         </p>
                       </div>
                       <button
-                        onClick={() => setIsSuccess(false)}
+                        onClick={() => {
+                          setFormData({
+                            name: "",
+                            email: "",
+                            phone: "",
+                            projectType: "residential",
+                            message: "",
+                          });
+                          setErrors({});
+                          setIsSuccess(false);
+                        }}
                         className="font-sans text-xs uppercase tracking-widest text-terracotta-light hover:text-white transition-colors font-semibold border-b border-terracotta-light/20 pb-1"
                       >
                         Send another message

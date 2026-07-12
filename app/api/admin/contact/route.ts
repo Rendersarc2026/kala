@@ -6,11 +6,16 @@ import { addSecurityHeaders } from "@/lib/security-headers";
 import { isSafeMapEmbedUrl } from "@/lib/validation";
 
 const contactSettingsSchema = z.object({
-  phone: z.string().trim().min(1, "Phone is required").max(100),
+  phone: z
+    .string()
+    .trim()
+    .min(1, "Phone is required")
+    .max(100)
+    .regex(/^[0-9+\s()-]+$/, "Invalid phone number format"),
   email: z.string().trim().email("Invalid email format"),
-  hoursMonFri: z.string().trim().min(1, "Monday-Friday hours are required").max(100),
-  hoursSat: z.string().trim().min(1, "Saturday hours are required").max(100),
-  hoursSun: z.string().trim().min(1, "Sunday hours are required").max(100),
+  hoursMonFri: z.string().trim().max(100).optional().default(""),
+  hoursSat: z.string().trim().max(100).optional().default(""),
+  hoursSun: z.string().trim().max(100).optional().default(""),
   // Rendered into <iframe src>, so it must be constrained to https Google Maps.
   mapEmbedUrl: z
     .string()

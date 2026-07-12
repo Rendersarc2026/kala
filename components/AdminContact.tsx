@@ -94,28 +94,18 @@ export default function AdminContact() {
 
     const trimmedPhone = phone.trim();
     const trimmedEmail = email.trim();
-    const trimmedMonFri = hoursMonFri.trim();
-    const trimmedSat = hoursSat.trim();
-    const trimmedSun = hoursSun.trim();
     const trimmedMap = mapEmbedUrl.trim();
 
     const errors: Record<string, string> = {};
     if (!trimmedPhone) {
       errors.phone = "Phone number is required and cannot contain only whitespace.";
+    } else if (!/^[0-9+\s()-]+$/.test(trimmedPhone)) {
+      errors.phone = "Please enter a valid phone number.";
     }
     if (!trimmedEmail) {
       errors.email = "Email address is required.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       errors.email = "Please enter a valid email address.";
-    }
-    if (!trimmedMonFri) {
-      errors.hoursMonFri = "Monday-Friday hours are required.";
-    }
-    if (!trimmedSat) {
-      errors.hoursSat = "Saturday hours are required.";
-    }
-    if (!trimmedSun) {
-      errors.hoursSun = "Sunday hours are required.";
     }
     if (!trimmedMap) {
       errors.mapEmbedUrl = "Google Maps embed link is required.";
@@ -134,9 +124,9 @@ export default function AdminContact() {
         body: JSON.stringify({
           phone: trimmedPhone,
           email: trimmedEmail,
-          hoursMonFri: trimmedMonFri,
-          hoursSat: trimmedSat,
-          hoursSun: trimmedSun,
+          hoursMonFri,
+          hoursSat,
+          hoursSun,
           mapEmbedUrl: trimmedMap,
         }),
       });
@@ -227,7 +217,11 @@ export default function AdminContact() {
                   type="text"
                   disabled={saving}
                   value={phone}
-                  onChange={(e) => { setPhone(e.target.value); clearFieldError("phone"); }}
+                  onChange={(e) => {
+                    const filtered = e.target.value.replace(/[^0-9+\s()-]/g, "");
+                    setPhone(filtered);
+                    clearFieldError("phone");
+                  }}
                   placeholder="+1 (555) 0199"
                   className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
                     fieldErrors.phone ? "border-red-500 focus:border-red-500" : "border-gray-200"
@@ -258,65 +252,7 @@ export default function AdminContact() {
                 )}
               </div>
 
-              {/* Hours: Mon-Fri */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                  Monday — Friday Hours
-                </label>
-                <input
-                  type="text"
-                  disabled={saving}
-                  value={hoursMonFri}
-                  onChange={(e) => { setHoursMonFri(e.target.value); clearFieldError("hoursMonFri"); }}
-                  placeholder="9:00 AM — 7:00 PM"
-                  className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                    fieldErrors.hoursMonFri ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                  }`}
-                />
-                {fieldErrors.hoursMonFri && (
-                  <p className="text-xs text-red-500 mt-1">{fieldErrors.hoursMonFri}</p>
-                )}
-              </div>
 
-              {/* Hours: Saturday */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                  Saturday Hours
-                </label>
-                <input
-                  type="text"
-                  disabled={saving}
-                  value={hoursSat}
-                  onChange={(e) => { setHoursSat(e.target.value); clearFieldError("hoursSat"); }}
-                  placeholder="10:00 AM — 5:00 PM"
-                  className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                    fieldErrors.hoursSat ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                  }`}
-                />
-                {fieldErrors.hoursSat && (
-                  <p className="text-xs text-red-500 mt-1">{fieldErrors.hoursSat}</p>
-                )}
-              </div>
-
-              {/* Hours: Sunday */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                  Sunday Hours
-                </label>
-                <input
-                  type="text"
-                  disabled={saving}
-                  value={hoursSun}
-                  onChange={(e) => { setHoursSun(e.target.value); clearFieldError("hoursSun"); }}
-                  placeholder="Closed"
-                  className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
-                    fieldErrors.hoursSun ? "border-red-500 focus:border-red-500" : "border-gray-200"
-                  }`}
-                />
-                {fieldErrors.hoursSun && (
-                  <p className="text-xs text-red-500 mt-1">{fieldErrors.hoursSun}</p>
-                )}
-              </div>
 
               {/* Map Embed URL */}
               <div className="space-y-1.5 md:col-span-2">

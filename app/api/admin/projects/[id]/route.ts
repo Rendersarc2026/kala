@@ -87,7 +87,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
-    if (data.featured) {
+    if (data.featured && !existing.featured) {
       const featuredCount = await prisma.project.count({
         where: { 
           featured: true,
@@ -118,9 +118,28 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       updateData.images = JSON.stringify(updateData.images);
     }
 
-    const project = await prisma.project.update({
-      where: { id },
-      data: updateData,
+    const project = await prisma.$transaction(async (tx) => {
+      // If sortOrder is being changed, shift existing project sort orders to make room
+      if (data.sortOrder !== undefined && data.sortOrder !== existing.sortOrder) {
+        await tx.project.updateMany({
+          where: {
+            id: { not: id },
+            sortOrder: {
+              gte: data.sortOrder,
+            },
+          },
+          data: {
+            sortOrder: {
+              increment: 1,
+            },
+          },
+        });
+      }
+
+      return await tx.project.update({
+        where: { id },
+        data: updateData,
+      });
     });
 
     const response = NextResponse.json({
@@ -151,7 +170,22 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
-    await prisma.project.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      await tx.project.delete({ where: { id } });
+
+      await tx.project.updateMany({
+        where: {
+          sortOrder: {
+            gt: existing.sortOrder,
+          },
+        },
+        data: {
+          sortOrder: {
+            decrement: 1,
+          },
+        },
+      });
+    });
 
     const response = NextResponse.json({ success: true, message: "Project deleted successfully" });
     return addSecurityHeaders(response);

@@ -155,6 +155,8 @@ export default function AdminProjects() {
     setFieldErrors({});
     setEditingId(null);
     setShowForm(false);
+    setError(null);
+    setSuccess(null);
   };
 
   const openEdit = (project: ProjectData) => {

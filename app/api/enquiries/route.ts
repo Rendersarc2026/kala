@@ -6,7 +6,12 @@ import { addSecurityHeaders } from "@/lib/security-headers";
 const createEnquirySchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   email: z.string().trim().email("Invalid email address").max(100),
-  phone: z.string().trim().min(1, "Mobile number is required").max(30),
+  phone: z
+    .string()
+    .trim()
+    .min(1, "Mobile number is required")
+    .max(30)
+    .regex(/^[0-9+\s()-]+$/, "Invalid phone number format"),
   projectType: z.string().trim().min(1, "Project type is required").max(100),
   message: z.string().trim().min(1, "Message/brief is required").max(5000),
 });

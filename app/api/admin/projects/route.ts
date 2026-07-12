@@ -92,22 +92,38 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    const project = await prisma.project.create({
-      data: {
-        slug: data.slug,
-        title: data.title,
-        category: data.category,
-        location: data.location,
-        area: data.area,
-        year: data.year,
-        client: data.client,
-        description: data.description,
-        narrative: data.narrative,
-        heroImage: data.heroImage,
-        images: JSON.stringify(data.images),
-        featured: data.featured,
-        sortOrder: data.sortOrder,
-      },
+    const project = await prisma.$transaction(async (tx) => {
+      // Shift existing project sort orders to make room for the new project
+      await tx.project.updateMany({
+        where: {
+          sortOrder: {
+            gte: data.sortOrder,
+          },
+        },
+        data: {
+          sortOrder: {
+            increment: 1,
+          },
+        },
+      });
+
+      return await tx.project.create({
+        data: {
+          slug: data.slug,
+          title: data.title,
+          category: data.category,
+          location: data.location,
+          area: data.area,
+          year: data.year,
+          client: data.client,
+          description: data.description,
+          narrative: data.narrative,
+          heroImage: data.heroImage,
+          images: JSON.stringify(data.images),
+          featured: data.featured,
+          sortOrder: data.sortOrder,
+        },
+      });
     });
 
     const response = NextResponse.json({
