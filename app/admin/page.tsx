@@ -43,14 +43,16 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/profile");
       if (!res.ok) {
-        router.push("/admin/login");
+        // Not authenticated: redirect to login and keep the spinner up during
+        // the redirect rather than flashing the "Authentication error" card.
+        router.replace("/admin/login");
         return;
       }
       const data = await res.json();
       setProfile(data.data);
+      setLoading(false);
     } catch (err) {
       setError("Failed to fetch admin profile.");
-    } finally {
       setLoading(false);
     }
   }
