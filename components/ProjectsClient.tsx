@@ -32,15 +32,18 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
 
   // Intersection Observer for Infinite Scroll
   useEffect(() => {
-    if (!hasMore) return;
-
     const target = observerTarget.current;
     if (!target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((prev) => prev + 6);
+          setVisibleCount((prev) => {
+            if (prev < filteredProjects.length) {
+              return prev + 6;
+            }
+            return prev;
+          });
         }
       },
       {
@@ -52,11 +55,9 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
     observer.observe(target);
 
     return () => {
-      if (target) {
-        observer.unobserve(target);
-      }
+      observer.unobserve(target);
     };
-  }, [hasMore, filteredProjects.length]);
+  }, [filteredProjects.length, activeFilter]);
 
   const filterTabs: { id: CategoryFilter; label: string }[] = [
     { id: 'all', label: 'All Projects' },
@@ -132,11 +133,11 @@ export default function ProjectsClient({ initialProjects }: ProjectsClientProps)
         </motion.div>
 
         {/* Sentinel Element for Infinite Scroll */}
-        {hasMore && (
-          <div ref={observerTarget} className="h-20 w-full flex items-center justify-center mt-16">
+        <div ref={observerTarget} className="h-20 w-full flex items-center justify-center mt-16">
+          {hasMore && (
             <div className="w-8 h-8 border-2 border-terracotta border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+          )}
+        </div>
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-20">
