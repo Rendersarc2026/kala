@@ -128,7 +128,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto flex items-center justify-center">
           <Link
             href="/"
-            className="text-center flex items-center justify-center gap-2 md:gap-3 whitespace-nowrap"
+            className="text-center flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-3 whitespace-nowrap"
           >
             <Image
               src="/logo.png"
