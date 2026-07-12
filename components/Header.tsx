@@ -125,10 +125,10 @@ export default function Header() {
     <>
       {/* 1. TOP HEADER (Absolute at top, scrolls away naturally) */}
       <div className="absolute top-0 left-0 right-0 z-40 py-8 px-6 md:px-12 w-full bg-transparent">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex items-center justify-center">
           <Link
             href="/"
-            className="absolute left-1/2 -translate-x-1/2 text-center flex items-center gap-2 md:gap-3 whitespace-nowrap"
+            className="text-center flex items-center justify-center gap-2 md:gap-3 whitespace-nowrap"
           >
             <Image
               src="/logo.png"
