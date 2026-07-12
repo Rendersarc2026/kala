@@ -62,7 +62,7 @@ function TimelineNode({
   scrollYProgress: MotionValue<number>; 
 }) {
   const totalSteps = 6;
-  const p_idx = 0.08 + idx * (0.9 - 0.08) / (totalSteps - 1);
+  const p_idx = idx / (totalSteps - 1);
   
   // Dynamic scale: scales up when scroll reaches it
   const scale = useTransform(
@@ -91,7 +91,7 @@ function TimelineContent({
   className: string;
 }) {
   const totalSteps = 6;
-  const p_idx = 0.08 + idx * (0.9 - 0.08) / (totalSteps - 1);
+  const p_idx = idx / (totalSteps - 1);
   const isEven = idx % 2 === 0;
 
   // Move towards the edge of the screen slightly:
@@ -125,8 +125,11 @@ export default function ProcessPage() {
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const easeSmooth: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-  const { scrollYProgress } = useScroll();
-  const lineHeight = useTransform(scrollYProgress, [0.08, 0.9], ['0%', '100%']);
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start center', 'end center'],
+  });
+  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
   return (
     <div className="w-full pt-28 pb-24 md:pb-36 bg-studio-gray">
@@ -147,10 +150,10 @@ export default function ProcessPage() {
       {/* Vertical Timeline */}
       <section ref={timelineRef} className="relative max-w-5xl mx-auto px-6">
         {/* Vertical Progress Line (only visible on desktop center) */}
-        <div className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 bottom-0 w-1 bg-charcoal/10 rounded-full z-0" />
+        <div className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 bottom-0 w-1 bg-bone/10 rounded-full z-0" />
         <motion.div
           style={{ height: lineHeight }}
-          className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 w-1 bg-charcoal rounded-full z-10 origin-top"
+          className="absolute hidden lg:block lg:left-1/2 lg:-translate-x-1/2 top-0 w-1 bg-bone rounded-full z-10 origin-top"
         />
 
         <div className="relative z-20 space-y-24 md:space-y-36">
