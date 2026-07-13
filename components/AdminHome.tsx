@@ -268,13 +268,26 @@ export default function AdminHome() {
                 <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold block">
                   Banner Background Image
                 </label>
-                <div className="relative aspect-video w-full max-w-md rounded-xl overflow-hidden bg-gray-50 border border-gray-200 group flex items-center justify-center mb-3">
+                 <div className="relative aspect-video w-full max-w-md rounded-xl overflow-hidden bg-gray-50 border border-gray-200 group flex items-center justify-center mb-3">
                   {backgroundImageUrl ? (
-                    <img
-                      src={backgroundImageUrl}
-                      alt="Banner background preview"
-                      className="w-full h-full object-cover"
-                    />
+                    backgroundImageUrl.toLowerCase().endsWith(".mp4") ||
+                    backgroundImageUrl.toLowerCase().endsWith(".webm") ||
+                    backgroundImageUrl.toLowerCase().endsWith(".ogg") ? (
+                      <video
+                        src={backgroundImageUrl}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={backgroundImageUrl}
+                        alt="Banner background preview"
+                        className="w-full h-full object-cover"
+                      />
+                    )
                   ) : (
                     <div className="text-center p-6 text-gray-300">
                       <ImageIcon className="w-8 h-8 mx-auto mb-2 text-gray-200" />

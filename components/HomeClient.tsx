@@ -88,20 +88,33 @@ export default function HomeClient({
           style={{ scale, borderRadius }}
           className="relative w-full h-full flex items-end justify-center overflow-hidden bg-[#FFFFFF]"
         >
-          {/* Parallax Background Image */}
+          {/* Parallax Background Image or Video */}
           {heroContent.backgroundImageUrl && (
             <motion.div
               style={{ y: yBg, scale: scaleBg }}
               className="absolute inset-0 z-0 pointer-events-none"
             >
-              <Image
-                src={heroContent.backgroundImageUrl}
-                alt="Luxury living space design by KALA"
-                fill
-                sizes="100vw"
-                priority
-                className="object-cover object-center"
-              />
+              {heroContent.backgroundImageUrl.toLowerCase().endsWith(".mp4") ||
+              heroContent.backgroundImageUrl.toLowerCase().endsWith(".webm") ||
+              heroContent.backgroundImageUrl.toLowerCase().endsWith(".ogg") ? (
+                <video
+                  src={heroContent.backgroundImageUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover object-center"
+                />
+              ) : (
+                <Image
+                  src={heroContent.backgroundImageUrl}
+                  alt="Luxury living space design by KALA"
+                  fill
+                  sizes="100vw"
+                  priority
+                  className="object-cover object-center"
+                />
+              )}
               {/* Smooth dark vertical gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(28,23,20,0.85)] via-[rgba(28,23,20,0.35)] to-transparent z-10" />
             </motion.div>
