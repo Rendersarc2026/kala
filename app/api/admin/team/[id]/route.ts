@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const member = await prisma.teamMember.findUnique({ where: { id } });
+    const member = await prisma.teamMember.findFirst({ where: { id, is_active: true } });
     if (!member) {
       const response = NextResponse.json({ error: "Team member not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.teamMember.findUnique({ where: { id } });
+    const existing = await prisma.teamMember.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Team member not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -98,13 +98,16 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.teamMember.findUnique({ where: { id } });
+    const existing = await prisma.teamMember.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Team member not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
-    await prisma.teamMember.delete({ where: { id } });
+    await prisma.teamMember.update({
+      where: { id },
+      data: { is_active: false },
+    });
 
     const response = NextResponse.json({ success: true, message: "Team member deleted successfully" });
     return addSecurityHeaders(response);

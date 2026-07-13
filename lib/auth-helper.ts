@@ -10,7 +10,6 @@ export interface AuthSuccess {
     email: string;
     username: string;
     role: string;
-    mustChangePassword: boolean;
   };
 }
 
@@ -40,13 +39,12 @@ export function isSuperAdmin(admin: AuthSuccess["admin"]): boolean {
 
 /**
  * Authenticates the admin using the access token from cookies.
- * By default, it blocks access if the admin has mustChangePassword=true,
- * unless allowMustChangePassword is set to true.
+ *
+ * A deactivated admin (is_active = false) is rejected here rather than only
+ * being hidden from listings, so that revoking an admin takes effect on their
+ * next request even though their access token is still cryptographically valid.
  */
-export async function authenticateAdmin(
-  request: NextRequest,
-  options?: { allowMustChangePassword?: boolean }
-): Promise<AuthResult> {
+export async function authenticateAdmin(request: NextRequest): Promise<AuthResult> {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("admin_access_token")?.value;
@@ -68,14 +66,13 @@ export async function authenticateAdmin(
       };
     }
 
-    const admin = await prisma.adminUser.findUnique({
-      where: { id: payload.adminId },
+    const admin = await prisma.adminUser.findFirst({
+      where: { id: payload.adminId, is_active: true },
       select: {
         id: true,
         email: true,
         username: true,
         role: true,
-        mustChangePassword: true,
       },
     });
 
@@ -84,14 +81,6 @@ export async function authenticateAdmin(
         authenticated: false,
         status: 403,
         error: "Admin user not found or access revoked.",
-      };
-    }
-
-    if (admin.mustChangePassword && !options?.allowMustChangePassword) {
-      return {
-        authenticated: false,
-        status: 403,
-        error: "You must change your password before accessing this resource.",
       };
     }
 

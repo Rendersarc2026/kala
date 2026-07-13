@@ -8,57 +8,40 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model AboutSection {
-  id         String @id @default("about")
+  id         String  @id @default("about")
   label      String
   heading    String
   paragraph  String
   image1Url  String
   image2Url  String
   buttonText String
+  is_active  Boolean @default(true)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model AdminUser {
-  id                 String    @id @default(uuid())
-  email              String    @unique
-  username           String    @unique @default("admin")
-  hashedPassword     String
-  role               String    @default("ADMIN")
-  mustChangePassword Boolean   @default(true)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @default(now()) @updatedAt
-  otps               Otp[]
-  sessions           Session[]
-}
+  id        String    @id @default(uuid())
+  email     String    @unique
+  username  String    @unique @default("admin")
+  role      String    @default("ADMIN")
+  is_active Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  otps      Otp[]
+  sessions  Session[]
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model BlogPost {
-  id            String   @id
-  title         String
-  excerpt       String
-  imageUrl      String
-  categoryTag   String
-  publishedDate DateTime @default(now())
-  sortOrder     Int
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model CtaSection {
-  id                 String @id @default("cta")
-  heading            String
-  subtext            String
-  buttonText         String
-  backgroundImageUrl String
+  @@index([is_active])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model HeroContent {
-  id                 String @id
+  id                 String  @id
   label              String
   heading            String
   buttonText         String
   backgroundImageUrl String
   slideOrder         Int
+  is_active          Boolean @default(true)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -77,11 +60,12 @@ model Project {
   images      String
   featured    Boolean  @default(false)
   sortOrder   Int      @default(0)
+  is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([sortOrder])
-  @@index([featured, sortOrder])
+  @@index([is_active, sortOrder])
+  @@index([is_active, featured, sortOrder])
 }
 
 model Service {
@@ -91,18 +75,22 @@ model Service {
   image       String
   details     String
   sortOrder   Int      @default(0)
+  is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([sortOrder])
+  @@index([is_active, sortOrder])
 }
 
 model Otp {
   id        String    @id @default(uuid())
   adminId   String
   admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  codeHash  String    // SHA-256 hash of the OTP
+  codeHash  String // SHA-256 hash of the OTP
   expiresAt DateTime
+  // Present for schema uniformity. OTP consumption stays a hard DELETE: a spent
+  // code must not survive as a row that one missing filter away is live again.
+  is_active Boolean   @default(true)
   createdAt DateTime  @default(now())
 
   @@index([adminId])
@@ -116,6 +104,9 @@ model FailedAttempt {
   id        String   @id @default(uuid())
   email     String
   ip        String?
+  // Present for schema uniformity. Clearing attempts after a successful login
+  // stays a hard DELETE, so a stale row can never re-lock an account.
+  is_active Boolean  @default(true)
   createdAt DateTime @default(now())
 
   @@index([createdAt])
@@ -126,9 +117,12 @@ model FailedAttempt {
 model Session {
   id           String    @id @default(uuid())
   adminId      String
-  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  admin        AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
   refreshToken String    @unique
   expiresAt    DateTime
+  // Present for schema uniformity. Logout and rotation stay hard DELETEs: a
+  // revoked refresh token must leave no row that could still authenticate.
+  is_active    Boolean   @default(true)
   createdAt    DateTime  @default(now())
 
   @@index([adminId])
@@ -143,10 +137,11 @@ model Testimonial {
   location    String
   projectType String
   image       String?
+  is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([createdAt])
+  @@index([is_active, createdAt])
 }
 
 model TeamMember {
@@ -155,10 +150,11 @@ model TeamMember {
   role      String
   image     String
   bio       String
+  is_active Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([createdAt])
+  @@index([is_active, createdAt])
 }
 
 model ContactSettings {
@@ -169,6 +165,7 @@ model ContactSettings {
   hoursSat    String
   hoursSun    String
   mapEmbedUrl String
+  is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -185,5 +182,5 @@ model Enquiry {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([createdAt])
+  @@index([is_active, createdAt])
 }

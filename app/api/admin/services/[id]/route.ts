@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const service = await prisma.service.findUnique({ where: { id } });
+    const service = await prisma.service.findFirst({ where: { id, is_active: true } });
     if (!service) {
       const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -55,7 +55,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.service.findUnique({ where: { id } });
+    const existing = await prisma.service.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -111,13 +111,16 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.service.findUnique({ where: { id } });
+    const existing = await prisma.service.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Service not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
-    await prisma.service.delete({ where: { id } });
+    await prisma.service.update({
+      where: { id },
+      data: { is_active: false },
+    });
 
     const response = NextResponse.json({ success: true, message: "Service deleted successfully" });
     return addSecurityHeaders(response);

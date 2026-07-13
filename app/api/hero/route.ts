@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    let hero = await prisma.heroContent.findUnique({
-      where: { id: "hero" },
+    let hero = await prisma.heroContent.findFirst({
+      where: { id: "hero", is_active: true },
     });
 
     if (!hero) {
@@ -16,6 +16,7 @@ export async function GET() {
         buttonText: "Discover Projects",
         backgroundImageUrl: "/interior/jason-wang-NxAwryAbtIw-unsplash.jpg.jpeg",
         slideOrder: 1,
+        is_active: true,
       };
     }
 

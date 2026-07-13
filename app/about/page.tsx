@@ -7,6 +7,7 @@ export const revalidate = 0;
 
 export default async function AboutPage() {
   const team = await prisma.teamMember.findMany({
+    where: { is_active: true },
     orderBy: { createdAt: "asc" },
   });
 

@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    let about = await prisma.aboutSection.findUnique({
-      where: { id: "about-teaser" },
+    let about = await prisma.aboutSection.findFirst({
+      where: { id: "about-teaser", is_active: true },
     });
 
     if (!about) {
@@ -16,6 +16,7 @@ export async function GET() {
         image1Url: "",
         image2Url: "",
         buttonText: "",
+        is_active: true,
       };
     }
 

@@ -53,9 +53,10 @@ export async function POST(request: NextRequest) {
     // Sanitization to prevent simple injection or control character attacks
     const sanitizedIdentifier = identifier.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
 
-    // 3. Find Admin User strictly by email
-    const admin = await prisma.adminUser.findUnique({
-      where: { email: sanitizedIdentifier },
+    // 3. Find Admin User strictly by email. A deactivated admin is treated as
+    // non-existent, so no OTP is ever issued for a revoked account.
+    const admin = await prisma.adminUser.findFirst({
+      where: { email: sanitizedIdentifier, is_active: true },
     });
 
     const targetIdentifier = admin ? admin.email : sanitizedIdentifier;

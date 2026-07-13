@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
@@ -33,51 +32,6 @@ export interface PreAuthPayload {
   adminId: string;
   email: string;
   type: "pre_auth";
-}
-
-// ==========================================
-// PASSWORD SECURITY
-// ==========================================
-
-/**
- * Hash password with bcrypt using 12 salt rounds.
- */
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
-}
-
-/**
- * Compare password with bcrypt hash.
- */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
-}
-
-/**
- * Validates password strength for creation/change:
- * - Minimum 10 characters long
- * - Contains at least one lowercase letter
- * - Contains at least one uppercase letter
- * - Contains at least one numeric digit
- * - Contains at least one special character
- */
-export function validatePasswordStrength(password: string): { isValid: boolean; message?: string } {
-  if (password.length < 10) {
-    return { isValid: false, message: "Password must be at least 10 characters long." };
-  }
-  const hasLower = /[a-z]/.test(password);
-  const hasUpper = /[A-Z]/.test(password);
-  const hasDigit = /\d/.test(password);
-  const hasSpecial = /[@$!%*?&_#^+\-=()[\]{}|\\;:'",.<>/?]/.test(password);
-
-  if (!hasLower || !hasUpper || !hasDigit || !hasSpecial) {
-    return {
-      isValid: false,
-      message: "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.",
-    };
-  }
-
-  return { isValid: true };
 }
 
 // ==========================================

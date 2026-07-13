@@ -18,7 +18,6 @@ interface AdminProfile {
   email: string;
   username: string;
   role: string;
-  mustChangePassword: boolean;
 }
 
 export default function AdminDashboardPage() {

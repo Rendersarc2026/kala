@@ -10,7 +10,6 @@ interface AdminProfile {
   email: string;
   username: string;
   role: string;
-  mustChangePassword: boolean;
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

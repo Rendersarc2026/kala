@@ -38,7 +38,9 @@ export async function POST() {
 
     const now = new Date();
 
-    if (!dbSession || dbSession.expiresAt <= now) {
+    // A deactivated admin must not be able to mint fresh tokens from a session
+    // that outlived their removal, so the account is re-checked on every refresh.
+    if (!dbSession || dbSession.expiresAt <= now || !dbSession.admin.is_active) {
       // Clean up invalid session if it exists in the database
       if (dbSession) {
         await prisma.session.delete({ where: { id: dbSession.id } }).catch(() => {});

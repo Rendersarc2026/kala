@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    let about = await prisma.aboutSection.findUnique({
-      where: { id: "about-teaser" },
+    let about = await prisma.aboutSection.findFirst({
+      where: { id: "about-teaser", is_active: true },
     });
 
     if (!about) {
@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         image1Url: "",
         image2Url: "",
         buttonText: "",
+        is_active: true,
       };
     }
 
@@ -62,6 +63,8 @@ export async function POST(request: NextRequest) {
       update: {
         label,
         heading,
+        // Saving content restores the row if it was previously deactivated.
+        is_active: true,
       },
       create: {
         id: "about-teaser",

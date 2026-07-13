@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const testimonial = await prisma.testimonial.findUnique({ where: { id } });
+    const testimonial = await prisma.testimonial.findFirst({ where: { id, is_active: true } });
     if (!testimonial) {
       const response = NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -51,7 +51,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.testimonial.findUnique({ where: { id } });
+    const existing = await prisma.testimonial.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -99,13 +99,16 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.testimonial.findUnique({ where: { id } });
+    const existing = await prisma.testimonial.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
-    await prisma.testimonial.delete({ where: { id } });
+    await prisma.testimonial.update({
+      where: { id },
+      data: { is_active: false },
+    });
 
     const response = NextResponse.json({ success: true, message: "Testimonial deleted successfully" });
     return addSecurityHeaders(response);

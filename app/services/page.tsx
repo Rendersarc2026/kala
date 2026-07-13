@@ -10,7 +10,10 @@ export default async function ServicesPage() {
   let dbServices: Awaited<ReturnType<typeof prisma.service.findMany>> = [];
 
   try {
-    dbServices = await prisma.service.findMany({ orderBy: { sortOrder: "asc" } });
+    dbServices = await prisma.service.findMany({
+      where: { is_active: true },
+      orderBy: { sortOrder: "asc" },
+    });
   } catch (error) {
     console.error("Failed to fetch services in Server Component:", error);
   }

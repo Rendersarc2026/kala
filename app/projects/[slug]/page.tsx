@@ -18,8 +18,8 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   let project;
   let nextProject;
 
-  const dbProject = await prisma.project.findUnique({
-    where: { slug },
+  const dbProject = await prisma.project.findFirst({
+    where: { slug, is_active: true },
   });
 
   if (dbProject) {
@@ -30,6 +30,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
     let nextDbProject = await prisma.project.findFirst({
       where: {
+        is_active: true,
         OR: [
           {
             sortOrder: {
@@ -60,6 +61,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
 
     if (!nextDbProject) {
       nextDbProject = await prisma.project.findFirst({
+        where: { is_active: true },
         orderBy: [
           { sortOrder: "asc" },
           { createdAt: "asc" },

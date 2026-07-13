@@ -60,14 +60,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
 
     // 4. Fetch resource
-    const targetAdmin = await prisma.adminUser.findUnique({
-      where: { id: targetId },
+    const targetAdmin = await prisma.adminUser.findFirst({
+      where: { id: targetId, is_active: true },
       select: {
         id: true,
         email: true,
         username: true,
         role: true,
-        mustChangePassword: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -142,6 +141,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
+    // A deactivated admin is not editable — it is gone as far as the API is concerned.
+    const target = await prisma.adminUser.findFirst({
+      where: { id: targetId, is_active: true },
+      select: { id: true },
+    });
+
+    if (!target) {
+      const response = NextResponse.json({ error: "Resource not found" }, { status: 404 });
+      return addSecurityHeaders(response);
+    }
+
     // Sanitization of inputs
     if (updateData.email) {
       updateData.email = updateData.email.trim().toLowerCase();
@@ -181,7 +191,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         email: true,
         username: true,
         role: true,
-        mustChangePassword: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -244,8 +253,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
 
     // 5. Check if the target admin exists
-    const targetAdmin = await prisma.adminUser.findUnique({
-      where: { id: targetId },
+    const targetAdmin = await prisma.adminUser.findFirst({
+      where: { id: targetId, is_active: true },
     });
 
     if (!targetAdmin) {
@@ -253,10 +262,18 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
-    // 6. Delete the admin user
-    await prisma.adminUser.delete({
-      where: { id: targetId },
-    });
+    // 6. Deactivate the admin user. Their sessions and OTPs are destroyed rather
+    // than deactivated: those are live credentials, and a soft delete used to be
+    // covered by the cascade on a real DELETE. Without this the removed admin
+    // keeps a working refresh token until it expires.
+    await prisma.$transaction([
+      prisma.adminUser.update({
+        where: { id: targetId },
+        data: { is_active: false },
+      }),
+      prisma.session.deleteMany({ where: { adminId: targetId } }),
+      prisma.otp.deleteMany({ where: { adminId: targetId } }),
+    ]);
 
     const response = NextResponse.json({
       success: true,

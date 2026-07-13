@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const admins = await prisma.adminUser.findMany({
+      where: { is_active: true },
       select: {
         id: true,
         email: true,
@@ -68,35 +69,44 @@ export async function POST(request: NextRequest) {
     const { email } = parseResult.data;
     const sanitizedEmail = email.trim().toLowerCase();
 
-    // Check if email already exists
+    // `email` is unique across every row, including deactivated ones. Only a live
+    // admin is a genuine conflict; a deactivated row holding the address is
+    // reactivated below, so removing and re-adding an admin keeps working.
     const existing = await prisma.adminUser.findUnique({
       where: { email: sanitizedEmail },
     });
 
-    if (existing) {
+    if (existing?.is_active) {
       const response = NextResponse.json({ error: "An admin user with this email already exists" }, { status: 409 });
       return addSecurityHeaders(response);
     }
 
-    // Set a default username from email prefix
-    const emailPrefix = sanitizedEmail.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
-    let username = emailPrefix || "admin_user";
-    
-    // Check for username collisions and append random numbers if needed
-    const usernameConflict = await prisma.adminUser.findUnique({ where: { username } });
-    if (usernameConflict) {
-      username = `${username}_${Math.floor(100 + Math.random() * 900)}`;
-    }
+    let admin;
 
-    const admin = await prisma.adminUser.create({
-      data: {
-        email: sanitizedEmail,
-        username,
-        hashedPassword: "passwordless", // Passwordless model requires a dummy hashedPassword since schema requires it
-        role: "ADMIN",
-        mustChangePassword: false,
-      },
-    });
+    if (existing) {
+      admin = await prisma.adminUser.update({
+        where: { id: existing.id },
+        data: { is_active: true, role: "ADMIN" },
+      });
+    } else {
+      // Set a default username from email prefix
+      const emailPrefix = sanitizedEmail.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+      let username = emailPrefix || "admin_user";
+
+      // Check for username collisions and append random numbers if needed
+      const usernameConflict = await prisma.adminUser.findUnique({ where: { username } });
+      if (usernameConflict) {
+        username = `${username}_${Math.floor(100 + Math.random() * 900)}`;
+      }
+
+      admin = await prisma.adminUser.create({
+        data: {
+          email: sanitizedEmail,
+          username,
+          role: "ADMIN",
+        },
+      });
+    }
 
     const response = NextResponse.json({
       success: true,

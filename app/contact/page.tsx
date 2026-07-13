@@ -10,8 +10,8 @@ export const revalidate = 0;
 
 export default async function ContactPage() {
   // 1. Fetch contact details directly from database
-  let contact = await prisma.contactSettings.findUnique({
-    where: { id: "contact" },
+  let contact = await prisma.contactSettings.findFirst({
+    where: { id: "contact", is_active: true },
   });
 
   if (!contact) {
@@ -23,6 +23,7 @@ export default async function ContactPage() {
       hoursSat: "10:00 AM — 5:00 PM",
       hoursSun: "Closed",
       mapEmbedUrl: DEFAULT_MAP_EMBED_URL,
+      is_active: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

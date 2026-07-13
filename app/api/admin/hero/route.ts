@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    let hero = await prisma.heroContent.findUnique({
-      where: { id: "hero" },
+    let hero = await prisma.heroContent.findFirst({
+      where: { id: "hero", is_active: true },
     });
 
     if (!hero) {
@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
         buttonText: "Discover Projects",
         backgroundImageUrl: "",
         slideOrder: 1,
+        is_active: true,
       };
     }
 
@@ -69,6 +70,8 @@ export async function POST(request: NextRequest) {
         label: data.label,
         heading: data.heading,
         backgroundImageUrl: data.backgroundImageUrl,
+        // Saving content restores the row if it was previously deactivated.
+        is_active: true,
       },
       create: {
         id: "hero",

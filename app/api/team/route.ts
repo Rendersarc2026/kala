@@ -5,6 +5,7 @@ import { teamMembers as staticTeam } from "@/data/team";
 export async function GET() {
   try {
     const team = await prisma.teamMember.findMany({
+      where: { is_active: true },
       orderBy: { createdAt: "asc" },
     });
 

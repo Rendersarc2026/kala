@@ -5,6 +5,7 @@ import { testimonials as staticTestimonials } from "@/data/testimonials";
 export async function GET() {
   try {
     const testimonials = await prisma.testimonial.findMany({
+      where: { is_active: true },
       orderBy: { createdAt: "asc" },
     });
 

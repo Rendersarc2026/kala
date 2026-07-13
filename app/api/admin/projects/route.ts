@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     const projects = await prisma.project.findMany({
+      where: { is_active: true },
       orderBy: [
         { sortOrder: "asc" },
         { createdAt: "asc" },
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     if (data.featured) {
       const featuredCount = await prisma.project.count({
-        where: { featured: true },
+        where: { featured: true, is_active: true },
       });
       if (featuredCount >= 4) {
         const response = NextResponse.json(
@@ -86,11 +87,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // `slug` is unique across every row, including soft-deleted ones. Only a live
+    // project is a genuine conflict; a deleted one still holding the slug is
+    // revived in place below, so deleting and re-adding a project keeps working.
     const existing = await prisma.project.findUnique({ where: { slug: data.slug } });
-    if (existing) {
+    if (existing?.is_active) {
       const response = NextResponse.json({ error: "A project with this slug already exists" }, { status: 409 });
       return addSecurityHeaders(response);
     }
+
+    const fields = {
+      slug: data.slug,
+      title: data.title,
+      category: data.category,
+      location: data.location,
+      area: data.area,
+      year: data.year,
+      client: data.client,
+      description: data.description,
+      narrative: data.narrative,
+      heroImage: data.heroImage,
+      images: JSON.stringify(data.images),
+      featured: data.featured,
+      sortOrder: data.sortOrder,
+    };
 
     const project = await prisma.$transaction(async (tx) => {
       // Shift existing project sort orders to make room for the new project
@@ -107,23 +127,14 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return await tx.project.create({
-        data: {
-          slug: data.slug,
-          title: data.title,
-          category: data.category,
-          location: data.location,
-          area: data.area,
-          year: data.year,
-          client: data.client,
-          description: data.description,
-          narrative: data.narrative,
-          heroImage: data.heroImage,
-          images: JSON.stringify(data.images),
-          featured: data.featured,
-          sortOrder: data.sortOrder,
-        },
-      });
+      if (existing) {
+        return await tx.project.update({
+          where: { id: existing.id },
+          data: { ...fields, is_active: true },
+        });
+      }
+
+      return await tx.project.create({ data: fields });
     });
 
     const response = NextResponse.json({

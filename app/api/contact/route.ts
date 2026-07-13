@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    let contact = await prisma.contactSettings.findUnique({
-      where: { id: "contact" },
+    let contact = await prisma.contactSettings.findFirst({
+      where: { id: "contact", is_active: true },
     });
 
     if (!contact) {
@@ -16,6 +16,7 @@ export async function GET() {
         hoursSat: "10:00 AM — 5:00 PM",
         hoursSun: "Closed",
         mapEmbedUrl: "https://maps.google.com/maps?q=11.7474785,75.4945499&z=17&output=embed",
+        is_active: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

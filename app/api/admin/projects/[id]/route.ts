@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const project = await prisma.project.findUnique({ where: { id } });
+    const project = await prisma.project.findFirst({ where: { id, is_active: true } });
     if (!project) {
       const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await prisma.project.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
       return addSecurityHeaders(response);
@@ -89,8 +89,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     if (data.featured && !existing.featured) {
       const featuredCount = await prisma.project.count({
-        where: { 
+        where: {
           featured: true,
+          is_active: true,
           id: { not: id }
         },
       });
@@ -164,14 +165,17 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await prisma.project.findFirst({ where: { id, is_active: true } });
     if (!existing) {
       const response = NextResponse.json({ error: "Project not found" }, { status: 404 });
       return addSecurityHeaders(response);
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.project.delete({ where: { id } });
+      await tx.project.update({
+        where: { id },
+        data: { is_active: false },
+      });
 
       await tx.project.updateMany({
         where: {

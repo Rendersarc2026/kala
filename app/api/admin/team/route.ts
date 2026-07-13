@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     const team = await prisma.teamMember.findMany({
+      where: { is_active: true },
       orderBy: { createdAt: "asc" },
     });
 

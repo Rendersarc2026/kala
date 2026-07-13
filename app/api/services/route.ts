@@ -6,6 +6,7 @@ import { parseStringArray } from "@/lib/json";
 export async function GET() {
   try {
     const services = await prisma.service.findMany({
+      where: { is_active: true },
       orderBy: { sortOrder: "asc" },
     });
 

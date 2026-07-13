@@ -9,6 +9,7 @@ export const revalidate = 0;
 
 export default async function ProjectsPage() {
   const dbProjects = await prisma.project.findMany({
+    where: { is_active: true },
     orderBy: [
       { sortOrder: "asc" },
       { createdAt: "asc" },

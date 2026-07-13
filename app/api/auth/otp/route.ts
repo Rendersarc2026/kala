@@ -93,9 +93,10 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    // 4. Retrieve admin user to get the role and check password-change status
-    const admin = await prisma.adminUser.findUnique({
-      where: { id: payload.adminId },
+    // 4. Retrieve admin user to get the role. Re-checked as active here because
+    // the account may have been deactivated after the OTP was issued.
+    const admin = await prisma.adminUser.findFirst({
+      where: { id: payload.adminId, is_active: true },
     });
 
     if (!admin) {
@@ -146,7 +147,6 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: "Authentication successful.",
-      mustChangePassword: false,
     });
 
     return addSecurityHeaders(response);

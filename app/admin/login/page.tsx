@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-type FormStep = "credentials" | "otp" | "change-password";
+type FormStep = "credentials" | "otp";
 
 export default function AdminLoginPage() {
   const router = useRouter();

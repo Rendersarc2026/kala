@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const testimonials = await prisma.testimonial.findMany({
+      where: { is_active: true },
       orderBy: { createdAt: "asc" },
     });
 

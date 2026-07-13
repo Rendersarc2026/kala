@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
-    let contact = await prisma.contactSettings.findUnique({
-      where: { id: "contact" },
+    let contact = await prisma.contactSettings.findFirst({
+      where: { id: "contact", is_active: true },
     });
 
     if (!contact) {
@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
         hoursSat: "10:00 AM — 5:00 PM",
         hoursSun: "Closed",
         mapEmbedUrl: "https://maps.google.com/maps?q=11.7474785,75.4945499&z=17&output=embed",
+        is_active: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -85,7 +86,8 @@ export async function POST(request: NextRequest) {
 
     const contact = await prisma.contactSettings.upsert({
       where: { id: "contact" },
-      update: data,
+      // Saving content restores the row if it was previously deactivated.
+      update: { ...data, is_active: true },
       create: {
         id: "contact",
         ...data,

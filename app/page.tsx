@@ -24,15 +24,19 @@ export default async function Home() {
   // paying four sequential round trips on every render.
   const [dbProjects, hero, about, dbTestimonials] = await Promise.all([
     prisma.project.findMany({
+      where: { is_active: true },
       orderBy: [
         { sortOrder: "asc" },
         { createdAt: "asc" },
         { id: "asc" },
       ],
     }),
-    prisma.heroContent.findUnique({ where: { id: "hero" } }),
-    prisma.aboutSection.findUnique({ where: { id: "about-teaser" } }),
-    prisma.testimonial.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.heroContent.findFirst({ where: { id: "hero", is_active: true } }),
+    prisma.aboutSection.findFirst({ where: { id: "about-teaser", is_active: true } }),
+    prisma.testimonial.findMany({
+      where: { is_active: true },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
 
   const projects: Project[] = dbProjects.map((p: DbProject) => ({
