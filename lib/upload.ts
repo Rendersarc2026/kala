@@ -1,13 +1,16 @@
 import path from "path";
 import crypto from "crypto";
 
-// Raster images only. SVG is intentionally excluded: it can embed
+// Raster images and select video formats. SVG is intentionally excluded: it can embed
 // <script>/onload handlers and become a stored-XSS vector.
 const MIME_TO_EXTENSION: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/gif": ".gif",
   "image/webp": ".webp",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/ogg": ".ogg",
 };
 
 // Leading bytes for each accepted format. `file.type` is supplied by the client
@@ -21,9 +24,17 @@ const MAGIC_BYTES: Record<string, (bytes: Uint8Array) => boolean> = {
   "image/webp": (b) =>
     b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && // "RIFF"
     b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50, // "WEBP"
+  "video/mp4": (b) =>
+    (b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70) || // "ftyp"
+    (b[0] === 0x00 && b[1] === 0x00 && b[2] === 0x00 && (b[3] === 0x14 || b[3] === 0x18 || b[3] === 0x20)),
+  "video/webm": (b) =>
+    b[0] === 0x1a && b[1] === 0x45 && b[2] === 0xdf && b[3] === 0xa3, // EBML
+  "video/ogg": (b) =>
+    b[0] === 0x4f && b[1] === 0x67 && b[2] === 0x67 && b[3] === 0x53, // "OggS"
 };
 
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100MB
 
 export interface UploadFailure {
   ok: false;
@@ -71,29 +82,45 @@ function buildObjectName(originalName: string, mimeType: string, prefix: string)
     .slice(0, 60);
 
   const suffix = crypto.randomBytes(6).toString("hex");
-  return `${prefix}${safeBaseName || "image"}-${Date.now()}-${suffix}${extension}`;
+  return `${prefix}${safeBaseName || "media"}-${Date.now()}-${suffix}${extension}`;
 }
 
 /**
- * Validates an uploaded image and streams it to Supabase Storage.
+ * Validates an uploaded image or video and streams it to Supabase Storage.
  * Callers must have already authenticated the request.
  */
 export async function uploadImage(
   file: File,
-  options: { prefix?: string } = {}
+  options: { prefix?: string; allowVideo?: boolean } = {}
 ): Promise<UploadResult> {
-  const { prefix = "" } = options;
+  const { prefix = "", allowVideo = false } = options;
+
+  const isVideo = file.type.startsWith("video/");
+  if (isVideo && !allowVideo) {
+    return {
+      ok: false,
+      status: 400,
+      error: "Video uploads are not allowed for this field.",
+    };
+  }
 
   if (!MIME_TO_EXTENSION[file.type]) {
     return {
       ok: false,
       status: 400,
-      error: "Invalid file type. Only JPG, PNG, GIF, and WEBP images are allowed.",
+      error: allowVideo
+        ? "Invalid file type. Only JPG, PNG, GIF, WEBP images, and MP4, WebM, Ogg videos are allowed."
+        : "Invalid file type. Only JPG, PNG, GIF, and WEBP images are allowed.",
     };
   }
 
-  if (file.size > MAX_SIZE_BYTES) {
-    return { ok: false, status: 400, error: "File size exceeds the 5MB limit." };
+  const maxLimit = isVideo ? MAX_VIDEO_SIZE_BYTES : MAX_IMAGE_SIZE_BYTES;
+  if (file.size > maxLimit) {
+    return {
+      ok: false,
+      status: 400,
+      error: `File size exceeds the ${isVideo ? "100MB" : "10MB"} limit.`,
+    };
   }
 
   const config = getSupabaseConfig();
@@ -109,7 +136,7 @@ export async function uploadImage(
     return {
       ok: false,
       status: 400,
-      error: "File content does not match its declared image type.",
+      error: "File content does not match its declared media type.",
     };
   }
 
@@ -129,7 +156,7 @@ export async function uploadImage(
 
   if (!uploadRes.ok) {
     console.error("Supabase Storage upload failed:", await uploadRes.text());
-    return { ok: false, status: 502, error: "Image upload failed." };
+    return { ok: false, status: 502, error: "Media upload failed." };
   }
 
   return {

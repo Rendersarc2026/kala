@@ -98,9 +98,9 @@ export default function AdminHome() {
         delete copy.backgroundImageUrl;
         return copy;
       });
-      showToast("Background image uploaded successfully!");
+      showToast("Media uploaded successfully!");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to upload image", "error");
+      showToast(err instanceof Error ? err.message : "Failed to upload media", "error");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -123,7 +123,7 @@ export default function AdminHome() {
       errors.heading = "Headline text is required and cannot contain only whitespace.";
     }
     if (!trimmedUrl) {
-      errors.backgroundImageUrl = "Banner background image is required. Please upload an image.";
+      errors.backgroundImageUrl = "Banner background media is required. Please upload an image or video.";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -263,10 +263,10 @@ export default function AdminHome() {
                 </span>
               </div>
 
-              {/* Background Cover Image */}
+              {/* Background Cover Image or Video */}
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold block">
-                  Banner Background Image
+                  Banner Background Image or Video
                 </label>
                  <div className="relative aspect-video w-full max-w-md rounded-xl overflow-hidden bg-gray-50 border border-gray-200 group flex items-center justify-center mb-3">
                   {backgroundImageUrl ? (
@@ -291,16 +291,16 @@ export default function AdminHome() {
                   ) : (
                     <div className="text-center p-6 text-gray-300">
                       <ImageIcon className="w-8 h-8 mx-auto mb-2 text-gray-200" />
-                      <span className="text-[10px] uppercase tracking-wider font-semibold">No Image Uploaded</span>
+                      <span className="text-[10px] uppercase tracking-wider font-semibold">No Media Uploaded</span>
                     </div>
                   )}
                   
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <label className="bg-white hover:bg-gray-100 text-gray-800 rounded-lg px-4 py-2 text-[10px] uppercase tracking-widest font-semibold cursor-pointer shadow transition-colors">
-                      {uploading ? "Uploading..." : "Change Image"}
+                      {uploading ? "Uploading..." : "Change Media"}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/*,video/*"
                         className="hidden"
                         onChange={handleImageUpload}
                         disabled={saving || uploading}

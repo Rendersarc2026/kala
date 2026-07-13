@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       console.error("Failed to query current hero for old image:", dbErr);
     }
 
-    const result = await uploadImage(file, { prefix: "banner-" });
+    const result = await uploadImage(file, { prefix: "banner-", allowVideo: true });
     if (!result.ok) {
       const response = NextResponse.json({ error: result.error }, { status: result.status });
       return addSecurityHeaders(response);
