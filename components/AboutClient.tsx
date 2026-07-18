@@ -30,12 +30,17 @@ const VALUES = [
 
 export default function AboutClient({
   initialTeamMembers,
+  initialCoreValues,
 }: {
   initialTeamMembers: TeamMember[];
+  initialCoreValues: { id: string; number: string; title: string; description: string }[];
 }) {
   const easeLarge: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const team = initialTeamMembers;
+  
+  // Use DB values if present, else fallback to hardcoded
+  const valuesData = initialCoreValues.length > 0 ? initialCoreValues : VALUES;
 
   const handleImageError = (id: string) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
@@ -105,17 +110,12 @@ export default function AboutClient({
           <div className="lg:col-span-5 lg:-mt-12 relative w-full aspect-[3/4] overflow-hidden bg-bone-dark shadow-sm">
             <Image
               src="https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
-              alt="Maison Serein rustic project"
+              alt="Interior project"
               fill
               sizes="(max-width: 1024px) 100vw, 40vw"
               className="object-cover"
               priority
             />
-            <div className="absolute bottom-4 left-4 bg-white/95 px-4 py-2">
-              <span className="font-sans text-[9px] tracking-wider text-[#121212] uppercase">
-                Maison Serein Project, France
-              </span>
-            </div>
           </div>
         </div>
       </section>
@@ -184,9 +184,9 @@ export default function AboutClient({
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
-          {VALUES.map((val, valIdx) => (
+          {valuesData.map((val, valIdx) => (
             <motion.div
-              key={val.number}
+              key={'id' in val ? (val as any).id : val.number}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -200,7 +200,7 @@ export default function AboutClient({
                 <h3 className="font-serif text-lg text-charcoal font-medium">
                   {val.title}
                 </h3>
-                <p className="font-sans text-xs text-charcoal-light leading-relaxed font-light">
+                <p className="font-sans text-xs text-charcoal-light leading-relaxed font-light whitespace-pre-line">
                   {val.description}
                 </p>
               </div>

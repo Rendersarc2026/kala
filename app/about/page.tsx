@@ -24,5 +24,20 @@ export default async function AboutPage() {
         }))
       : staticTeam;
 
-  return <AboutClient initialTeamMembers={teamData} />;
+  const coreValues = await prisma.coreValue.findMany({
+    where: { is_active: true },
+    orderBy: { sortOrder: "asc" },
+  });
+
+  return (
+    <AboutClient 
+      initialTeamMembers={teamData} 
+      initialCoreValues={coreValues.map((v, idx) => ({
+        id: v.id,
+        number: String(idx + 1).padStart(2, "0"),
+        title: v.title,
+        description: v.description,
+      }))}
+    />
+  );
 }

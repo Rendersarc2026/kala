@@ -251,14 +251,14 @@ export default function AdminProjects() {
         break;
       case "heroImage":
         if (!value.trim()) {
-          errorMsg = "Hero image URL is required";
+          errorMsg = "Hero image is required";
         } else if (value.length > 500) {
           errorMsg = "Hero image URL must be 500 characters or less";
         }
         break;
       case "images":
         if (value.length === 0) {
-          errorMsg = "At least one gallery image URL is required";
+          errorMsg = "At least one gallery image is required";
         }
         break;
     }
@@ -329,7 +329,7 @@ export default function AdminProjects() {
     }
 
     if (!form.heroImage.trim()) {
-      errs.heroImage = "Hero image URL is required";
+      errs.heroImage = "Hero image is required";
     } else if (form.heroImage.length > 500) {
       errs.heroImage = "Hero image URL must be 500 characters or less";
     }

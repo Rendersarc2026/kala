@@ -116,6 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   else if (pathname === "/admin/projects") activeTab = "projects";
   else if (pathname === "/admin/services") activeTab = "services";
   else if (pathname === "/admin/process") activeTab = "process";
+  else if (pathname === "/admin/why-choose-us") activeTab = "why-choose-us";
   else if (pathname === "/admin/about") activeTab = "about";
   else if (pathname === "/admin/testimonials") activeTab = "testimonials";
   else if (pathname === "/admin/enquiries") activeTab = "enquiries";
