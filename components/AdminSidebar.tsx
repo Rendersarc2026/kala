@@ -14,6 +14,7 @@ import {
   MapPin,
   Mail,
   Briefcase,
+  Settings,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -30,6 +31,7 @@ const TABS = [
   { id: "home", label: "Home Page", icon: Home },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "services", label: "Services", icon: Briefcase },
+  { id: "process", label: "Our Process", icon: Settings },
   { id: "about", label: "About Page", icon: Info },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
   { id: "enquiries", label: "Enquiries", icon: Mail },

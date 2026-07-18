@@ -184,3 +184,16 @@ model Enquiry {
 
   @@index([is_active, createdAt])
 }
+
+model ProcessStep {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  details     String
+  sortOrder   Int      @default(1)
+  is_active   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([is_active, sortOrder])
+}
