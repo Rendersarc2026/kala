@@ -59,7 +59,7 @@ model Project {
   heroImage   String
   images      String
   featured    Boolean  @default(false)
-  sortOrder   Int      @default(0)
+  sortOrder   Int      @default(1)
   is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -74,7 +74,7 @@ model Service {
   description String
   image       String
   details     String
-  sortOrder   Int      @default(0)
+  sortOrder   Int      @default(1)
   is_active   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

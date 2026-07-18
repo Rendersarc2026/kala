@@ -19,7 +19,7 @@ const createProjectSchema = z.object({
   heroImage: z.string().trim().min(1, "Hero image is required").max(500),
   images: z.array(z.string().trim().min(1)).max(3, "You can have a maximum of 3 gallery images"),
   featured: z.boolean().default(false),
-  sortOrder: z.number().int().default(0),
+  sortOrder: z.number().int().default(1),
 });
 
 export async function GET(request: NextRequest) {

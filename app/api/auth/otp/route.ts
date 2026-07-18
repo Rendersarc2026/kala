@@ -10,6 +10,8 @@ import {
   checkLockout,
   recordFailedAttempt,
   resetFailedAttempts,
+  SESSION_EXPIRY_MS,
+  SESSION_EXPIRY_SECONDS,
 } from "@/lib/auth";
 import { addSecurityHeaders } from "@/lib/security-headers";
 
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = signRefreshToken(claims);
 
     // Save refresh token session in database
-    const sessionExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const sessionExpiry = new Date(Date.now() + SESSION_EXPIRY_MS); // 12 hours
     await prisma.session.create({
       data: {
         adminId: admin.id,
@@ -132,7 +134,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 2 * 60 * 60, // 2 hours
+      maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });
 
@@ -140,7 +142,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });
 

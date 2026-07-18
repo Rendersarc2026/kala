@@ -25,12 +25,12 @@ interface ServiceData {
   sortOrder: number;
 }
 
-const emptyForm: Omit<ServiceData, "id"> = {
+const emptyForm: Omit<ServiceData, "id"> & { sortOrder: number | string } = {
   title: "",
   description: "",
   image: "",
   details: [""],
-  sortOrder: 0,
+  sortOrder: 1,
 };
 
 export default function AdminServices() {
@@ -40,7 +40,8 @@ export default function AdminServices() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<ServiceData, "id">>(emptyForm);
+  const [form, setForm] = useState<Omit<ServiceData, "id"> & { sortOrder: number | string }>(emptyForm);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof ServiceData, string>>>({});
   const [saving, setSaving] = useState(false);
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -93,8 +94,9 @@ export default function AdminServices() {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === "sortOrder" ? parseInt(value) || 0 : value,
+      [name]: name === "sortOrder" ? (value === "" ? "" : isNaN(parseInt(value)) ? 1 : parseInt(value)) : value,
     }));
+    setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
   const handleDetailChange = (index: number, value: string) => {
@@ -143,9 +145,10 @@ export default function AdminServices() {
   const openAddForm = () => {
     setForm({
       ...emptyForm,
-      sortOrder: services.length,
+      sortOrder: services.length + 1,
     });
     setEditingId(null);
+    setFieldErrors({});
     setShowForm(true);
   };
 
@@ -158,6 +161,7 @@ export default function AdminServices() {
       sortOrder: service.sortOrder,
     });
     setEditingId(service.id);
+    setFieldErrors({});
     setShowForm(true);
   };
 
@@ -165,19 +169,38 @@ export default function AdminServices() {
     setShowForm(false);
     setEditingId(null);
     setForm(emptyForm);
+    setFieldErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
-    // Clean up empty deliverables
+    const errs: Partial<Record<keyof ServiceData, string>> = {};
+
+    if (!form.title.trim()) errs.title = "Service title is required";
+    if (!form.description.trim()) errs.description = "Description is required";
+
+    const orderValue = typeof form.sortOrder === "string" ? parseInt(form.sortOrder) : form.sortOrder;
+    if (isNaN(orderValue || 0) || (orderValue || 0) < 1) {
+      errs.sortOrder = "Order must be 1 or greater";
+    }
+
+    if (!form.image) errs.image = "Service image is required";
+
     const cleanedDetails = form.details.map((d) => d.trim()).filter((d) => d !== "");
     if (cleanedDetails.length === 0) {
-      showToast("Please add at least one deliverable details item.", "warning");
+      errs.details = "Please add at least one deliverable item";
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      if (errs.details) showToast(errs.details, "warning");
       setSaving(false);
       return;
     }
+
+    setFieldErrors({});
 
     try {
       const url = editingId
@@ -190,6 +213,7 @@ export default function AdminServices() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          sortOrder: typeof form.sortOrder === "string" ? (parseInt(form.sortOrder) || 1) : form.sortOrder,
           details: cleanedDetails,
         }),
       });
@@ -198,14 +222,11 @@ export default function AdminServices() {
       if (!res.ok) throw new Error(json.error || "Failed to save service");
 
       if (editingId) {
-        setServices((prev) =>
-          prev.map((s) => (s.id === editingId ? json.data : s))
-        );
         showToast("Service updated successfully!");
       } else {
-        setServices((prev) => [...prev, json.data]);
         showToast("Service created successfully!");
       }
+      await fetchServices();
       closeForm();
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to save service", "error");
@@ -223,7 +244,7 @@ export default function AdminServices() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to delete service");
 
-      setServices((prev) => prev.filter((s) => s.id !== id));
+      await fetchServices();
       showToast("Service deleted successfully!");
       setDeleteConfirm(null);
     } catch (err) {
@@ -332,15 +353,15 @@ export default function AdminServices() {
                     value={form.title}
                     onChange={handleInputChange}
                     placeholder="Residential Interiors"
-                    className="w-full bg-[#ffffff] border border-gray-200 rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55"
-                    required
+                    className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none transition-colors disabled:opacity-55 ${fieldErrors.title ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-gray-400"}`}
                   />
+                  {fieldErrors.title && <p className="text-red-400 text-[10px] mt-1 font-medium">{fieldErrors.title}</p>}
                 </div>
 
                 {/* Sort Order */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                    Sort Order (Display Index)
+                    Order
                   </label>
                   <input
                     type="number"
@@ -348,11 +369,11 @@ export default function AdminServices() {
                     disabled={saving}
                     value={form.sortOrder}
                     onChange={handleInputChange}
-                    placeholder="0"
-                    min={0}
-                    className="w-full bg-[#ffffff] border border-gray-200 rounded-lg py-2.5 px-4 text-sm text-gray-900 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55"
-                    required
+                    placeholder="1"
+                    min={1}
+                    className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 focus:outline-none transition-colors disabled:opacity-55 ${fieldErrors.sortOrder ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-gray-400"}`}
                   />
+                  {fieldErrors.sortOrder && <p className="text-red-400 text-[10px] mt-1 font-medium">{fieldErrors.sortOrder}</p>}
                 </div>
 
                 {/* Description */}
@@ -367,9 +388,9 @@ export default function AdminServices() {
                     onChange={handleInputChange}
                     placeholder="Describe this service category..."
                     rows={3}
-                    className="w-full bg-[#ffffff] border border-gray-200 rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 resize-none font-sans font-light"
-                    required
+                    className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none transition-colors disabled:opacity-55 resize-none font-sans font-light ${fieldErrors.description ? "border-red-500 focus:border-red-500" : "border-gray-200 focus:border-gray-400"}`}
                   />
+                  {fieldErrors.description && <p className="text-red-400 text-[10px] mt-1 font-medium">{fieldErrors.description}</p>}
                 </div>
 
                 {/* Deliverables Items (Details) */}
@@ -399,7 +420,6 @@ export default function AdminServices() {
                           onChange={(e) => handleDetailChange(index, e.target.value)}
                           placeholder={`Deliverable item ${index + 1} (e.g. Curation of bespoke lighting)`}
                           className="flex-1 bg-[#ffffff] border border-gray-200 rounded-lg py-2.5 px-4 text-sm text-gray-900 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55"
-                          required
                         />
                         {form.details.length > 1 && (
                           <button

@@ -11,7 +11,7 @@ const createServiceSchema = z.object({
   description: z.string().trim().min(1).max(1000),
   image: z.string().trim().min(1).max(500),
   details: z.array(z.string().trim().min(1)).min(1),
-  sortOrder: z.number().int().default(0),
+  sortOrder: z.number().int().default(1),
 });
 
 export async function GET(request: NextRequest) {
@@ -62,14 +62,28 @@ export async function POST(request: NextRequest) {
 
     const data = parseResult.data;
 
-    const service = await prisma.service.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        image: data.image,
-        details: JSON.stringify(data.details),
-        sortOrder: data.sortOrder,
-      },
+    const service = await prisma.$transaction(async (tx) => {
+      await tx.service.updateMany({
+        where: {
+          is_active: true,
+          sortOrder: {
+            gte: data.sortOrder,
+          },
+        },
+        data: {
+          sortOrder: { increment: 1 },
+        },
+      });
+
+      return tx.service.create({
+        data: {
+          title: data.title,
+          description: data.description,
+          image: data.image,
+          details: JSON.stringify(data.details),
+          sortOrder: data.sortOrder,
+        },
+      });
     });
 
     const response = NextResponse.json({

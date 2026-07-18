@@ -84,9 +84,37 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       updateData.details = JSON.stringify(updateData.details);
     }
 
-    const service = await prisma.service.update({
-      where: { id },
-      data: updateData,
+    const service = await prisma.$transaction(async (tx) => {
+      if (data.sortOrder !== undefined && data.sortOrder !== existing.sortOrder) {
+        if (data.sortOrder < existing.sortOrder) {
+          await tx.service.updateMany({
+            where: {
+              is_active: true,
+              sortOrder: {
+                gte: data.sortOrder,
+                lt: existing.sortOrder,
+              },
+            },
+            data: { sortOrder: { increment: 1 } },
+          });
+        } else {
+          await tx.service.updateMany({
+            where: {
+              is_active: true,
+              sortOrder: {
+                gt: existing.sortOrder,
+                lte: data.sortOrder,
+              },
+            },
+            data: { sortOrder: { decrement: 1 } },
+          });
+        }
+      }
+
+      return tx.service.update({
+        where: { id },
+        data: updateData,
+      });
     });
 
     const response = NextResponse.json({
@@ -117,9 +145,23 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return addSecurityHeaders(response);
     }
 
-    await prisma.service.update({
-      where: { id },
-      data: { is_active: false },
+    await prisma.$transaction(async (tx) => {
+      await tx.service.update({
+        where: { id },
+        data: { is_active: false },
+      });
+
+      await tx.service.updateMany({
+        where: {
+          is_active: true,
+          sortOrder: {
+            gt: existing.sortOrder,
+          },
+        },
+        data: {
+          sortOrder: { decrement: 1 },
+        },
+      });
     });
 
     const response = NextResponse.json({ success: true, message: "Service deleted successfully" });

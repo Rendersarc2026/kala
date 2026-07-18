@@ -49,7 +49,7 @@ const emptyForm: Omit<ProjectData, "id"> = {
   heroImage: "",
   images: [],
   featured: false,
-  sortOrder: 0,
+  sortOrder: 1,
 };
 
 export default function AdminProjects() {
@@ -313,9 +313,9 @@ export default function AdminProjects() {
     }
 
     if (form.sortOrder === undefined || form.sortOrder === null || form.sortOrder === "" || isNaN(Number(form.sortOrder))) {
-      errs.sortOrder = "Sort order is required";
-    } else if (Number(form.sortOrder) < 0) {
-      errs.sortOrder = "Sort order must be 0 or greater";
+      errs.sortOrder = "Order is required";
+    } else if (Number(form.sortOrder) < 1) {
+      errs.sortOrder = "Order must be 1 or greater";
     }
 
     if (!form.description.trim()) {
@@ -515,7 +515,7 @@ export default function AdminProjects() {
       area: formattedArea,
       year: form.year.trim(),
       client: form.client.trim(),
-      sortOrder: form.sortOrder === "" ? 0 : Number(form.sortOrder),
+      sortOrder: form.sortOrder === "" ? 1 : Number(form.sortOrder),
       description: form.description.trim(),
       narrative: form.narrative.trim(),
       heroImage: form.heroImage.trim(),
@@ -863,10 +863,10 @@ export default function AdminProjects() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <label className={labelClass}>Sort Order</label>
+                <label className={labelClass}>Order</label>
                 <input
                   type="number"
-                  min="0"
+                  min="1"
                   value={form.sortOrder === "" ? "" : String(form.sortOrder)}
                   onChange={handleSortOrderChange}
                   onKeyDown={blockInvalidNumberKeys}

@@ -19,9 +19,11 @@ const REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET || `${JWT_SECRET}_
 const PRE_AUTH_SECRET: string = process.env.PRE_AUTH_SECRET || `${JWT_SECRET}_pre_auth`;
 
 // Expirations
-const ACCESS_TOKEN_EXPIRY = "2h"; // 2 hours
-const REFRESH_TOKEN_EXPIRY_DAYS = 7;
-const PRE_AUTH_TOKEN_EXPIRY = "5m"; // 5 minutes
+export const ACCESS_TOKEN_EXPIRY = "12h"; // 12 hours
+export const REFRESH_TOKEN_EXPIRY = "12h"; // 12 hours
+export const SESSION_EXPIRY_MS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+export const SESSION_EXPIRY_SECONDS = 12 * 60 * 60; // 12 hours in seconds
+export const PRE_AUTH_TOKEN_EXPIRY = "5m"; // 5 minutes
 
 export interface JwtPayload {
   adminId: string;
@@ -51,8 +53,8 @@ export function verifyAccessToken(token: string): JwtPayload | null {
 }
 
 export function signRefreshToken(payload: JwtPayload): string {
-  // Signed with 7 days expiration matching the DB sessions
-  return jwt.sign(payload, REFRESH_SECRET, { expiresIn: `${REFRESH_TOKEN_EXPIRY_DAYS}d` });
+  // Signed with 12 hours expiration matching the DB sessions
+  return jwt.sign(payload, REFRESH_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
 }
 
 export function verifyRefreshToken(token: string): JwtPayload | null {
