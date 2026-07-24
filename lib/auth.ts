@@ -87,10 +87,10 @@ interface LockoutStatus {
 }
 
 /**
- * Checks if login is locked out due to 5 consecutive failed attempts in the last 5 minutes.
+ * Checks if login is locked out due to 5 consecutive failed attempts in the last 30 minutes.
  */
 export async function checkLockout(email: string): Promise<LockoutStatus> {
-  const lockoutWindowMs = 5 * 60 * 1000; // 5 minutes
+  const lockoutWindowMs = 30 * 60 * 1000; // 30 minutes
   const limitTime = new Date(Date.now() - lockoutWindowMs);
 
   const attempts = await prisma.failedAttempt.findMany({
@@ -143,7 +143,7 @@ export async function resetFailedAttempts(email: string): Promise<void> {
 // including ones that never carry a valid pre-auth token or a well-formed body.
 // Without it an attacker can flood /login or /otp indefinitely, because those
 // early-return paths never touch the email-keyed counter.
-const IP_LOCKOUT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const IP_LOCKOUT_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 const IP_MAX_ATTEMPTS = 10; // per IP, per window
 
 /**
