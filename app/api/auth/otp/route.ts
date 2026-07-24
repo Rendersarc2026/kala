@@ -9,6 +9,7 @@ import {
   signRefreshToken,
   checkLockout,
   checkIpRateLimit,
+  formatRetryAfter,
   recordFailedAttempt,
   recordFailedIp,
   resetFailedAttempts,
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (ipLimit.isLocked) {
       const response = NextResponse.json(
         {
-          error: `Too many requests. Please try again after ${ipLimit.retryAfterSeconds} seconds.`,
+          error: `Too many requests. Please try again after ${formatRetryAfter(ipLimit.retryAfterSeconds)}.`,
           retryAfter: ipLimit.retryAfterSeconds,
         },
         { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (lockout.isLocked) {
       const response = NextResponse.json(
         {
-          error: `Too many failed login attempts. This account is locked. Please try again after ${lockout.retryAfterSeconds} seconds.`,
+          error: `Too many failed login attempts. This account is locked. Please try again after ${formatRetryAfter(lockout.retryAfterSeconds)}.`,
           retryAfter: lockout.retryAfterSeconds,
         },
         { status: 423 }

@@ -213,7 +213,8 @@ export default function AdminLoginPage() {
           {/* Locked Out Alert */}
           {lockoutTimeLeft > 0 && (
             <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg p-3 text-xs text-center mb-5 font-semibold">
-              Lockout active: Please try again in {lockoutTimeLeft}s
+              Lockout active: Please try again in{" "}
+              {Math.floor(lockoutTimeLeft / 60)}m {String(lockoutTimeLeft % 60).padStart(2, "0")}s
             </div>
           )}
 

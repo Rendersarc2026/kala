@@ -87,6 +87,15 @@ interface LockoutStatus {
 }
 
 /**
+ * Render a retry delay for end users in whole minutes, rounded up
+ * (e.g. 1438s -> "24 minutes", 40s -> "1 minute").
+ */
+export function formatRetryAfter(seconds: number): string {
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
+
+/**
  * Checks if login is locked out due to 5 consecutive failed attempts in the last 30 minutes.
  */
 export async function checkLockout(email: string): Promise<LockoutStatus> {
