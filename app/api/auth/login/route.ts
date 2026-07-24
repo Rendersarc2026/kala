@@ -5,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { addSecurityHeaders } from "@/lib/security-headers";
 import {
   checkLockout,
+  checkIpRateLimit,
   recordFailedAttempt,
+  recordFailedIp,
   generateOtp,
   deliverOtp,
   checkOtpRateLimit,
@@ -34,13 +36,28 @@ const GENERIC_LOGIN_RESPONSE = {
 export async function POST(request: NextRequest) {
   try {
     // 1. Get client IP
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || null;
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+
+    // Per-IP throttle. Runs first so email-rotation floods (each random identifier
+    // dodges the email-keyed lockout) are still counted and blocked per source IP.
+    const ipLimit = await checkIpRateLimit(ip);
+    if (ipLimit.isLocked) {
+      const response = NextResponse.json(
+        {
+          error: `Too many requests. Please try again after ${ipLimit.retryAfterSeconds} seconds.`,
+          retryAfter: ipLimit.retryAfterSeconds,
+        },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+      );
+      return addSecurityHeaders(response);
+    }
 
     // 2. Parse and validate inputs using Zod
     const body = await request.json().catch(() => ({}));
     const parseResult = loginSchema.safeParse(body);
 
     if (!parseResult.success) {
+      await recordFailedIp(ip);
       const response = NextResponse.json(
         { error: "Invalid inputs", details: parseResult.error.flatten().fieldErrors },
         { status: 400 }

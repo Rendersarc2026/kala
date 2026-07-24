@@ -138,6 +138,62 @@ export async function resetFailedAttempts(email: string): Promise<void> {
   });
 }
 
+// Per-IP throttle. Unlike the email-based lockout, this is checked at the very
+// top of the auth endpoints and counts EVERY request that reaches them —
+// including ones that never carry a valid pre-auth token or a well-formed body.
+// Without it an attacker can flood /login or /otp indefinitely, because those
+// early-return paths never touch the email-keyed counter.
+const IP_LOCKOUT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const IP_MAX_ATTEMPTS = 10; // per IP, per window
+
+/**
+ * Checks whether an IP has exceeded the request throttle for the auth endpoints.
+ * A null IP (header missing) is never locked — we cannot attribute the request.
+ */
+export async function checkIpRateLimit(ip: string | null): Promise<LockoutStatus> {
+  if (!ip) return { isLocked: false, retryAfterSeconds: 0 };
+
+  const limitTime = new Date(Date.now() - IP_LOCKOUT_WINDOW_MS);
+
+  const attempts = await prisma.failedAttempt.findMany({
+    where: {
+      ip,
+      createdAt: { gte: limitTime },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (attempts.length >= IP_MAX_ATTEMPTS) {
+    const mostRecent = attempts[0];
+    const remainingMs = IP_LOCKOUT_WINDOW_MS - (Date.now() - mostRecent.createdAt.getTime());
+
+    if (remainingMs > 0) {
+      return {
+        isLocked: true,
+        retryAfterSeconds: Math.ceil(remainingMs / 1000),
+      };
+    }
+  }
+
+  return { isLocked: false, retryAfterSeconds: 0 };
+}
+
+/**
+ * Record a failed/aborted request for IP-only throttling, when no admin email is
+ * known (e.g. a missing/invalid pre-auth token or malformed body). Rows age out
+ * of the window on their own and are never tied to a real account's lockout,
+ * because the empty email can never match a genuine identifier.
+ */
+export async function recordFailedIp(ip: string | null): Promise<void> {
+  if (!ip) return;
+  await prisma.failedAttempt.create({
+    data: {
+      email: "",
+      ip,
+    },
+  });
+}
+
 // ==========================================
 // OTP HANDLING & DELIVERY
 // ==========================================

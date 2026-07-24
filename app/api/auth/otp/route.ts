@@ -8,7 +8,9 @@ import {
   signAccessToken,
   signRefreshToken,
   checkLockout,
+  checkIpRateLimit,
   recordFailedAttempt,
+  recordFailedIp,
   resetFailedAttempts,
   SESSION_EXPIRY_MS,
   SESSION_EXPIRY_SECONDS,
@@ -24,11 +26,29 @@ const otpVerifySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+
+    // 0. Per-IP throttle. Runs before anything else so that requests which never
+    // present a valid pre-auth token (or a valid body) are still counted and
+    // blocked — otherwise the endpoint could be flooded/brute-forced freely.
+    const ipLimit = await checkIpRateLimit(ip);
+    if (ipLimit.isLocked) {
+      const response = NextResponse.json(
+        {
+          error: `Too many requests. Please try again after ${ipLimit.retryAfterSeconds} seconds.`,
+          retryAfter: ipLimit.retryAfterSeconds,
+        },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+      );
+      return addSecurityHeaders(response);
+    }
+
     // 1. Get pre-auth token from cookies
     const cookieStore = await cookies();
     const preAuthTokenCookie = cookieStore.get("admin_pre_auth_token");
 
     if (!preAuthTokenCookie?.value) {
+      await recordFailedIp(ip);
       const response = NextResponse.json(
         { error: "Session expired or invalid. Please login again." },
         { status: 401 }
@@ -38,14 +58,13 @@ export async function POST(request: NextRequest) {
 
     const payload = verifyPreAuthToken(preAuthTokenCookie.value);
     if (!payload) {
+      await recordFailedIp(ip);
       const response = NextResponse.json(
         { error: "Session expired or invalid. Please login again." },
         { status: 401 }
       );
       return addSecurityHeaders(response);
     }
-
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || null;
 
     // Check lockout status
     const lockout = await checkLockout(payload.email);
@@ -65,6 +84,7 @@ export async function POST(request: NextRequest) {
     const parseResult = otpVerifySchema.safeParse(body);
 
     if (!parseResult.success) {
+      await recordFailedIp(ip);
       const response = NextResponse.json(
         { error: "Invalid OTP format", details: parseResult.error.flatten().fieldErrors },
         { status: 400 }
