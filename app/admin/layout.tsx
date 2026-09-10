@@ -40,19 +40,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router]);
 
   async function fetchProfile() {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/admin/profile");
+      let res = await fetch("/api/admin/profile");
+      if (res.status === 401) {
+        try {
+          const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
+          if (refreshRes.ok) {
+            res = await fetch("/api/admin/profile");
+          }
+        } catch {
+          // Ignore refresh network error; fallback to redirect
+        }
+      }
+
       if (!res.ok) {
-        // Not authenticated: redirect to login. Keep `loading` true so the
-        // spinner stays up during the redirect instead of flashing the
-        // "Authentication error" card.
-        router.replace("/admin/login");
+        window.location.href = "/admin/login";
         return;
       }
       const data = await res.json();
       setProfile(data.data);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch admin profile.");
       setLoading(false);
     }
@@ -60,6 +70,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (pathname === "/admin/login") {
+      setShowLogoutConfirm(false);
+      setLoggingOut(false);
+      setProfile(null);
+      setError(null);
       setLoading(false);
       return;
     }
@@ -70,11 +84,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/admin/login");
     } catch (err) {
       console.error("Logout failed:", err);
-      setLoggingOut(false);
+    } finally {
       setShowLogoutConfirm(false);
+      setLoggingOut(false);
+      setProfile(null);
+      setError(null);
+      window.location.href = "/admin/login";
     }
   };
 
@@ -82,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-  if (loading) {
+  if (loading || (!profile && !error)) {
     return (
       <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center text-gray-800">
         <div className="text-center">
@@ -100,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-4" />
           <p className="text-sm mb-4 font-light text-gray-700">{error || "Authentication error."}</p>
           <button
-            onClick={() => router.push("/admin/login")}
+            onClick={() => { window.location.href = "/admin/login"; }}
             className="bg-black text-[#ffffff] text-xs font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-800 cursor-pointer transition-colors"
           >
             Go to Login

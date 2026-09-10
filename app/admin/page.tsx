@@ -40,17 +40,25 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/profile");
+      let res = await fetch("/api/admin/profile");
+      if (res.status === 401) {
+        try {
+          const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
+          if (refreshRes.ok) {
+            res = await fetch("/api/admin/profile");
+          }
+        } catch {
+          // Ignore refresh error
+        }
+      }
       if (!res.ok) {
-        // Not authenticated: redirect to login and keep the spinner up during
-        // the redirect rather than flashing the "Authentication error" card.
-        router.replace("/admin/login");
+        window.location.href = "/admin/login";
         return;
       }
       const data = await res.json();
       setProfile(data.data);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch admin profile.");
       setLoading(false);
     }
@@ -136,7 +144,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (loading) {
+  if (loading || (!profile && !error)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-black" />

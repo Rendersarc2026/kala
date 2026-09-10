@@ -17,9 +17,31 @@ export async function POST() {
       });
     }
 
-    // Delete cookies on the client side
+    // Clear cookies explicitly across all browsers
+    cookieStore.set("admin_access_token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
+    cookieStore.set("admin_refresh_token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
+    cookieStore.set("admin_pre_auth_token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
     cookieStore.delete("admin_access_token");
     cookieStore.delete("admin_refresh_token");
+    cookieStore.delete("admin_pre_auth_token");
 
     const response = NextResponse.json({
       success: true,

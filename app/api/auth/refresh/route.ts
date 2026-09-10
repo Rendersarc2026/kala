@@ -79,7 +79,7 @@ export async function POST() {
     cookieStore.set("admin_access_token", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });
@@ -87,7 +87,7 @@ export async function POST() {
     cookieStore.set("admin_refresh_token", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });

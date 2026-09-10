@@ -149,12 +149,19 @@ export async function POST(request: NextRequest) {
     });
 
     // 6. Set access & refresh tokens in httpOnly, secure cookies, and clear pre-auth cookie
+    cookieStore.set("admin_pre_auth_token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0,
+      path: "/",
+    });
     cookieStore.delete("admin_pre_auth_token");
 
     cookieStore.set("admin_access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });
@@ -162,7 +169,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set("admin_refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: SESSION_EXPIRY_SECONDS, // 12 hours
       path: "/",
     });

@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set("admin_pre_auth_token", preAuthToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 5 * 60, // 5 minutes
       path: "/",
     });

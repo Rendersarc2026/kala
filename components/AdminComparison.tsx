@@ -171,7 +171,7 @@ export default function AdminComparison() {
             Comparison Table
           </h2>
           <p className="font-sans text-sm text-gray-500 mt-2 tracking-wide uppercase">
-            Manage the "How we do things differently" table
+            Manage the &quot;How we do things differently&quot; table
           </p>
         </div>
         {!showForm && (

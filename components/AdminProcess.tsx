@@ -456,7 +456,7 @@ export default function AdminProcess() {
                         >
                           <AlertCircle className="w-8 h-8 text-red-600 mb-2" />
                           <h4 className="text-sm font-semibold text-gray-900">Delete Step?</h4>
-                          <p className="text-xs text-gray-500 mt-1 max-w-xs">This will permanently delete "{s.title}".</p>
+                          <p className="text-xs text-gray-500 mt-1 max-w-xs">This will permanently delete &quot;{s.title}&quot;.</p>
                           <div className="flex items-center gap-3 mt-5">
                             <button
                               onClick={() => setDeleteConfirm(null)}

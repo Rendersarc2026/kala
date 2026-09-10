@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
       try {
         const res = await fetch("/api/admin/profile");
         if (res.ok) {
-          router.replace("/admin");
+          window.location.href = "/admin";
         }
       } catch {
         // Not authenticated, stay on login page
@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
         setStep("otp");
       } else {
         // Fallback if OTP is bypassed (should not happen)
-        router.push("/admin");
+        window.location.href = "/admin";
       }
     } catch (err) {
       setError(
@@ -156,7 +156,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.push("/admin");
+      window.location.href = "/admin";
     } catch (err) {
       setError("Connection error. Please try again.");
     } finally {
