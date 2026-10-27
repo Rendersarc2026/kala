@@ -541,7 +541,7 @@ export default function ContactClient({
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="KALA Studio Location"
+                title="Fermento Casa Location"
               />
             </div>
           </motion.section>

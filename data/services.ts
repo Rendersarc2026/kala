@@ -16,7 +16,7 @@ export const services: Service[] = [
   {
     id: 'renovation',
     title: 'Renovation Projects',
-    description: 'Kala handles renovation projects with a focus on upgrading spaces through smart planning, improved functionality, and modern aesthetics, transforming existing interiors into refreshed, practical, and visually appealing environments.',
+    description: 'Fermento Casa handles renovation projects with a focus on upgrading spaces through smart planning, improved functionality, and modern aesthetics, transforming existing interiors into refreshed, practical, and visually appealing environments.',
     image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/piqsels.com-id-frfbp.jpg',
     details: [
       'Smart planning for existing layouts',
@@ -28,7 +28,7 @@ export const services: Service[] = [
   {
     id: 'management',
     title: 'Project Management & Consulting',
-    description: 'Kala offers project management and consulting services that ensure smooth planning, coordination, and execution at every stage. With a focus on efficiency, clear communication, and attention to detail, each project is delivered in line with design goals, timelines, and client expectations.',
+    description: 'Fermento Casa offers project management and consulting services that ensure smooth planning, coordination, and execution at every stage. With a focus on efficiency, clear communication, and attention to detail, each project is delivered in line with design goals, timelines, and client expectations.',
     image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper.jpg',
     details: [
       'Smooth coordination and stage execution',
@@ -40,7 +40,7 @@ export const services: Service[] = [
   {
     id: 'kitchens',
     title: 'Modular Kitchens',
-    description: 'Kala designs modular kitchens that combine functionality, efficiency, and modern aesthetics, creating well-planned spaces with smart storage and smooth workflow. Each kitchen is carefully designed with ergonomic layouts, high-quality materials, and durable finishes to ensure long-term performance and ease of maintenance. With attention to detailing, organization, and visual balance, Kala delivers kitchens that are practical, stylish, and comfortable for everyday use.',
+    description: 'Fermento Casa designs modular kitchens that combine functionality, efficiency, and modern aesthetics, creating well-planned spaces with smart storage and smooth workflow. Each kitchen is carefully designed with ergonomic layouts, high-quality materials, and durable finishes to ensure long-term performance and ease of maintenance. With attention to detailing, organization, and visual balance, Fermento Casa delivers kitchens that are practical, stylish, and comfortable for everyday use.',
     image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg',
     details: [
       'Ergonomic layouts & smooth workflow',
@@ -52,7 +52,7 @@ export const services: Service[] = [
   {
     id: 'residential',
     title: 'Residential Interiors',
-    description: 'Kala designs residential interiors that blend comfort, functionality, and style, creating well-planned living spaces tailored to everyday needs. With attention to layout, materials, lighting, and detailing, each home is crafted to be practical, cohesive, and reflective of the client’s lifestyle.',
+    description: 'Fermento Casa designs residential interiors that blend comfort, functionality, and style, creating well-planned living spaces tailored to everyday needs. With attention to layout, materials, lighting, and detailing, each home is crafted to be practical, cohesive, and reflective of the client’s lifestyle.',
     image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper.jpg',
     details: [
       'Tailored living spaces for everyday needs',
@@ -64,7 +64,7 @@ export const services: Service[] = [
   {
     id: 'commercial',
     title: 'Commercial Interiors',
-    description: 'Kala designs commercial interiors with a focus on functionality, efficient space planning, and visual appeal, creating well-organized and professional spaces that align with business needs and enhance overall user experience.',
+    description: 'Fermento Casa designs commercial interiors with a focus on functionality, efficient space planning, and visual appeal, creating well-organized and professional spaces that align with business needs and enhance overall user experience.',
     image: 'https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(4).jpg',
     details: [
       'Efficient commercial space planning',

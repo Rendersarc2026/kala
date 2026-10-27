@@ -14,7 +14,7 @@ const FALLBACK_HERO = {
 };
 
 const FALLBACK_ABOUT = {
-  label: "About Kala Studio",
+  label: "About Fermento Casa",
   heading:
     "We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care.",
 };

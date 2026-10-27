@@ -191,7 +191,7 @@ export default function AdminAbout() {
                     disabled={saving}
                     value={label}
                     onChange={(e) => { setLabel(e.target.value); clearFieldError("label"); }}
-                    placeholder="About Kala Studio"
+                    placeholder="About Fermento Casa"
                     className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
                       fieldErrors.label ? "border-red-500 focus:border-red-500" : "border-gray-200"
                     }`}

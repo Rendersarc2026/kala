@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   LayoutDashboard,
   LogOut,
@@ -59,8 +60,8 @@ export default function AdminSidebar({
       {/* Mobile Header Bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#121212] border-b border-[#ffffff]/10 px-6 flex items-center justify-between z-[60]">
         <div>
-          <h1 className="text-lg tracking-[0.3em] text-[#ffffff] font-serif font-bold">
-            KALA
+          <h1>
+            <Image src="/logo.png" alt="Fermento Casa" width={1600} height={398} className="h-5 w-auto object-contain" />
           </h1>
           <p className="text-[8px] uppercase tracking-widest text-[#ffffff]/40 font-semibold mt-0.5">
             Admin Panel
@@ -92,8 +93,8 @@ export default function AdminSidebar({
       >
         {/* Brand */}
         <div className="px-6 pt-8 pb-6 border-b border-[#ffffff]/10">
-          <h1 className="text-xl tracking-[0.3em] text-[#ffffff] font-serif font-bold">
-            KALA
+          <h1>
+            <Image src="/logo.png" alt="Fermento Casa" width={1600} height={398} className="h-8 w-auto object-contain" />
           </h1>
           <p className="text-[10px] uppercase tracking-widest text-[#ffffff]/40 font-semibold mt-1">
             Admin Panel

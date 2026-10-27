@@ -289,7 +289,7 @@ This code is valid for 5 minutes. If you did not request this, please change you
     });
 
     await transporter.sendMail({
-      from: `"Kala Admin Security" <${from}>`,
+      from: `"Fermento Casa Admin Security" <${from}>`,
       to: email,
       subject,
       text: textMessage,

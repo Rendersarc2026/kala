@@ -85,7 +85,7 @@ export default function AboutClient({
             className="lg:col-span-7 space-y-6 text-charcoal-muted font-sans text-sm md:text-base font-light leading-relaxed"
           >
             <p>
-              Kala design and build is a Thalassery-based interior firm founded in 2017 by Rehiyan Raheem K. Our practice is driven by a passion for creating meaningful, elegant, and functional spaces that respond thoughtfully to their context and the aspirations of our clients.
+              Fermento Casa is a Thalassery-based interior firm founded in 2017 by Rehiyan Raheem K. Our practice is driven by a passion for creating meaningful, elegant, and functional spaces that respond thoughtfully to their context and the aspirations of our clients.
             </p>
             <p>
               With extensive experience in architectural design and contracting, we offer comprehensive solutions from concept development to project execution. Our design approach balances aesthetics, practicality, and sustainability, ensuring each project is both timeless and purposeful.
@@ -102,7 +102,7 @@ export default function AboutClient({
             </div>
             
             <p>
-              At Kala design and build, we believe architecture is more than building structures—it is about shaping experiences and environments that enhance everyday living. Every project is treated as a unique collaboration, crafted with attention to detail, quality, and integrity.
+              At Fermento Casa, we believe architecture is more than building structures—it is about shaping experiences and environments that enhance everyday living. Every project is treated as a unique collaboration, crafted with attention to detail, quality, and integrity.
             </p>
           </motion.div>
 

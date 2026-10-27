@@ -132,15 +132,12 @@ export default function Header() {
           >
             <Image
               src="/logo.png"
-              alt="KALA Logo"
-              width={240}
-              height={155}
-              className="h-10 sm:h-12 md:h-16 w-auto object-contain transition-all duration-300"
+              alt="Fermento Casa"
+              width={1600}
+              height={398}
+              className="h-8 sm:h-10 md:h-12 w-auto object-contain transition-all duration-300"
               priority
             />
-            <span className="font-serif text-[10px] sm:text-base md:text-xl tracking-[0.2em] sm:tracking-[0.25em] font-bold transition-colors duration-300 text-[#FFFFFF]">
-              THE KALA INTERIORS
-            </span>
           </Link>
         </div>
       </div>
@@ -225,10 +222,10 @@ export default function Header() {
                   </span>
                   <Image
                     src="/logo.png"
-                    alt="KALA Logo"
-                    width={120}
-                    height={78}
-                    className="h-12 md:h-16 w-auto object-contain"
+                    alt="Fermento Casa"
+                    width={1600}
+                    height={398}
+                    className="h-7 md:h-9 w-auto object-contain"
                     priority
                   />
                 </div>

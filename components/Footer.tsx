@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -44,8 +45,14 @@ export default function Footer() {
           
           {/* Brand Column */}
           <div className="md:col-span-2 space-y-6">
-            <Link href="/" className="font-serif text-3xl tracking-[0.25em] font-light text-bone">
-              KALA
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo.png"
+                alt="Fermento Casa"
+                width={1600}
+                height={398}
+                className="h-10 md:h-12 w-auto object-contain"
+              />
             </Link>
             <p className="font-sans text-sm text-bone/60 max-w-sm leading-relaxed font-light">
               An award-winning interior design studio sculpting architectural spaces, tactile residences, and immersive hospitality environments.
@@ -111,7 +118,7 @@ export default function Footer() {
 
         {/* Bottom Section */}
         <div className="pt-12 flex flex-col md:flex-row items-center justify-between text-xs text-bone/40 space-y-4 md:space-y-0 font-light">
-          <p>&copy; {currentYear} KALA Studio. All rights reserved.</p>
+          <p>&copy; {currentYear} Fermento Casa. All rights reserved.</p>
           <div className="flex space-x-6">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors">
               Instagram

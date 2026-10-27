@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     if (!about) {
       about = {
         id: "about-teaser",
-        label: "About Kala Studio",
+        label: "About Fermento Casa",
         heading: "We sculpt tactile, honest spaces focused on tectonic integrity and sensory warmth. Trusted by clients who demand precision, beauty, and care.",
         paragraph: "",
         image1Url: "",

@@ -242,7 +242,7 @@ export default function AdminContact() {
                   disabled={saving}
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
-                  placeholder="studio@kaladesign.com"
+                  placeholder="studio@fermentocasa.com"
                   className={`w-full bg-[#ffffff] border rounded-lg py-2.5 px-4 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-colors disabled:opacity-55 ${
                     fieldErrors.email ? "border-red-500 focus:border-red-500" : "border-gray-200"
                   }`}

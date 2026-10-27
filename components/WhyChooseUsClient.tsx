@@ -82,7 +82,7 @@ export default function WhyChooseUsClient({
           className="max-w-4xl"
         >
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl text-charcoal font-light leading-[1.15] tracking-wide">
-            Why Choose KALA
+            Why Choose Fermento Casa
           </h1>
           <p className="font-sans text-sm sm:text-base text-charcoal-muted max-w-2xl mt-6 font-light leading-relaxed">
             We bridge the gap between creative architectural design and rigorous
@@ -316,7 +316,7 @@ export default function WhyChooseUsClient({
                   <tr className="bg-charcoal text-white font-sans text-[10px] uppercase tracking-widest border-b border-charcoal/10">
                     <th className="py-5 px-6 font-semibold w-1/4">Feature</th>
                     <th className="py-5 px-6 font-semibold bg-terracotta w-2/5">
-                      KALA Designs
+                      Fermento Casa
                     </th>
                     <th className="py-5 px-6 font-semibold text-white/50 w-2/5">
                       Standard Practice

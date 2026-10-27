@@ -108,7 +108,7 @@ export default function HomeClient({
               ) : (
                 <Image
                   src={heroContent.backgroundImageUrl}
-                  alt="Luxury living space design by KALA"
+                  alt="Luxury living space design by Fermento Casa"
                   fill
                   sizes="100vw"
                   priority
@@ -344,7 +344,7 @@ export default function HomeClient({
       <section className="relative h-[65vh] w-full flex items-center justify-center overflow-hidden bg-charcoal">
         <Image
           src="https://paifcnthsfxutublwcja.supabase.co/storage/v1/object/public/kala%20images/interior/wallpaperflare.com_wallpaper%20(2).jpg"
-          alt="Minimalist design interior by KALA"
+          alt="Minimalist design interior by Fermento Casa"
           fill
           sizes="100vw"
           className="object-cover opacity-60 object-center grayscale"

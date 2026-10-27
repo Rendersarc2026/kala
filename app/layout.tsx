@@ -14,18 +14,18 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'KALA | Premium Interior Design Studio',
+  title: 'Fermento Casa | Premium Interior Design Studio',
   description: 'An award-winning interior design studio specializing in residential, commercial, and hospitality interiors. Sculpting warm, tactile spaces with a refined editorial aesthetic.',
   keywords: ['interior design', 'luxury residential design', 'hospitality interiors', 'commercial architects', 'modular kitchens', 'soho design studio'],
-  authors: [{ name: 'KALA Studio' }],
-  creator: 'KALA Studio',
+  authors: [{ name: 'Fermento Casa' }],
+  creator: 'Fermento Casa',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://kaladesign.com',
-    title: 'KALA | Premium Interior Design Studio',
+    title: 'Fermento Casa | Premium Interior Design Studio',
     description: 'Bespoke residential, commercial, and hospitality interiors designed with meticulous craftsmanship.',
-    siteName: 'KALA Studio',
+    siteName: 'Fermento Casa',
   },
 };
 

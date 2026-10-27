@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Lock,
   Mail,
@@ -174,8 +175,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md z-10 transition-all duration-500 transform scale-100">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-light tracking-[0.3em] text-[#ffffff] mb-2 select-text font-serif">
-            KALA
+          <h1 className="mb-3 flex justify-center">
+            <Image src="/logo.png" alt="Fermento Casa" width={1600} height={398} className="h-12 w-auto object-contain" priority />
           </h1>
           <p className="text-xs uppercase tracking-widest text-[#ffffff]/40 font-semibold font-sans">
             Administration Portal

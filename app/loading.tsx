@@ -20,7 +20,7 @@ export default function Loading() {
         {/* Minimalist Brand Accent */}
         <div className="space-y-1.5 select-none">
           <h2 className="font-serif text-sm tracking-[0.35em] uppercase text-charcoal font-light">
-            KALA
+            FERMENTO CASA
           </h2>
           <p className="font-sans text-[8px] uppercase tracking-widest text-charcoal-muted">
             Loading Space

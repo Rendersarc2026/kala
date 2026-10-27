@@ -6,7 +6,7 @@ export const teamMembers: TeamMember[] = [
     name: 'Rehiyan',
     role: 'Founder',
     image: '/team/rehiyan.png',
-    bio: 'Kala is led by its founder Rehiyan, whose vision and dedication drive the company forward. With a strong focus on design, quality, and client satisfaction, his leadership guides a skilled team committed to delivering well-planned, functional, and aesthetically refined interior solutions.',
+    bio: 'Fermento Casa is led by its founder Rehiyan, whose vision and dedication drive the company forward. With a strong focus on design, quality, and client satisfaction, his leadership guides a skilled team committed to delivering well-planned, functional, and aesthetically refined interior solutions.',
   },
   {
     id: '2',

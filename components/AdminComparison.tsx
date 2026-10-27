@@ -95,7 +95,7 @@ export default function AdminComparison() {
     const errs: Partial<Record<keyof ComparisonItemData, string>> = {};
 
     if (!form.feature.trim()) errs.feature = "Feature name is required";
-    if (!form.kala.trim()) errs.kala = "Kala value is required";
+    if (!form.kala.trim()) errs.kala = "Fermento Casa value is required";
     if (!form.others.trim()) errs.others = "Others value is required";
 
     const orderValue = typeof form.sortOrder === "string" ? parseInt(form.sortOrder) : form.sortOrder;
@@ -221,7 +221,7 @@ export default function AdminComparison() {
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                    Kala Designs
+                    Fermento Casa
                   </label>
                   <textarea
                     name="kala"
@@ -345,7 +345,7 @@ export default function AdminComparison() {
                       
                       <div className="md:col-span-1 border-l border-gray-100 pl-4">
                         <span className="font-sans text-[10px] uppercase tracking-widest text-terracotta font-bold block mb-1">
-                          Kala Designs
+                          Fermento Casa
                         </span>
                         <p className="font-sans text-sm text-gray-700 leading-relaxed font-medium">
                           {s.kala}
